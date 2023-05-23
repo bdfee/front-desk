@@ -1,5 +1,5 @@
 import { Router } from "express";
-import Specialist from "../models/specialist";
+import { Specialist } from "../models";
 
 const router = Router();
 
