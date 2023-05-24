@@ -37,13 +37,25 @@ router.get("/:id", async (req, res) => {
 router.put("/:id", async (req, res) => {
   try {
     const specialist = await Specialist.findByPk(req.params.id);
-    if (specialist) {
-      const updatedSpecialist = await specialist.update({ ...specialist, ...req.body });
-      res.json(updatedSpecialist);
-    }
+    const updatedSpecialist = await specialist?.update({ ...specialist, ...req.body });
+    res.json(updatedSpecialist);
   } catch (error) {
     console.log("Error updateing specialist: ", error);
     res.status(500).json({ error: "Error updating specialist: " + error });
+  }
+});
+
+router.delete("/:id", async (req, res) => {
+  try {
+    await Specialist.destroy({
+      where: {
+        specialistId: req.params.id,
+      },
+    });
+    res.status(204).end();
+  } catch (error) {
+    console.log("Error deleting specialist: ", error);
+    res.status(500).json({ error: "Error deleting specialist: " + error });
   }
 });
 
