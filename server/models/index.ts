@@ -1,13 +1,21 @@
 import Patient from "./patient";
-import Calendar from "./calendar";
 import Appointment from "./appointment";
 import Specialist from "./specialist";
-import AppointmentType from "./appointmentType";
 
-Patient.sync().catch((error) => console.log("error syncing Patient: " + error));
-Specialist.sync().catch((error) => console.log("error syncing Specialist: " + error));
-Calendar.sync().catch((error) => console.log("error syncing Calendar: " + error));
-Appointment.sync().catch((error) => console.log("error syncing Appointment: " + error));
-AppointmentType.sync().catch((error) => console.log("error syncing AppointmentType: " + error));
+const isDev = process.env.NODE_ENV === "dev";
 
-export { Patient, Calendar, Appointment, Specialist, AppointmentType };
+Appointment.belongsTo(Patient, {
+  foreignKey: "patientId",
+});
+Appointment.belongsTo(Specialist, {
+  foreignKey: "specialistId",
+});
+Patient.belongsTo(Specialist, {
+  foreignKey: "specialistId",
+});
+
+Patient.sync({ alter: isDev }).catch((error) => console.log("error syncing Patient: " + error));
+Specialist.sync({ alter: isDev }).catch((error) => console.log("error syncing Specialist: " + error));
+Appointment.sync({ alter: isDev }).catch((error) => console.log("error syncing Appointment: " + error));
+
+export { Patient, Appointment, Specialist };
