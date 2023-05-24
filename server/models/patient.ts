@@ -1,8 +1,15 @@
-import { Model, DataTypes } from "sequelize";
+import { Model, InferAttributes, InferCreationAttributes, CreationOptional, DataTypes } from "sequelize";
 import { sequelize } from "../utils/connectToDb";
-import { PatientAttributes } from "../types";
 
-class Patient extends Model<PatientAttributes> {}
+class Patient extends Model<InferAttributes<Patient>, InferCreationAttributes<Patient>> {
+  declare patientId: CreationOptional<number>;
+  declare name: string;
+  declare email: string;
+  declare phone: string;
+  declare dateOfBirth: string;
+  declare gender: string;
+  declare address: string;
+}
 
 Patient.init(
   {
@@ -11,10 +18,7 @@ Patient.init(
       primaryKey: true,
       autoIncrement: true,
     },
-    specialistId: {
-      type: DataTypes.INTEGER,
-    },
-    patientName: {
+    name: {
       type: DataTypes.STRING,
     },
     email: {
@@ -24,10 +28,10 @@ Patient.init(
       type: DataTypes.STRING,
     },
     dateOfBirth: {
-      type: DataTypes.DATE,
+      type: DataTypes.STRING,
     },
     gender: {
-      type: DataTypes.STRING,
+      type: DataTypes.ENUM("male", "female", "nonbinary", "other"),
     },
     address: {
       type: DataTypes.STRING,
@@ -37,6 +41,7 @@ Patient.init(
     sequelize,
     underscored: true,
     timestamps: false,
+    tableName: "patients",
     modelName: "patient",
   }
 );

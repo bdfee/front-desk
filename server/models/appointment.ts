@@ -1,17 +1,14 @@
-import { Model, DataTypes } from "sequelize";
+import { Model, InferAttributes, InferCreationAttributes, CreationOptional, DataTypes } from "sequelize";
 import { sequelize } from "../utils/connectToDb";
 
-interface AppointmentAttributes {
-  appointmentId: number;
-  patientId: number;
-  specialistId: number;
-  appointmentDate: Date;
-  appointmentDuration: string;
-  appointmentType: string;
-  description: string;
+class Appointment extends Model<InferAttributes<Appointment>, InferCreationAttributes<Appointment>> {
+  declare appointmentId: CreationOptional<number>;
+  declare date: string;
+  declare start: string;
+  declare end: string;
+  declare type: string;
+  declare description: string;
 }
-
-class Appointment extends Model<AppointmentAttributes> {}
 
 Appointment.init(
   {
@@ -20,29 +17,27 @@ Appointment.init(
       primaryKey: true,
       autoIncrement: true,
     },
-    patientId: {
-      type: DataTypes.INTEGER,
-    },
-    specialistId: {
-      type: DataTypes.INTEGER,
-    },
-    appointmentDate: {
-      type: DataTypes.DATE,
-    },
-    appointmentDuration: {
+    date: {
       type: DataTypes.STRING,
     },
-    appointmentType: {
+    start: {
       type: DataTypes.STRING,
+    },
+    end: {
+      type: DataTypes.STRING,
+    },
+    type: {
+      type: DataTypes.ENUM("intake", "physicalTherapy", "nutrition"),
     },
     description: {
-      type: DataTypes.STRING,
+      type: DataTypes.TEXT,
     },
   },
   {
     sequelize,
     underscored: true,
     timestamps: false,
+    tableName: "appointments",
     modelName: "appointment",
   }
 );

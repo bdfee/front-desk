@@ -1,13 +1,11 @@
-import { Model, DataTypes } from "sequelize";
+import { Model, DataTypes, InferAttributes, InferCreationAttributes, CreationOptional } from "sequelize";
 import { sequelize } from "../utils/connectToDb";
 
-interface SpecialistAttributes {
-  specialistId: number;
-  specialistName: string;
-  specialty: string;
+class Specialist extends Model<InferAttributes<Specialist>, InferCreationAttributes<Specialist>> {
+  declare specialistId: CreationOptional<number>;
+  declare name: string;
+  declare speciality: string;
 }
-
-class Specialist extends Model<SpecialistAttributes> {}
 
 Specialist.init(
   {
@@ -16,10 +14,10 @@ Specialist.init(
       primaryKey: true,
       autoIncrement: true,
     },
-    specialistName: {
+    name: {
       type: DataTypes.STRING,
     },
-    specialty: {
+    speciality: {
       type: DataTypes.STRING,
     },
   },
@@ -27,6 +25,7 @@ Specialist.init(
     sequelize,
     underscored: true,
     timestamps: false,
+    tableName: "specialists",
     modelName: "specialist",
   }
 );
