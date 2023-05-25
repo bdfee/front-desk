@@ -1,11 +1,13 @@
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 import { Router } from "express";
 import { Patient } from "../models";
+import { updateOneById } from "../services/appointment";
+import * as patientService from "../services/patient";
 const router = Router();
 
 router.get("/", async (_req, res) => {
   try {
-    const patients = await Patient.findAll();
+    const patients = await patientService.getAll();
     res.json(patients);
   } catch (error) {
     console.log("Error getting patients:", error);
@@ -25,7 +27,7 @@ router.post("/", async (req, res) => {
 
 router.get("/:id", async (req, res) => {
   try {
-    const patient = await Patient.findByPk(req.params.id);
+    const patient = await patientService.getOneById(req.params.id);
     res.json(patient);
   } catch (error) {
     console.log("Error posting patient:", error);
@@ -35,8 +37,7 @@ router.get("/:id", async (req, res) => {
 
 router.put("/:id", async (req, res) => {
   try {
-    const patient = await Patient.findByPk(req.params.id);
-    const updatedPatient = await patient?.update({ ...patient, ...req.body });
+    const updatedPatient = await updateOneById(req.params.id, req.body);
     res.json(updatedPatient);
   } catch (error) {
     console.log("Error updating patient: ", error);
@@ -46,11 +47,7 @@ router.put("/:id", async (req, res) => {
 
 router.delete("/:id", async (req, res) => {
   try {
-    await Patient.destroy({
-      where: {
-        patientId: req.params.id,
-      },
-    });
+    await patientService.deleteOneById(req.params.id);
     res.status(204).end();
   } catch (error) {
     console.log("Error deleting patient: ", error);
