@@ -21,21 +21,27 @@ Patient.init(
     },
     name: {
       type: DataTypes.STRING,
+      allowNull: false,
     },
     email: {
       type: DataTypes.STRING,
+      allowNull: false,
     },
     phone: {
       type: DataTypes.STRING,
+      allowNull: false,
     },
     dateOfBirth: {
       type: DataTypes.STRING,
+      allowNull: false,
     },
     gender: {
       type: DataTypes.ENUM("male", "female", "nonbinary", "other"),
+      allowNull: false,
     },
     address: {
       type: DataTypes.STRING,
+      allowNull: false,
     },
   },
   {

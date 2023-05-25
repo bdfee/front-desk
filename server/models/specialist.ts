@@ -16,9 +16,18 @@ Specialist.init(
     },
     name: {
       type: DataTypes.STRING,
+      allowNull: false,
+      unique: true,
+      validate: {
+        notEmpty: true,
+      },
     },
     speciality: {
       type: DataTypes.STRING,
+      allowNull: false,
+      validate: {
+        notEmpty: true,
+      },
     },
   },
   {
