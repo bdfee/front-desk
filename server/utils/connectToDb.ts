@@ -1,7 +1,9 @@
 import { Sequelize } from "sequelize";
-import { DB_URI } from "./config";
+import { DB_URI, TEST_DB_URI } from "./config";
 
-export const sequelize = new Sequelize(DB_URI as string);
+const isTest = process.env.NODE_ENV === "test";
+
+export const sequelize = new Sequelize((isTest ? TEST_DB_URI : DB_URI) as string);
 
 export const connectToDatabase = async () => {
   try {

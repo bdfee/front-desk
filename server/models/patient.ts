@@ -1,8 +1,9 @@
-import { Model, InferAttributes, InferCreationAttributes, CreationOptional, DataTypes } from "sequelize";
+import { Model, InferAttributes, InferCreationAttributes, CreationOptional, DataTypes, ForeignKey } from "sequelize";
 import { sequelize } from "../utils/connectToDb";
 
 class Patient extends Model<InferAttributes<Patient>, InferCreationAttributes<Patient>> {
   declare patientId: CreationOptional<number>;
+  declare specialistId: ForeignKey<number>;
   declare name: string;
   declare email: string;
   declare phone: string;
