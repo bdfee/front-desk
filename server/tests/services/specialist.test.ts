@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
 import { Specialist } from "../../models";
 import { sequelize } from "../../utils/connectToDb";
 import { createTestSpecialist, dropAllTables } from "../helpers";
@@ -16,6 +15,19 @@ describe("deleting specialists", () => {
 
     expect(await Specialist.count()).toBe(1);
   });
+
+  test("no id match returns expected message", async () => {
+    await createTestSpecialist();
+    expect(await Specialist.count()).toBe(1);
+
+    try {
+      await deleteOneById("2");
+    } catch (error) {
+      error instanceof Error && expect(error.message).toBe("No matching specialist id found");
+    }
+
+    expect(await Specialist.count()).toBe(1);
+  });
 });
 
 describe("updating specialists", () => {
@@ -28,6 +40,20 @@ describe("updating specialists", () => {
     const updatedSpecialist = await Specialist.findByPk(specialist.specialistId);
 
     expect(updatedSpecialist?.name).toEqual("update name");
+    expect(await Specialist.count()).toBe(1);
+  });
+
+  test("no id match returns expected message", async () => {
+    const specialist = await createTestSpecialist();
+    expect(await Specialist.count()).toBe(1);
+
+    try {
+      await updateOneById("2", { name: "update name" });
+    } catch (error) {
+      error instanceof Error && expect(error.message).toBe("No matching specialist id found");
+    }
+    const unchangedSpecialist = await Specialist.findByPk(specialist.specialistId);
+    expect(unchangedSpecialist?.name).toBe("test specialist");
     expect(await Specialist.count()).toBe(1);
   });
 });
