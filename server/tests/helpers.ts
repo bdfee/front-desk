@@ -1,5 +1,5 @@
-import { Specialist, Patient, Appointment } from "../../models";
-import { sequelize } from "../../utils/connectToDb";
+import { Specialist, Patient, Appointment } from "../models";
+import { sequelize } from "../utils/connectToDb";
 
 export const createTestSpecialist = async () => {
   return Specialist.create({

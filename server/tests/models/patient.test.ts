@@ -1,5 +1,5 @@
 import { Specialist, Appointment, Patient } from "../../models";
-import { createTestPatientAndSpecialist, createTestSpecialist, dropAllTables } from "./helpers";
+import { createTestPatientAndSpecialist, createTestSpecialist, dropAllTables } from "../helpers";
 import { sequelize } from "../../utils/connectToDb";
 
 beforeEach(async () => await dropAllTables());
