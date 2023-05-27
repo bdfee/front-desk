@@ -21,18 +21,41 @@ Appointment.init(
     },
     date: {
       type: DataTypes.STRING,
+      allowNull: false,
+      validate: {
+        notEmpty: true,
+        isDate: true,
+      },
     },
     start: {
       type: DataTypes.STRING,
+      allowNull: false,
+      validate: {
+        notEmpty: true,
+        is: /^(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d$/,
+      },
     },
     end: {
       type: DataTypes.STRING,
+      allowNull: false,
+      validate: {
+        notEmpty: true,
+        is: /^(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d$/,
+      },
     },
     type: {
       type: DataTypes.ENUM("intake", "physicalTherapy", "nutrition"),
+      allowNull: false,
+      validate: {
+        notEmpty: true,
+      },
     },
     description: {
       type: DataTypes.TEXT,
+      allowNull: false,
+      validate: {
+        notEmpty: true,
+      },
     },
   },
   {
