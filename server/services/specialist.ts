@@ -1,5 +1,17 @@
 import { Specialist } from "../models";
 
+export const getAll = async () => Specialist.findAll();
+
+export const getOneById = async (id: string) => {
+  const specialist = await Specialist.findByPk(id);
+
+  if (specialist === null) {
+    throw new Error("No matching patient id found");
+  }
+
+  return specialist;
+};
+
 export const deleteOneById = async (id: string) => {
   const specialist = await Specialist.findByPk(id);
 

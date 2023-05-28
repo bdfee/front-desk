@@ -1,9 +1,27 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { Specialist } from "../../models";
 import { sequelize } from "../../utils/connectToDb";
 import { createTestSpecialist, dropAllTables } from "../helpers";
 import { deleteOneById, updateOneById } from "../../services/specialist";
 
 beforeEach(async () => await dropAllTables());
+
+const expectSpecialistInformation = (specialist: object) => {
+  expect(specialist).toMatchObject({
+    specialistId: expect.any(Number),
+    name: expect.any(String),
+    speciality: expect.any(String),
+  });
+};
+
+describe("returned shape", () => {
+  test("updateOneById()", async () => {
+    const { specialistId } = await createTestSpecialist();
+    const update = { name: "update name" };
+    const updatedSpecialist = await updateOneById(`${specialistId}`, update);
+    expectSpecialistInformation(updatedSpecialist);
+  });
+});
 
 describe("deleteOneById()", () => {
   test("can delete by ID", async () => {

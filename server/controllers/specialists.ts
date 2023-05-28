@@ -7,7 +7,7 @@ const router = Router();
 
 router.get("/", async (_req, res) => {
   try {
-    const specialists = await Specialist.findAll();
+    const specialists = await specialistService.getAll();
     res.json(specialists);
   } catch (error) {
     console.log("Error getting specialists: ", error);
@@ -27,7 +27,7 @@ router.post("/", async (req, res) => {
 
 router.get("/:id", async (req, res) => {
   try {
-    const specialist = await Specialist.findByPk(req.params.id);
+    const specialist = await specialistService.getOneById(req.params.id);
     res.json(specialist);
   } catch (error) {
     console.log("Error getting specialist: ", error);
