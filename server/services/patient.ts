@@ -5,14 +5,18 @@ export const getAll = async () => {
     include: [
       {
         model: Specialist,
+        as: "specialist",
         attributes: ["name"],
       },
     ],
+    attributes: {
+      exclude: ["specialistId"],
+    },
   });
 };
 
 export const getOneById = async (id: string) => {
-  return Patient.findOne({
+  const patient = await Patient.findOne({
     where: {
       patientId: id,
     },
@@ -23,14 +27,23 @@ export const getOneById = async (id: string) => {
       },
     ],
   });
+
+  if (patient === null) {
+    throw new Error("No matching patient id found");
+  }
+
+  return patient;
 };
 
 export const deleteOneById = async (id: string) => {
-  return Patient.destroy({
-    where: {
-      patientId: id,
-    },
-  });
+  const patient = await Patient.findByPk(id);
+
+  if (!patient) {
+    throw new Error("No matching patient id found");
+  }
+
+  await patient.destroy();
+  return 1;
 };
 
 export const updateOneById = async (id: string, body: object) => {
@@ -45,5 +58,8 @@ export const updateOneById = async (id: string, body: object) => {
       },
     ],
   });
-  return patient?.update({ ...patient, ...body });
+  if (!patient) {
+    throw new Error("No matching patient id found");
+  }
+  return patient.update({ ...patient, ...body });
 };

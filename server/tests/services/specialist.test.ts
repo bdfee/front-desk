@@ -5,7 +5,7 @@ import { deleteOneById, updateOneById } from "../../services/specialist";
 
 beforeEach(async () => await dropAllTables());
 
-describe("deleting specialists", () => {
+describe("deleteOneById()", () => {
   test("can delete by ID", async () => {
     const { specialistId } = await createTestSpecialist();
     await createTestSpecialist();
@@ -30,7 +30,7 @@ describe("deleting specialists", () => {
   });
 });
 
-describe("updating specialists", () => {
+describe("updateOneById()", () => {
   test("can update by ID", async () => {
     const specialist = await createTestSpecialist();
     await updateOneById(`${specialist.specialistId}`, { name: "update name" });
@@ -43,7 +43,7 @@ describe("updating specialists", () => {
     expect(await Specialist.count()).toBe(1);
   });
 
-  test("no id match returns expected message", async () => {
+  test("no id match returns expected error message", async () => {
     const specialist = await createTestSpecialist();
     expect(await Specialist.count()).toBe(1);
 
@@ -59,5 +59,3 @@ describe("updating specialists", () => {
 });
 
 afterAll(async () => await sequelize.close());
-
-// what error is returned?
