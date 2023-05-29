@@ -1,16 +1,15 @@
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { Specialist } from "../../models";
 import { sequelize } from "../../utils/connectToDb";
 import { createTestSpecialist, dropAllTables } from "../helpers";
-import { deleteOneById, updateOneById } from "../../services/specialist";
-
+import { deleteOneById, updateOneById, getOneById, create } from "../../services/specialist";
+import { isSpecialistInput } from "../../types";
 beforeEach(async () => await dropAllTables());
 
 const expectSpecialistInformation = (specialist: object) => {
   expect(specialist).toMatchObject({
-    specialistId: expect.any(Number),
-    name: expect.any(String),
-    speciality: expect.any(String),
+    specialistId: expect.any(Number) as unknown as number,
+    name: expect.any(String) as unknown as string,
+    speciality: expect.any(String) as unknown as string,
   });
 };
 
@@ -18,8 +17,60 @@ describe("returned shape", () => {
   test("updateOneById()", async () => {
     const { specialistId } = await createTestSpecialist();
     const update = { name: "update name" };
-    const updatedSpecialist = await updateOneById(`${specialistId}`, update);
-    expectSpecialistInformation(updatedSpecialist);
+    expectSpecialistInformation(await updateOneById(`${specialistId}`, update));
+  });
+
+  test("create()", async () => {
+    const specialist = await create({
+      name: "test specialist",
+      speciality: "testing",
+    });
+    if (isSpecialistInput(specialist)) {
+      expectSpecialistInformation(specialist);
+    }
+  });
+
+  test("getOneById()", async () => {
+    const { specialistId } = await createTestSpecialist();
+    expectSpecialistInformation(await getOneById(`${specialistId}`));
+  });
+});
+
+describe("create()", () => {
+  test("creates specialist", async () => {
+    expect(await Specialist.count()).toBe(0);
+    await create({
+      name: "test specialist",
+      speciality: "test speciality",
+    });
+    expect(await Specialist.count()).toBe(1);
+  });
+
+  test("no creation returns expected message", async () => {
+    // todo
+  });
+});
+
+describe("getOneById()", () => {
+  test("returns specialist", async () => {
+    await createTestSpecialist();
+    const { specialistId } = await createTestSpecialist();
+    expect(await Specialist.count()).toBe(2);
+    const specialist = await getOneById(`${specialistId}`);
+
+    expect(specialist.specialistId).toBe(2);
+  });
+  test("no id match returns expected message", async () => {
+    await createTestSpecialist();
+    expect(await Specialist.count()).toBe(1);
+
+    try {
+      await getOneById("2");
+    } catch (error) {
+      error instanceof Error && expect(error.message).toBe("No matching specialist id found");
+    }
+
+    expect(await Specialist.count()).toBe(1);
   });
 });
 

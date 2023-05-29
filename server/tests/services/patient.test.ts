@@ -1,37 +1,41 @@
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { Patient } from "../../models";
 import { sequelize } from "../../utils/connectToDb";
 import { createTestPatientAndSpecialist, dropAllTables } from "../helpers";
 import { getAll, deleteOneById, updateOneById, getOneById } from "../../services/patient";
+// import { isPatientInput } from "../../types";
 
 beforeEach(async () => await dropAllTables());
 
 const expectPatientInformation = (patient: object) => {
   expect(patient).toMatchObject({
-    patientId: expect.any(Number),
-    name: expect.any(String),
-    email: expect.any(String),
-    phone: expect.any(String),
-    dateOfBirth: expect.any(String),
-    gender: expect.any(String),
-    address: expect.any(String),
+    patientId: expect.any(Number) as unknown as number,
+    name: expect.any(String) as unknown as string,
+    email: expect.any(String) as unknown as string,
+    phone: expect.any(String) as unknown as string,
+    dateOfBirth: expect.any(String) as unknown as string,
+    gender: expect.any(String) as unknown as string,
+    address: expect.any(String) as unknown as string,
     specialist: {
-      name: expect.any(String),
+      name: expect.any(String) as unknown as string,
     },
   });
 };
 
 describe("returned shape", () => {
-  test("getAll() patient", async () => {
+  test("getAll()", async () => {
     await createTestPatientAndSpecialist();
     const [patient] = await getAll();
     expectPatientInformation(patient);
   });
 
-  test("getOneById patient", async () => {
+  test("getOneById()", async () => {
     await createTestPatientAndSpecialist();
     const patient = await getOneById("1");
     expectPatientInformation(patient);
+  });
+
+  test("create()", async () => {
+    // todo
   });
 
   test("updateOneById() patient", async () => {
@@ -39,6 +43,12 @@ describe("returned shape", () => {
     const update = { name: "update name" };
     const updatedPatient = await updateOneById(`${patientId}`, update);
     expectPatientInformation(updatedPatient);
+  });
+});
+
+describe("create()", () => {
+  test("creates patient", async () => {
+    // todo
   });
 });
 

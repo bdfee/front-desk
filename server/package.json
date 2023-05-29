@@ -9,7 +9,7 @@
     "start": "ts-node index.ts",
     "lint": "eslint --ext .ts .",
     "dev": "NODE_ENV=dev ts-node-dev index.ts",
-    "test": "NODE_ENV=test jest --verbose --runInBand"
+    "test": "NODE_ENV=test jest --runInBand"
   },
   "author": "",
   "license": "ISC",
