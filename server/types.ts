@@ -1,26 +1,15 @@
-import { Specialist, Patient } from "./models";
+import { InferAttributes } from "sequelize";
+import { Appointment, Patient, Specialist } from "./models";
 
-export const isSpecialistInput = (object: unknown): object is Specialist => {
-  if (typeof object !== "object" || object === null) {
-    return false;
-  }
-
-  const { name, speciality } = object as Specialist;
-  return typeof name === "string" && typeof speciality === "string";
+export type PatientAttributes = InferAttributes<Patient>;
+export type PatientInformationAttributes = Omit<PatientAttributes, "specialistId"> & {
+  specialist: object;
 };
 
-export const isPatientInput = (object: unknown): object is Patient => {
-  if (typeof object !== "object" || object === null) {
-    return false;
-  }
-  const { name, email, phone, dateOfBirth, gender, address, specialist } = object as Patient;
-  return (
-    typeof name === "string" &&
-    typeof email === "string" &&
-    typeof phone === "string" &&
-    typeof dateOfBirth === "string" &&
-    typeof gender === "string" &&
-    typeof address === "string" &&
-    typeof specialist === "object"
-  );
+export type SpecialistInformationAttributes = InferAttributes<Specialist>;
+
+export type AppointmentAttributes = InferAttributes<Appointment>;
+export type AppointmentInformationAttributes = Omit<AppointmentAttributes, "specialistId" | "patientId"> & {
+  specialist: object;
+  patient: object;
 };

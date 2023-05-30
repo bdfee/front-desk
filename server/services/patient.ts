@@ -1,4 +1,13 @@
 import { Patient, Specialist } from "../models";
+import { isPatientInput } from "../typeUtils";
+
+export const create = async (patientInput: object) => {
+  if (!isPatientInput(patientInput)) {
+    throw new Error("Malformed or missing patient input");
+  }
+
+  return Patient.create(patientInput);
+};
 
 export const getAll = async () => {
   return Patient.findAll({
@@ -15,7 +24,7 @@ export const getAll = async () => {
   });
 };
 
-export const getOneById = async (id: string) => {
+export const getOneById = async (id: number) => {
   const patient = await Patient.findOne({
     where: {
       patientId: id,
@@ -35,7 +44,7 @@ export const getOneById = async (id: string) => {
   return patient;
 };
 
-export const deleteOneById = async (id: string) => {
+export const deleteOneById = async (id: number) => {
   const patient = await Patient.findByPk(id);
 
   if (!patient) {
@@ -46,7 +55,7 @@ export const deleteOneById = async (id: string) => {
   return 1;
 };
 
-export const updateOneById = async (id: string, body: object) => {
+export const updateOneById = async (id: number, body: object) => {
   const patient = await Patient.findOne({
     where: {
       patientId: id,

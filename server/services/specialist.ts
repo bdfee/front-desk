@@ -1,5 +1,5 @@
 import { Specialist } from "../models";
-import { isSpecialistInput } from "../types";
+import { isSpecialistInput } from "../typeUtils";
 export const getAll = async () => Specialist.findAll();
 
 export const create = async (specialistInput: object) => {
@@ -10,7 +10,7 @@ export const create = async (specialistInput: object) => {
   return Specialist.create(specialistInput);
 };
 
-export const getOneById = async (id: string) => {
+export const getOneById = async (id: number) => {
   const specialist = await Specialist.findByPk(id);
 
   if (specialist === null) {
@@ -20,7 +20,7 @@ export const getOneById = async (id: string) => {
   return specialist;
 };
 
-export const deleteOneById = async (id: string) => {
+export const deleteOneById = async (id: number) => {
   const specialist = await Specialist.findByPk(id);
 
   if (!specialist) {
@@ -32,7 +32,7 @@ export const deleteOneById = async (id: string) => {
   return 1;
 };
 
-export const updateOneById = async (id: string, body: object) => {
+export const updateOneById = async (id: number, body: object) => {
   const specialist = await Specialist.findByPk(id);
 
   if (!specialist) {

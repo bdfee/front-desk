@@ -1,4 +1,14 @@
-import { Model, InferAttributes, InferCreationAttributes, CreationOptional, DataTypes, ForeignKey } from "sequelize";
+import {
+  Model,
+  InferAttributes,
+  InferCreationAttributes,
+  NonAttribute,
+  CreationOptional,
+  DataTypes,
+  ForeignKey,
+} from "sequelize";
+import Specialist from "./specialist";
+import Patient from "./patient";
 import { sequelize } from "../utils/connectToDb";
 
 class Appointment extends Model<InferAttributes<Appointment>, InferCreationAttributes<Appointment>> {
@@ -10,6 +20,8 @@ class Appointment extends Model<InferAttributes<Appointment>, InferCreationAttri
   declare end: string;
   declare type: string;
   declare description: string;
+  declare specialist?: NonAttribute<Specialist>;
+  declare patient?: NonAttribute<Patient>;
 }
 
 Appointment.init(

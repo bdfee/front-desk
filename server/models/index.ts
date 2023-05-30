@@ -39,8 +39,8 @@ Appointment.belongsTo(Specialist, {
 //   },
 // });
 
-Patient.sync({ alter: isDev }).catch((error) => console.log("error syncing Patient: " + error));
-Specialist.sync({ alter: isDev }).catch((error) => console.log("error syncing Specialist: " + error));
-Appointment.sync({ alter: isDev }).catch((error) => console.log("error syncing Appointment: " + error));
+Patient.sync({ alter: isDev }).catch((error) => console.error("error syncing Patient: " + error));
+Specialist.sync({ alter: isDev }).catch((error) => console.error("error syncing Specialist: " + error));
+Appointment.sync({ alter: isDev }).catch((error) => console.error("error syncing Appointment: " + error));
 
 export { Patient, Appointment, Specialist };

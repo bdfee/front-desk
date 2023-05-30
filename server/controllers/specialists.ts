@@ -10,7 +10,7 @@ router.get("/", async (_req, res) => {
     const specialists = await specialistService.getAll();
     res.json(specialists);
   } catch (error) {
-    console.log("Error getting specialists: ", error);
+    console.error("Error getting specialists: ", error);
     res.status(400).json({ error: "Error getting specialists: " + error });
   }
 });
@@ -20,7 +20,7 @@ router.post("/", async (req, res) => {
     const specialist = await Specialist.create(req.body);
     res.json(specialist);
   } catch (error) {
-    console.log("Error creating specialists: ", error);
+    console.error("Error creating specialists: ", error);
     res.status(400).json({ error: "Error creating specialists: " + error });
   }
 });
@@ -30,7 +30,7 @@ router.get("/:id", async (req, res) => {
     const specialist = await specialistService.getOneById(req.params.id);
     res.json(specialist);
   } catch (error) {
-    console.log("Error getting specialist: ", error);
+    console.error("Error getting specialist: ", error);
     res.status(400).json({ error: "Error getting specialist: " + error });
   }
 });
@@ -40,7 +40,7 @@ router.put("/:id", async (req, res) => {
     const updatedSpecialist = await specialistService.updateOneById(req.params.id, req.body);
     res.json(updatedSpecialist);
   } catch (error) {
-    console.log("Error updating specialist: ", error);
+    console.error("Error updating specialist: ", error);
     res.status(400).json({ error: "Error updating specialist: " + error });
   }
 });
@@ -50,7 +50,7 @@ router.delete("/:id", async (req, res) => {
     await specialistService.deleteOneById(req.params.id);
     res.status(204).end();
   } catch (error) {
-    console.log("Error deleting specialist: ", error);
+    console.error("Error deleting specialist: ", error);
     res.status(400).json({ error: "Error deleting specialist: " + error });
   }
 });
