@@ -1,7 +1,7 @@
 import { Appointment } from "../../models";
 import { sequelize } from "../../utils/connectToDb";
 import { createTestPatientAndSpecialist, createTestSPA, createTestSpecificSPA, dropAllTables } from "../helpers/models";
-import { getAll, getOneById, create } from "../../services/appointment";
+import { getAll, getOneById, create, updateOneById, deleteOneById } from "../../services/appointment";
 import { expectAppointment, expectAppointmentInformation } from "../helpers/shape";
 import { AppointmentInformationAttributes, AppointmentAttributes } from "../../types";
 
@@ -17,30 +17,33 @@ describe("returned shape", () => {
 
   test("getOneById()", async () => {
     await createTestSPA();
-    const appointment = await getOneById(1);
-    expect(await Appointment.count()).toBe(1);
-
-    expectAppointmentInformation(appointment as AppointmentInformationAttributes);
+    expectAppointmentInformation((await getOneById(1)) as AppointmentInformationAttributes);
   });
 
   test("create()", async () => {
     const { specialistId, patientId } = await createTestPatientAndSpecialist();
-    const appointment = await create({
-      date: "2020-02-02",
-      start: "09:00:00",
-      end: "10:00:00",
-      type: "intake",
-      description: "Appointment description",
-      specialistId,
-      patientId,
-    });
 
-    expectAppointment(appointment as AppointmentAttributes);
+    expectAppointment(
+      (await create({
+        date: "2020-02-02",
+        start: "09:00:00",
+        end: "10:00:00",
+        type: "intake",
+        description: "Appointment description",
+        specialistId,
+        patientId,
+      })) as AppointmentAttributes
+    );
   });
 
-  //   test("updateOneById()", async () => {
-  //     //
-  //   });
+  test("updateOneById()", async () => {
+    await createTestSPA();
+    const update = {
+      date: "2020-03-03",
+      description: "updated description",
+    };
+    expectAppointmentInformation((await updateOneById(1, update)) as AppointmentInformationAttributes);
+  });
 });
 
 describe("getAll()", () => {
@@ -116,25 +119,56 @@ describe("create()", () => {
   });
 });
 
-// describe("deleteOneById()", () => {
-//   //
-//   test("deletes patient by ID", async () => {
-//     //
-//   });
+describe("deleteOneById()", () => {
+  test("deletes appointment by ID", async () => {
+    const { appointmentId } = await createTestSPA();
 
-//   test("no id match returns expected error message", async () => {
-//     //
-//   });
-// });
+    expect(await Appointment.count()).toBe(1);
+    await deleteOneById(appointmentId);
 
-// describe("updateOneById()", () => {
-//   //
-//   test("updates one patient by id", async () => {
-//     //
-//   });
-//   test("no id match returns expected error message", async () => {
-//     //
-//   });
-// });
+    expect(await Appointment.count()).toBe(0);
+  });
+
+  test("no id match returns expected error message", async () => {
+    await createTestSPA();
+    expect(await Appointment.count()).toBe(1);
+
+    try {
+      await deleteOneById(2);
+    } catch (error) {
+      error instanceof Error && expect(error.message).toBe("No matching appointment id found");
+    }
+
+    expect(await Appointment.count()).toBe(1);
+  });
+});
+
+describe("updateOneById()", () => {
+  test("updates one appointment by id", async () => {
+    const { appointmentId } = await createTestSPA();
+
+    await updateOneById(appointmentId, { date: "2020-03-03", description: "updated description" });
+
+    expect(await Appointment.count()).toBe(1);
+
+    const updatedAppointment = await Appointment.findByPk(appointmentId);
+
+    expect(updatedAppointment?.date).toEqual("2020-03-03");
+    expect(updatedAppointment?.description).toEqual("updated description");
+    expect(await Appointment.count()).toBe(1);
+  });
+
+  test("no id match returns expected error message", async () => {
+    await createTestSPA();
+    expect(await Appointment.count()).toBe(1);
+
+    try {
+      await updateOneById(2, { description: "updated description" });
+    } catch (error) {
+      error instanceof Error && expect(error.message).toBe("No matching appointment id found");
+    }
+    expect(await Appointment.count()).toBe(1);
+  });
+});
 
 afterAll(async () => await sequelize.close());

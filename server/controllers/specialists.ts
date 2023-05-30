@@ -27,7 +27,7 @@ router.post("/", async (req, res) => {
 
 router.get("/:id", async (req, res) => {
   try {
-    const specialist = await specialistService.getOneById(req.params.id);
+    const specialist = await specialistService.getOneById(+req.params.id);
     res.json(specialist);
   } catch (error) {
     console.error("Error getting specialist: ", error);
@@ -37,7 +37,7 @@ router.get("/:id", async (req, res) => {
 
 router.put("/:id", async (req, res) => {
   try {
-    const updatedSpecialist = await specialistService.updateOneById(req.params.id, req.body);
+    const updatedSpecialist = await specialistService.updateOneById(+req.params.id, req.body);
     res.json(updatedSpecialist);
   } catch (error) {
     console.error("Error updating specialist: ", error);
@@ -47,7 +47,7 @@ router.put("/:id", async (req, res) => {
 
 router.delete("/:id", async (req, res) => {
   try {
-    await specialistService.deleteOneById(req.params.id);
+    await specialistService.deleteOneById(+req.params.id);
     res.status(204).end();
   } catch (error) {
     console.error("Error deleting specialist: ", error);

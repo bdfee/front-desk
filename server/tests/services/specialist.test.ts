@@ -14,11 +14,12 @@ describe("returned shape", () => {
   });
 
   test("create()", async () => {
-    const specialist = await create({
-      name: "test specialist",
-      speciality: "testing",
-    });
-    expectSpecialistInformation(specialist);
+    expectSpecialistInformation(
+      await create({
+        name: "test specialist",
+        speciality: "testing",
+      })
+    );
   });
 
   test("getOneById()", async () => {

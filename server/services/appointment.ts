@@ -6,23 +6,7 @@ export const create = async (appointmentInput: object) => {
     throw new Error("Malformed or missing appointment input");
   }
 
-  return Appointment.create(appointmentInput, {
-    include: [
-      {
-        model: Specialist,
-        as: "specialist",
-        attributes: ["name"],
-      },
-      {
-        model: Patient,
-        as: "patient",
-        attributes: ["name"],
-      },
-    ],
-    attributes: {
-      exclude: ["specialistId", "patientId"],
-    },
-  });
+  return Appointment.create(appointmentInput);
 };
 
 export const getAll = async () => {
@@ -65,11 +49,14 @@ export const getOneById = async (id: number) => {
 };
 
 export const deleteOneById = async (id: number) => {
-  return Appointment.destroy({
-    where: {
-      appointmentId: id,
-    },
-  });
+  const appointment = await Appointment.findByPk(id);
+
+  if (!appointment) {
+    throw new Error("No matching appointment id found");
+  }
+
+  await appointment.destroy();
+  return 1;
 };
 
 export const updateOneById = async (id: number, body: object) => {
@@ -88,5 +75,10 @@ export const updateOneById = async (id: number, body: object) => {
       },
     ],
   });
-  return appointment?.update({ ...appointment, ...body });
+
+  if (!appointment) {
+    throw new Error("No matching appointment id found");
+  }
+
+  return appointment.update({ ...appointment, ...body });
 };

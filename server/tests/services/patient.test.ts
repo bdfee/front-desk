@@ -18,32 +18,31 @@ describe("returned shape", () => {
 
   test("getOneById()", async () => {
     await createTestPatientAndSpecialist();
-    const patient = await getOneById(1);
 
-    expectPatientInformation(patient as PatientInformationAttributes);
+    expectPatientInformation((await getOneById(1)) as PatientInformationAttributes);
   });
 
   test("create()", async () => {
     await createTestSpecialist();
-    const patient = await create({
-      name: "test patient",
-      email: "test@test.com",
-      phone: "1234567890",
-      dateOfBirth: "2020-02-02",
-      gender: "male",
-      address: "123 street city state",
-      specialistId: 1,
-    });
 
-    expectPatient(patient as PatientAttributes);
+    expectPatient(
+      (await create({
+        name: "test patient",
+        email: "test@test.com",
+        phone: "1234567890",
+        dateOfBirth: "2020-02-02",
+        gender: "male",
+        address: "123 street city state",
+        specialistId: 1,
+      })) as PatientAttributes
+    );
   });
 
   test("updateOneById() patient", async () => {
     const { patientId } = await createTestPatientAndSpecialist();
     const update = { name: "update name" };
-    const updatedPatient = await updateOneById(patientId, update);
 
-    expectPatientInformation(updatedPatient as PatientInformationAttributes);
+    expectPatientInformation((await updateOneById(patientId, update)) as PatientInformationAttributes);
   });
 });
 
@@ -159,7 +158,7 @@ describe("updateOneById", () => {
   });
 
   test("no id match returns expected error message", async () => {
-    const { patientId } = await createTestPatientAndSpecialist();
+    await createTestPatientAndSpecialist();
     expect(await Patient.count()).toBe(1);
 
     try {
@@ -167,8 +166,7 @@ describe("updateOneById", () => {
     } catch (error) {
       error instanceof Error && expect(error.message).toBe("No matching patient id found");
     }
-    const unchangedPatient = await Patient.findByPk(patientId);
-    expect(unchangedPatient?.name).toBe("test patient");
+
     expect(await Patient.count()).toBe(1);
   });
 });

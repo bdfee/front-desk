@@ -27,7 +27,7 @@ router.post("/", async (req, res) => {
 
 router.get("/:id", async (req, res) => {
   try {
-    const patient = await patientService.getOneById(req.params.id);
+    const patient = await patientService.getOneById(+req.params.id);
     res.json(patient);
   } catch (error) {
     console.error("Error posting patient:", error);
@@ -37,7 +37,7 @@ router.get("/:id", async (req, res) => {
 
 router.put("/:id", async (req, res) => {
   try {
-    const updatedPatient = await updateOneById(req.params.id, req.body);
+    const updatedPatient = await updateOneById(+req.params.id, req.body);
     res.json(updatedPatient);
   } catch (error) {
     console.error("Error updating patient: ", error);
@@ -47,7 +47,7 @@ router.put("/:id", async (req, res) => {
 
 router.delete("/:id", async (req, res) => {
   try {
-    await patientService.deleteOneById(req.params.id);
+    await patientService.deleteOneById(+req.params.id);
     res.status(204).end();
   } catch (error) {
     console.error("Error deleting patient: ", error);

@@ -26,7 +26,7 @@ router.post("/", async (req, res) => {
 
 router.get("/:id", async (req, res) => {
   try {
-    const appointment = await appointmentService.getOneById(req.params.id);
+    const appointment = await appointmentService.getOneById(+req.params.id);
     res.json(appointment);
   } catch (error) {
     console.error("Error getting appointment: ", error);
@@ -36,7 +36,7 @@ router.get("/:id", async (req, res) => {
 
 router.put("/:id", async (req, res) => {
   try {
-    const updatedAppointment = await appointmentService.updateOneById(req.params.id, req.body);
+    const updatedAppointment = await appointmentService.updateOneById(+req.params.id, req.body);
     res.json(updatedAppointment);
   } catch (error) {
     console.error("Error updating appointment: ", error);
@@ -46,7 +46,7 @@ router.put("/:id", async (req, res) => {
 
 router.delete("/:id", async (req, res) => {
   try {
-    await appointmentService.deleteOneById(req.params.id);
+    await appointmentService.deleteOneById(+req.params.id);
     res.status(204).end();
   } catch (error) {
     console.error("Error deleting appointment: ", error);
