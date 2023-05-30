@@ -24,21 +24,6 @@ Appointment.belongsTo(Specialist, {
   },
 });
 
-// something weird here
-
-// Patient.hasOne(Specialist, {
-//   foreignKey: {
-//     name: "specialistId",
-//     allowNull: false,
-//   },
-// });
-// Specialist.hasMany(Patient, {
-//   foreignKey: {
-//     name: "specialistId",
-//     allowNull: false,
-//   },
-// });
-
 Patient.sync({ alter: isDev }).catch((error) => console.error("error syncing Patient: " + error));
 Specialist.sync({ alter: isDev }).catch((error) => console.error("error syncing Specialist: " + error));
 Appointment.sync({ alter: isDev }).catch((error) => console.error("error syncing Appointment: " + error));
