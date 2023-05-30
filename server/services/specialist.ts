@@ -1,8 +1,7 @@
 import { Specialist } from "../models";
 import { isSpecialistInput } from "../typeUtils";
-export const getAll = async () => Specialist.findAll();
 
-export const create = async (specialistInput: object) => {
+export const create = async (specialistInput: object): Promise<Specialist> => {
   if (!isSpecialistInput(specialistInput)) {
     throw new Error("Malformed or missing specialist input");
   }
@@ -10,7 +9,11 @@ export const create = async (specialistInput: object) => {
   return Specialist.create(specialistInput);
 };
 
-export const getOneById = async (id: number) => {
+export const getAll = async (): Promise<Specialist[]> => {
+  return Specialist.findAll();
+};
+
+export const getOneById = async (id: number): Promise<Specialist> => {
   const specialist = await Specialist.findByPk(id);
 
   if (specialist === null) {
@@ -32,7 +35,7 @@ export const deleteOneById = async (id: number) => {
   return 1;
 };
 
-export const updateOneById = async (id: number, body: object) => {
+export const updateOneById = async (id: number, body: object): Promise<Specialist> => {
   const specialist = await Specialist.findByPk(id);
 
   if (!specialist) {

@@ -9,7 +9,7 @@ export const create = async (patientInput: object) => {
   return Patient.create(patientInput);
 };
 
-export const getAll = async () => {
+export const getAll = async (): Promise<Patient[]> => {
   return Patient.findAll({
     include: [
       {
@@ -24,7 +24,7 @@ export const getAll = async () => {
   });
 };
 
-export const getOneById = async (id: number) => {
+export const getOneById = async (id: number): Promise<Patient> => {
   const patient = await Patient.findOne({
     where: {
       patientId: id,
@@ -55,7 +55,7 @@ export const deleteOneById = async (id: number) => {
   return 1;
 };
 
-export const updateOneById = async (id: number, body: object) => {
+export const updateOneById = async (id: number, body: object): Promise<Patient> => {
   const patient = await Patient.findOne({
     where: {
       patientId: id,

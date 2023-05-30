@@ -5,16 +5,25 @@ import { PatientInformationAttributes, AppointmentInformationAttributes } from "
 
 export const isSpecialistInput = (object: unknown): object is Specialist => {
   if (typeof object !== "object" || object === null) {
-    return false;
+    throw new Error("malformed or missing object");
   }
 
   const { name, speciality } = object as Specialist;
   return typeof name === "string" && typeof speciality === "string";
 };
 
+export const isSpecialist = (object: unknown): object is Specialist => {
+  if (typeof object !== "object" || object === null) {
+    throw new Error("malformed or missing object");
+  }
+
+  const { specialistId, name, speciality } = object as Specialist;
+  return typeof specialistId === "number" && typeof name === "string" && typeof speciality === "string";
+};
+
 export const isPatientInput = (object: unknown): object is Patient => {
   if (typeof object !== "object" || object === null) {
-    return false;
+    throw new Error("malformed or missing object");
   }
   const { name, email, phone, dateOfBirth, gender, address, specialistId } = object as Patient;
   return (
@@ -30,7 +39,7 @@ export const isPatientInput = (object: unknown): object is Patient => {
 
 export const isPatientInformation = (object: unknown): object is PatientInformationAttributes => {
   if (typeof object !== "object" || object === null) {
-    return false;
+    throw new Error("malformed or missing object");
   }
 
   const { name, email, phone, dateOfBirth, gender, address, specialist } = object as PatientInformationAttributes;
@@ -50,7 +59,7 @@ export const isPatientInformation = (object: unknown): object is PatientInformat
 
 export const isAppointmentInput = (object: unknown): object is Appointment => {
   if (typeof object !== "object" || object === null) {
-    return false;
+    throw new Error("malformed or missing object");
   }
   const { patientId, specialistId, date, start, end, type, description } = object as Appointment;
 
@@ -67,7 +76,7 @@ export const isAppointmentInput = (object: unknown): object is Appointment => {
 
 export const isAppointmentInformation = (object: unknown): object is AppointmentInformationAttributes => {
   if (typeof object !== "object" || object === null) {
-    return false;
+    throw new Error("malformed or missing object");
   }
 
   const { date, start, end, type, description, specialist, patient } = object as AppointmentInformationAttributes;

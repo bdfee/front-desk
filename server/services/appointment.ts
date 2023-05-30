@@ -1,7 +1,7 @@
 import { Appointment, Specialist, Patient } from "../models";
 import { isAppointmentInput } from "../typeUtils";
 
-export const create = async (appointmentInput: object) => {
+export const create = async (appointmentInput: object): Promise<Appointment> => {
   if (!isAppointmentInput(appointmentInput)) {
     throw new Error("Malformed or missing appointment input");
   }
@@ -9,7 +9,7 @@ export const create = async (appointmentInput: object) => {
   return Appointment.create(appointmentInput);
 };
 
-export const getAll = async () => {
+export const getAll = async (): Promise<Appointment[]> => {
   return Appointment.findAll({
     include: [
       {
@@ -24,7 +24,7 @@ export const getAll = async () => {
   });
 };
 
-export const getOneById = async (id: number) => {
+export const getOneById = async (id: number): Promise<Appointment> => {
   const appointment = await Appointment.findOne({
     where: {
       appointmentId: id,
@@ -59,7 +59,7 @@ export const deleteOneById = async (id: number) => {
   return 1;
 };
 
-export const updateOneById = async (id: number, body: object) => {
+export const updateOneById = async (id: number, body: object): Promise<Appointment> => {
   const appointment = await Appointment.findOne({
     where: {
       appointmentId: id,
