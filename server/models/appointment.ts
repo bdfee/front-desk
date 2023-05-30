@@ -1,13 +1,27 @@
-import { Model, InferAttributes, InferCreationAttributes, CreationOptional, DataTypes } from "sequelize";
+import {
+  Model,
+  InferAttributes,
+  InferCreationAttributes,
+  NonAttribute,
+  CreationOptional,
+  DataTypes,
+  ForeignKey,
+} from "sequelize";
+import Specialist from "./specialist";
+import Patient from "./patient";
 import { sequelize } from "../utils/connectToDb";
 
 class Appointment extends Model<InferAttributes<Appointment>, InferCreationAttributes<Appointment>> {
   declare appointmentId: CreationOptional<number>;
+  declare patientId: ForeignKey<number>;
+  declare specialistId: ForeignKey<number>;
   declare date: string;
   declare start: string;
   declare end: string;
   declare type: string;
   declare description: string;
+  declare specialist?: NonAttribute<Specialist>;
+  declare patient?: NonAttribute<Patient>;
 }
 
 Appointment.init(
@@ -19,18 +33,41 @@ Appointment.init(
     },
     date: {
       type: DataTypes.STRING,
+      allowNull: false,
+      validate: {
+        notEmpty: true,
+        isDate: true,
+      },
     },
     start: {
       type: DataTypes.STRING,
+      allowNull: false,
+      validate: {
+        notEmpty: true,
+        is: /^(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d$/,
+      },
     },
     end: {
       type: DataTypes.STRING,
+      allowNull: false,
+      validate: {
+        notEmpty: true,
+        is: /^(?:[01]\d|2[0-3]):[0-5]\d:[0-5]\d$/,
+      },
     },
     type: {
       type: DataTypes.ENUM("intake", "physicalTherapy", "nutrition"),
+      allowNull: false,
+      validate: {
+        notEmpty: true,
+      },
     },
     description: {
       type: DataTypes.TEXT,
+      allowNull: false,
+      validate: {
+        notEmpty: true,
+      },
     },
   },
   {

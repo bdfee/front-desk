@@ -1,4 +1,13 @@
 import { Appointment, Specialist, Patient } from "../models";
+import { isAppointmentInput } from "../typeUtils";
+
+export const create = async (appointmentInput: object) => {
+  if (!isAppointmentInput(appointmentInput)) {
+    throw new Error("Malformed or missing appointment input");
+  }
+
+  return Appointment.create(appointmentInput);
+};
 
 export const getAll = async () => {
   return Appointment.findAll({
@@ -15,33 +24,7 @@ export const getAll = async () => {
   });
 };
 
-export const getOneById = async (id: string) => {
-  return Appointment.findOne({
-    where: {
-      appointmentId: id,
-    },
-    include: [
-      {
-        model: Specialist,
-        attributes: ["name"],
-      },
-      {
-        model: Patient,
-        attributes: ["name"],
-      },
-    ],
-  });
-};
-
-export const deleteOneById = async (id: string) => {
-  return Appointment.destroy({
-    where: {
-      appointmentId: id,
-    },
-  });
-};
-
-export const updateOneById = async (id: string, body: object) => {
+export const getOneById = async (id: number) => {
   const appointment = await Appointment.findOne({
     where: {
       appointmentId: id,
@@ -57,5 +40,45 @@ export const updateOneById = async (id: string, body: object) => {
       },
     ],
   });
-  return appointment?.update({ ...appointment, ...body });
+
+  if (appointment === null) {
+    throw new Error("No matching appointment id found");
+  }
+
+  return appointment;
+};
+
+export const deleteOneById = async (id: number) => {
+  const appointment = await Appointment.findByPk(id);
+
+  if (!appointment) {
+    throw new Error("No matching appointment id found");
+  }
+
+  await appointment.destroy();
+  return 1;
+};
+
+export const updateOneById = async (id: number, body: object) => {
+  const appointment = await Appointment.findOne({
+    where: {
+      appointmentId: id,
+    },
+    include: [
+      {
+        model: Specialist,
+        attributes: ["name"],
+      },
+      {
+        model: Patient,
+        attributes: ["name"],
+      },
+    ],
+  });
+
+  if (!appointment) {
+    throw new Error("No matching appointment id found");
+  }
+
+  return appointment.update({ ...appointment, ...body });
 };

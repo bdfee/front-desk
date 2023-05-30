@@ -4,18 +4,43 @@ import Specialist from "./specialist";
 
 const isDev = process.env.NODE_ENV === "dev";
 
-Appointment.belongsTo(Patient, {
-  foreignKey: "patientId",
-});
-Appointment.belongsTo(Specialist, {
-  foreignKey: "specialistId",
-});
 Patient.belongsTo(Specialist, {
-  foreignKey: "specialistId",
+  foreignKey: {
+    name: "specialistId",
+    allowNull: false,
+  },
 });
 
-Patient.sync({ alter: isDev }).catch((error) => console.log("error syncing Patient: " + error));
-Specialist.sync({ alter: isDev }).catch((error) => console.log("error syncing Specialist: " + error));
-Appointment.sync({ alter: isDev }).catch((error) => console.log("error syncing Appointment: " + error));
+Appointment.belongsTo(Patient, {
+  foreignKey: {
+    name: "patientId",
+    allowNull: false,
+  },
+});
+Appointment.belongsTo(Specialist, {
+  foreignKey: {
+    name: "specialistId",
+    allowNull: false,
+  },
+});
+
+// something weird here
+
+// Patient.hasOne(Specialist, {
+//   foreignKey: {
+//     name: "specialistId",
+//     allowNull: false,
+//   },
+// });
+// Specialist.hasMany(Patient, {
+//   foreignKey: {
+//     name: "specialistId",
+//     allowNull: false,
+//   },
+// });
+
+Patient.sync({ alter: isDev }).catch((error) => console.error("error syncing Patient: " + error));
+Specialist.sync({ alter: isDev }).catch((error) => console.error("error syncing Specialist: " + error));
+Appointment.sync({ alter: isDev }).catch((error) => console.error("error syncing Appointment: " + error));
 
 export { Patient, Appointment, Specialist };
