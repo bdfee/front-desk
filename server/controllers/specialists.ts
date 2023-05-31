@@ -1,7 +1,7 @@
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
 import { Router } from "express";
 import { Specialist } from "../models";
 import * as specialistService from "../services/specialist";
+import { isSpecialistInput } from "../typeUtils";
 
 const router = Router();
 
@@ -17,8 +17,10 @@ router.get("/", async (_req, res) => {
 
 router.post("/", async (req, res) => {
   try {
-    const specialist = await Specialist.create(req.body);
-    res.json(specialist);
+    if (isSpecialistInput(req.body)) {
+      const specialist = await Specialist.create(req.body);
+      res.json(specialist);
+    }
   } catch (error) {
     console.error("Error creating specialists: ", error);
     res.status(400).json({ error: "Error creating specialists: " + error });

@@ -169,6 +169,17 @@ describe("updateOneById", () => {
 
     expect(await Patient.count()).toBe(1);
   });
+
+  test("invalid property returns expected error message", async () => {
+    await createTestPatientAndSpecialist();
+    expect(await Patient.count()).toBe(1);
+
+    try {
+      await updateOneById(1, { invalid: "invalid update" });
+    } catch (error) {
+      error instanceof Error && expect(error.message).toBe("invalid property");
+    }
+  });
 });
 
 afterAll(async () => await sequelize.close());

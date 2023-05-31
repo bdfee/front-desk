@@ -1,8 +1,7 @@
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
 import { Router } from "express";
 import { Patient } from "../models";
-import { updateOneById } from "../services/appointment";
 import * as patientService from "../services/patient";
+import { isPatientInput } from "../typeUtils";
 const router = Router();
 
 router.get("/", async (_req, res) => {
@@ -17,8 +16,10 @@ router.get("/", async (_req, res) => {
 
 router.post("/", async (req, res) => {
   try {
-    const patient = await Patient.create(req.body);
-    res.json(patient);
+    if (isPatientInput(req.body)) {
+      const patient = await Patient.create(req.body);
+      res.json(patient);
+    }
   } catch (error) {
     console.error("Error posting patient:", error);
     res.status(400).json({ error: "Error posting patient: " + error });
@@ -37,7 +38,7 @@ router.get("/:id", async (req, res) => {
 
 router.put("/:id", async (req, res) => {
   try {
-    const updatedPatient = await updateOneById(+req.params.id, req.body);
+    const updatedPatient = await patientService.updateOneById(+req.params.id, req.body);
     res.json(updatedPatient);
   } catch (error) {
     console.error("Error updating patient: ", error);

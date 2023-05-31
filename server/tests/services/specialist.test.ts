@@ -21,6 +21,7 @@ describe("returned shape", () => {
       })
     );
   });
+  Specialist.getAttributes();
 
   test("getOneById()", async () => {
     const { specialistId } = await createTestSpecialist();
@@ -123,6 +124,17 @@ describe("updateOneById()", () => {
     const unchangedSpecialist = await Specialist.findByPk(specialist.specialistId);
     expect(unchangedSpecialist?.name).toBe("test specialist");
     expect(await Specialist.count()).toBe(1);
+  });
+
+  test("invalid property returns expected error message", async () => {
+    await createTestSpecialist();
+    expect(await Specialist.count()).toBe(1);
+
+    try {
+      await updateOneById(1, { invalid: "invalid update" });
+    } catch (error) {
+      error instanceof Error && expect(error.message).toBe("invalid property");
+    }
   });
 });
 

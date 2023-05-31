@@ -1,8 +1,8 @@
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
 import { Router } from "express";
 import { Appointment } from "../models";
 const router = Router();
 import * as appointmentService from "../services/appointment";
+import { isAppointmentInput } from "../typeUtils";
 
 router.get("/", async (_req, res) => {
   try {
@@ -16,8 +16,10 @@ router.get("/", async (_req, res) => {
 
 router.post("/", async (req, res) => {
   try {
-    const appointment = await Appointment.create(req.body);
-    res.json(appointment);
+    if (isAppointmentInput(req.body)) {
+      const appointment = await Appointment.create(req.body);
+      res.json(appointment);
+    }
   } catch (error) {
     console.error("Error creating appointments", error);
     res.status(400).json({ error: "Error getting appointments" + error });

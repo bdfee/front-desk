@@ -1,5 +1,5 @@
 import { Appointment, Specialist, Patient } from "../models";
-import { isAppointmentInput } from "../typeUtils";
+import { appointmentProperties, isAppointmentInput } from "../typeUtils";
 
 export const create = async (appointmentInput: object): Promise<Appointment> => {
   if (!isAppointmentInput(appointmentInput)) {
@@ -59,7 +59,7 @@ export const deleteOneById = async (id: number) => {
   return 1;
 };
 
-export const updateOneById = async (id: number, body: object): Promise<Appointment> => {
+export const updateOneById = async (id: number, object: unknown): Promise<Appointment> => {
   const appointment = await Appointment.findOne({
     where: {
       appointmentId: id,
@@ -80,5 +80,9 @@ export const updateOneById = async (id: number, body: object): Promise<Appointme
     throw new Error("No matching appointment id found");
   }
 
-  return appointment.update({ ...appointment, ...body });
+  if (!appointmentProperties(object)) {
+    throw new Error("Invalid property");
+  }
+
+  return appointment.update({ ...appointment, ...object });
 };

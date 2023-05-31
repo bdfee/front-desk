@@ -1,7 +1,11 @@
 import { Specialist, Patient, Appointment } from "./models";
-import { PatientInformationAttributes, AppointmentInformationAttributes } from "./types";
-
-// check for properties and assert type
+import {
+  PatientInformationAttributes,
+  AppointmentInformationAttributes,
+  SpecialistProperties,
+  PatientProperties,
+  AppointmentProperties,
+} from "./types";
 
 export const isSpecialistInput = (object: unknown): object is Specialist => {
   if (typeof object !== "object" || object === null) {
@@ -19,6 +23,30 @@ export const isSpecialist = (object: unknown): object is Specialist => {
 
   const { specialistId, name, speciality } = object as Specialist;
   return typeof specialistId === "number" && typeof name === "string" && typeof speciality === "string";
+};
+
+export const specialistProperties = (object: unknown): object is SpecialistProperties => {
+  if (typeof object !== "object" || object === null) {
+    throw new Error("malformed or missing object");
+  }
+  for (const key in object) {
+    if (!["specialistId", "name", "speciality"].includes(key)) {
+      throw new Error("invalid property");
+    }
+  }
+  return true;
+};
+
+export const patientProperties = (object: unknown): object is PatientProperties => {
+  if (typeof object !== "object" || object === null) {
+    throw new Error("malformed or missing object");
+  }
+  for (const key in object) {
+    if (!["name", "email", "phone", "dateOfBirth", "gender", "address", "specialistId"].includes(key)) {
+      throw new Error("invalid property");
+    }
+  }
+  return true;
 };
 
 export const isPatientInput = (object: unknown): object is Patient => {
@@ -55,6 +83,18 @@ export const isPatientInformation = (object: unknown): object is PatientInformat
     typeof specialist === "object" &&
     typeof specialistName === "string"
   );
+};
+
+export const appointmentProperties = (object: unknown): object is AppointmentProperties => {
+  if (typeof object !== "object" || object === null) {
+    throw new Error("malformed or missing object");
+  }
+  for (const key in object) {
+    if (!["patientId", "specialistId", "date", "start", "end", "type", "description"].includes(key)) {
+      throw new Error("invalid property");
+    }
+  }
+  return true;
 };
 
 export const isAppointmentInput = (object: unknown): object is Appointment => {

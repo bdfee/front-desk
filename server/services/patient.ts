@@ -1,5 +1,5 @@
 import { Patient, Specialist } from "../models";
-import { isPatientInput } from "../typeUtils";
+import { isPatientInput, patientProperties } from "../typeUtils";
 
 export const create = async (patientInput: object) => {
   if (!isPatientInput(patientInput)) {
@@ -55,7 +55,7 @@ export const deleteOneById = async (id: number) => {
   return 1;
 };
 
-export const updateOneById = async (id: number, body: object): Promise<Patient> => {
+export const updateOneById = async (id: number, object: unknown): Promise<Patient> => {
   const patient = await Patient.findOne({
     where: {
       patientId: id,
@@ -70,5 +70,10 @@ export const updateOneById = async (id: number, body: object): Promise<Patient> 
   if (!patient) {
     throw new Error("No matching patient id found");
   }
-  return patient.update({ ...patient, ...body });
+
+  if (!patientProperties(object)) {
+    throw new Error("Invalid property");
+  }
+
+  return patient.update({ ...patient, ...object });
 };
