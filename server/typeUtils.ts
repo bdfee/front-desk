@@ -7,9 +7,10 @@ import {
   AppointmentProperties,
 } from "./types";
 
+// specialist
 export const isSpecialistInput = (object: unknown): object is Specialist => {
-  if (typeof object !== "object" || object === null) {
-    throw new Error("malformed or missing object");
+  if (typeof object !== "object" || object === null || "specialistId" in object) {
+    return false;
   }
 
   const { name, speciality } = object as Specialist;
@@ -18,20 +19,21 @@ export const isSpecialistInput = (object: unknown): object is Specialist => {
 
 export const isSpecialist = (object: unknown): object is Specialist => {
   if (typeof object !== "object" || object === null) {
-    throw new Error("malformed or missing object");
+    return false;
   }
 
   const { specialistId, name, speciality } = object as Specialist;
   return typeof specialistId === "number" && typeof name === "string" && typeof speciality === "string";
 };
 
-export const specialistProperties = (object: unknown): object is SpecialistProperties => {
+export const validSpecialistProperties = (object: unknown): object is SpecialistProperties => {
   if (typeof object !== "object" || object === null) {
-    throw new Error("malformed or missing object");
+    return false;
   }
+
   for (const key in object) {
     if (!["specialistId", "name", "speciality"].includes(key)) {
-      throw new Error("invalid property");
+      return false;
     }
   }
   return true;

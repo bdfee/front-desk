@@ -2,11 +2,19 @@ import { Specialist } from "../../models";
 import { sequelize } from "../../utils/connectToDb";
 import { createTestSpecialist, dropAllTables } from "../helpers/models";
 import { expectSpecialistInformation } from "../helpers/shape";
-import { deleteOneById, updateOneById, getOneById, create } from "../../services/specialist";
+import { deleteOneById, updateOneById, getOneById, create, getAll } from "../../services/specialist";
+import { SpecialistInformationAttributes } from "../../types";
 
 beforeEach(async () => await dropAllTables());
 
 describe("returned shape", () => {
+  test("getAll()", async () => {
+    await createTestSpecialist();
+    const [specialist] = await getAll();
+
+    expectSpecialistInformation(specialist as SpecialistInformationAttributes);
+  });
+
   test("updateOneById()", async () => {
     const { specialistId } = await createTestSpecialist();
     const update = { name: "update name" };
@@ -46,8 +54,24 @@ describe("create()", () => {
         speciality: "test speciality",
       });
     } catch (error) {
-      error instanceof Error && expect(error.message).toBe("Malformed or missing specialist input");
+      error instanceof Error && expect(error.message).toBe("malformed or invalid value on specialist input");
     }
+  });
+});
+
+describe("getAll()", () => {
+  test("returns all specialists", async () => {
+    await createTestSpecialist();
+    await createTestSpecialist();
+    await createTestSpecialist();
+
+    expect(await Specialist.count()).toBe(3);
+    expect(await getAll()).toHaveLength(3);
+  });
+
+  test("no patients returns empty array", async () => {
+    expect(await Specialist.count()).toBe(0);
+    expect(await getAll()).toHaveLength(0);
   });
 });
 
@@ -133,7 +157,7 @@ describe("updateOneById()", () => {
     try {
       await updateOneById(1, { invalid: "invalid update" });
     } catch (error) {
-      error instanceof Error && expect(error.message).toBe("invalid property");
+      error instanceof Error && expect(error.message).toBe("Invalid property");
     }
   });
 });

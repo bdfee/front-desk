@@ -1,12 +1,20 @@
 import { Specialist } from "../models";
-import { isSpecialistInput, specialistProperties } from "../typeUtils";
+import { isSpecialistInput, validSpecialistProperties } from "../typeUtils";
 
 export const create = async (object: unknown): Promise<Specialist> => {
-  if (!isSpecialistInput(object)) {
-    throw new Error("Malformed or missing specialist input");
+  if (!validSpecialistProperties(object)) {
+    throw new Error("invalid property on specialist input");
   }
 
-  return Specialist.create(object);
+  if (!isSpecialistInput(object)) {
+    throw new Error("malformed or invalid value on specialist input");
+  }
+
+  try {
+    return Specialist.create(object);
+  } catch (error) {
+    throw new Error("unknown error creating specialist: " + error);
+  }
 };
 
 export const getAll = async (): Promise<Specialist[]> => {
@@ -42,7 +50,7 @@ export const updateOneById = async (id: number, object: unknown): Promise<Specia
     throw new Error("No matching specialist id found");
   }
 
-  if (!specialistProperties(object)) {
+  if (!validSpecialistProperties(object)) {
     throw new Error("Invalid property");
   }
 
