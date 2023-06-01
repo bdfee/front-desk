@@ -35,8 +35,7 @@ describe("/api/specialists", () => {
         .send({ invalid: "invalid", name: "test specialist", speciality: "testing" });
 
       expect(response.status).toBe(400);
-      const responseBody = JSON.parse(response.text);
-      expect(responseBody.error).toBe("Error posting specialists: Error: invalid property on specialist input");
+      expect(response.body.error).toBe("Error posting specialist: Error: invalid property on specialist input");
       expect(await Specialist.count()).toBe(0);
     });
 
@@ -44,9 +43,8 @@ describe("/api/specialists", () => {
       const response = await api.post("/api/specialists").send({ name: 12345, speciality: "testing" });
 
       expect(response.status).toBe(400);
-      const responseBody = JSON.parse(response.text);
-      expect(responseBody.error).toBe(
-        "Error posting specialists: Error: malformed or invalid value on specialist input"
+      expect(response.body.error).toBe(
+        "Error posting specialist: Error: malformed or invalid value on specialist input"
       );
       expect(await Specialist.count()).toBe(0);
     });
@@ -55,9 +53,8 @@ describe("/api/specialists", () => {
       const response = await api.post("/api/specialists").send({ speciality: "testing" });
 
       expect(response.status).toBe(400);
-      const responseBody = JSON.parse(response.text);
-      expect(responseBody.error).toBe(
-        "Error posting specialists: Error: malformed or invalid value on specialist input"
+      expect(response.body.error).toBe(
+        "Error posting specialist: Error: malformed or invalid value on specialist input"
       );
       expect(await Specialist.count()).toBe(0);
     });
@@ -68,9 +65,8 @@ describe("/api/specialists", () => {
         .send({ name: "testing", speciality: "testing", specialistId: 2 });
 
       expect(response.status).toBe(400);
-      const responseBody = JSON.parse(response.text);
-      expect(responseBody.error).toBe(
-        "Error posting specialists: Error: malformed or invalid value on specialist input"
+      expect(response.body.error).toBe(
+        "Error posting specialist: Error: malformed or invalid value on specialist input"
       );
       expect(await Specialist.count()).toBe(0);
     });
@@ -89,8 +85,7 @@ describe("/api/specialists/:id", () => {
     test("no id match returns expected message", async () => {
       const response = await api.get("/api/specialists/2");
       expect(response.status).toBe(400);
-      const responseBody = JSON.parse(response.text);
-      expect(responseBody.error).toBe("Error getting specialist: Error: no matching specialist id found");
+      expect(response.body.error).toBe("Error getting specialist: Error: no matching specialist id found");
     });
   });
   describe("put", () => {
@@ -104,24 +99,21 @@ describe("/api/specialists/:id", () => {
     test("no id match returns expected message", async () => {
       const response = await api.put("/api/specialists/2").send({ name: "updated name" });
       expect(response.status).toBe(400);
-      const responseBody = JSON.parse(response.text);
-      expect(responseBody.error).toBe("Error updating specialist: Error: no matching specialist id found");
+      expect(response.body.error).toBe("Error updating specialist: Error: no matching specialist id found");
     });
 
     test("invalid properties return expected message", async () => {
       const { specialistId } = await createTestSpecialist();
       const response = await api.put(`/api/specialists/${specialistId}`).send({ invalid: "invalid property name" });
       expect(response.status).toBe(400);
-      const responseBody = JSON.parse(response.text);
-      expect(responseBody.error).toBe("Error updating specialist: Error: invalid property");
+      expect(response.body.error).toBe("Error updating specialist: Error: invalid property");
     });
 
     test("invalid values return expected message", async () => {
       const { specialistId } = await createTestSpecialist();
       const response = await api.put(`/api/specialists/${specialistId}`).send({ name: 1234 });
       expect(response.status).toBe(400);
-      const responseBody = JSON.parse(response.text);
-      expect(responseBody.error).toBe("Error updating specialist: Error: malformed or invalid value on specialist");
+      expect(response.body.error).toBe("Error updating specialist: Error: malformed or invalid value on specialist");
     });
   });
   describe("delete", () => {
@@ -137,9 +129,8 @@ describe("/api/specialists/:id", () => {
       await createTestSpecialist();
       expect(await Specialist.count()).toBe(1);
       const response = await api.delete(`/api/specialists/2`);
-
       expect(response.status).toBe(400);
-
+      expect(response.body.error).toBe("Error deleting specialist: Error: no matching specialist id found");
       expect(await Specialist.count()).toBe(1);
     });
   });

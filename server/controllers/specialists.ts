@@ -3,53 +3,63 @@ import * as specialistService from "../services/specialist";
 
 const router = Router();
 
-router.get("/", async (_req, res) => {
+router.get("/", async (_req, res, next) => {
   try {
     const specialists = await specialistService.getAll();
     res.json(specialists);
   } catch (error) {
-    console.log("Error getting specialists: ", error);
-    res.status(400).json({ error: "Error getting specialists: " + error });
+    if (error instanceof Error) {
+      error.message = "Error getting specialists: " + error;
+      next(error);
+    }
   }
 });
 
-router.post("/", async (req, res) => {
+router.post("/", async (req, res, next) => {
   try {
     const specialist = await specialistService.create(req.body);
     res.json(specialist);
   } catch (error) {
-    console.log("Error posting specialists: ", error);
-    res.status(400).json({ error: "Error posting specialists: " + error });
+    if (error instanceof Error) {
+      error.message = "Error posting specialist: " + error;
+      next(error);
+    }
   }
 });
 
-router.get("/:id", async (req, res) => {
+router.get("/:id", async (req, res, next) => {
   try {
     const specialist = await specialistService.getOneById(+req.params.id);
     res.json(specialist);
   } catch (error) {
-    console.log("Error getting specialist: ", error);
-    res.status(400).json({ error: "Error getting specialist: " + error });
+    if (error instanceof Error) {
+      error.message = "Error getting specialist: " + error;
+      next(error);
+    }
   }
 });
 
-router.put("/:id", async (req, res) => {
+router.put("/:id", async (req, res, next) => {
   try {
     const updatedSpecialist = await specialistService.updateOneById(+req.params.id, req.body);
     res.json(updatedSpecialist);
   } catch (error) {
-    console.log("Error updating specialist: ", error);
-    res.status(400).json({ error: "Error updating specialist: " + error });
+    if (error instanceof Error) {
+      error.message = "Error updating specialist: " + error;
+      next(error);
+    }
   }
 });
 
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", async (req, res, next) => {
   try {
     await specialistService.deleteOneById(+req.params.id);
     res.status(204).end();
   } catch (error) {
-    console.log("Error deleting specialist: ", error);
-    res.status(400).json({ error: "Error deleting specialist: " + error });
+    if (error instanceof Error) {
+      error.message = "Error deleting specialist: " + error;
+      next(error);
+    }
   }
 });
 
