@@ -52,8 +52,7 @@ describe("/api/patients", () => {
       });
 
       expect(response.status).toBe(400);
-      const responseBody = JSON.parse(response.text);
-      expect(responseBody.error).toBe("Error posting patient: Error: invalid property on patient input");
+      expect(response.body.error).toBe("Error posting patient: Error: invalid property on patient input");
       expect(await Patient.count()).toBe(0);
     });
 
@@ -70,8 +69,7 @@ describe("/api/patients", () => {
       });
 
       expect(response.status).toBe(400);
-      const responseBody = JSON.parse(response.text);
-      expect(responseBody.error).toBe("Error posting patient: Error: malformed or invalid value on patient input");
+      expect(response.body.error).toBe("Error posting patient: Error: malformed or invalid value on patient input");
       expect(await Patient.count()).toBe(0);
     });
 
@@ -87,8 +85,7 @@ describe("/api/patients", () => {
       });
 
       expect(response.status).toBe(400);
-      const responseBody = JSON.parse(response.text);
-      expect(responseBody.error).toBe("Error posting patient: Error: malformed or invalid value on patient input");
+      expect(response.body.error).toBe("Error posting patient: Error: malformed or invalid value on patient input");
       expect(await Patient.count()).toBe(0);
     });
 
@@ -106,8 +103,7 @@ describe("/api/patients", () => {
       });
 
       expect(response.status).toBe(400);
-      const responseBody = JSON.parse(response.text);
-      expect(responseBody.error).toBe("Error posting patient: Error: invalid property on patient input");
+      expect(response.body.error).toBe("Error posting patient: Error: invalid property on patient input");
       expect(await Patient.count()).toBe(0);
     });
   });
@@ -125,8 +121,7 @@ describe("/api/patients/:id", () => {
     test("no id match returns expected error message", async () => {
       const response = await api.get("/api/patients/2");
       expect(response.status).toBe(400);
-      const responseBody = JSON.parse(response.text);
-      expect(responseBody.error).toBe("Error getting patient: Error: no matching patient id found");
+      expect(response.body.error).toBe("Error getting patient: Error: no matching patient id found");
     });
   });
   describe("put", () => {
@@ -140,24 +135,21 @@ describe("/api/patients/:id", () => {
     test("no id match returns expected message", async () => {
       const response = await api.put("/api/patients/2").send({ name: "updated name" });
       expect(response.status).toBe(400);
-      const responseBody = JSON.parse(response.text);
-      expect(responseBody.error).toBe("Error updating patient: Error: no matching patient id found");
+      expect(response.body.error).toBe("Error updating patient: Error: no matching patient id found");
     });
 
     test("invalid properties return expected message", async () => {
       const { patientId } = await createTestPatientAndSpecialist();
       const response = await api.put(`/api/patients/${patientId}`).send({ invalid: "invalid property name" });
       expect(response.status).toBe(400);
-      const responseBody = JSON.parse(response.text);
-      expect(responseBody.error).toBe("Error updating patient: Error: invalid property");
+      expect(response.body.error).toBe("Error updating patient: Error: invalid property");
     });
 
     test("invalid values return expected message", async () => {
       const { patientId } = await createTestPatientAndSpecialist();
       const response = await api.put(`/api/patients/${patientId}`).send({ name: 1234 });
       expect(response.status).toBe(400);
-      const responseBody = JSON.parse(response.text);
-      expect(responseBody.error).toBe("Error updating patient: Error: malformed or invalid value on patient");
+      expect(response.body.error).toBe("Error updating patient: Error: malformed or invalid value on patient");
     });
   });
   describe("delete", () => {
@@ -175,8 +167,7 @@ describe("/api/patients/:id", () => {
       expect(await Patient.count()).toBe(1);
       const response = await api.delete(`/api/patients/2`);
       expect(response.status).toBe(400);
-      const responseBody = JSON.parse(response.text);
-      expect(responseBody.error).toBe("Error deleting patient: Error: no matching patient id found");
+      expect(response.body.error).toBe("Error deleting patient: Error: no matching patient id found");
       expect(await Patient.count()).toBe(1);
     });
   });

@@ -3,53 +3,63 @@ import * as patientService from "../services/patient";
 
 const router = Router();
 
-router.get("/", async (_req, res) => {
+router.get("/", async (_req, res, next) => {
   try {
     const patients = await patientService.getAll();
     res.json(patients);
   } catch (error) {
-    console.log("Error getting patients:", error);
-    res.status(400).json({ error: "Error getting patients: " + error });
+    if (error instanceof Error) {
+      error.message = "Error getting patients: " + error;
+      next(error);
+    }
   }
 });
 
-router.post("/", async (req, res) => {
+router.post("/", async (req, res, next) => {
   try {
     const patient = await patientService.create(req.body);
     res.json(patient);
   } catch (error) {
-    console.log("Error posting patient:", error);
-    res.status(400).json({ error: "Error posting patient: " + error });
+    if (error instanceof Error) {
+      error.message = "Error posting patient: " + error;
+      next(error);
+    }
   }
 });
 
-router.get("/:id", async (req, res) => {
+router.get("/:id", async (req, res, next) => {
   try {
     const patient = await patientService.getOneById(+req.params.id);
     res.json(patient);
   } catch (error) {
-    console.log("Error getting patient:", error);
-    res.status(400).json({ error: "Error getting patient: " + error });
+    if (error instanceof Error) {
+      error.message = "Error getting patient: " + error;
+      next(error);
+    }
   }
 });
 
-router.put("/:id", async (req, res) => {
+router.put("/:id", async (req, res, next) => {
   try {
     const updatedPatient = await patientService.updateOneById(+req.params.id, req.body);
     res.json(updatedPatient);
   } catch (error) {
-    console.log("Error updating patient: ", error);
-    res.status(400).json({ error: "Error updating patient: " + error });
+    if (error instanceof Error) {
+      error.message = "Error updating patient: " + error;
+      next(error);
+    }
   }
 });
 
-router.delete("/:id", async (req, res) => {
+router.delete("/:id", async (req, res, next) => {
   try {
     await patientService.deleteOneById(+req.params.id);
     res.status(204).end();
   } catch (error) {
-    console.log("Error deleting patient: ", error);
-    res.status(400).json({ error: "Error deleting patient: " + error });
+    if (error instanceof Error) {
+      error.message = "Error deleting patient: " + error;
+      next(error);
+    }
   }
 });
 

@@ -51,8 +51,7 @@ describe("/api/appointments", () => {
       });
 
       expect(response.status).toBe(400);
-      const responseBody = JSON.parse(response.text);
-      expect(responseBody.error).toBe("Error posting appointment: Error: invalid property on appointment input");
+      expect(response.body.error).toBe("Error posting appointment: Error: invalid property on appointment input");
       expect(await Appointment.count()).toBe(0);
     });
 
@@ -88,8 +87,7 @@ describe("/api/appointments", () => {
       });
 
       expect(response.status).toBe(400);
-      const responseBody = JSON.parse(response.text);
-      expect(responseBody.error).toBe(
+      expect(response.body.error).toBe(
         "Error posting appointment: Error: malformed or invalid value on appointment input"
       );
       expect(await Appointment.count()).toBe(0);
@@ -109,8 +107,7 @@ describe("/api/appointments", () => {
       });
 
       expect(response.status).toBe(400);
-      const responseBody = JSON.parse(response.text);
-      expect(responseBody.error).toBe("Error posting appointment: Error: invalid property on appointment input");
+      expect(response.body.error).toBe("Error posting appointment: Error: invalid property on appointment input");
       expect(await Appointment.count()).toBe(0);
     });
   });
@@ -127,8 +124,7 @@ describe("/api/appointments/:id", () => {
     test("no id match returns expected error message", async () => {
       const response = await api.get("/api/appointments/2");
       expect(response.status).toBe(400);
-      const responseBody = JSON.parse(response.text);
-      expect(responseBody.error).toBe("Error getting appointment: Error: no matching appointment id found");
+      expect(response.body.error).toBe("Error getting appointment: Error: no matching appointment id found");
     });
   });
   describe("put", () => {
@@ -143,24 +139,21 @@ describe("/api/appointments/:id", () => {
     test("no id match returns expected message", async () => {
       const response = await api.put("/api/appointments/2").send({ date: "2020-03-03" });
       expect(response.status).toBe(400);
-      const responseBody = JSON.parse(response.text);
-      expect(responseBody.error).toBe("Error updating appointment: Error: no matching appointment id found");
+      expect(response.body.error).toBe("Error updating appointment: Error: no matching appointment id found");
     });
 
     test("invalid properties return expected message", async () => {
       const { appointmentId } = await createTestSPA();
       const response = await api.put(`/api/appointments/${appointmentId}`).send({ invalid: "invalid property name" });
       expect(response.status).toBe(400);
-      const responseBody = JSON.parse(response.text);
-      expect(responseBody.error).toBe("Error updating appointment: Error: invalid property");
+      expect(response.body.error).toBe("Error updating appointment: Error: invalid property");
     });
 
     test("invalid values return expected message", async () => {
       const { appointmentId } = await createTestSPA();
       const response = await api.put(`/api/appointments/${appointmentId}`).send({ date: 1234 });
       expect(response.status).toBe(400);
-      const responseBody = JSON.parse(response.text);
-      expect(responseBody.error).toBe("Error updating appointment: Error: malformed or invalid value on appointment");
+      expect(response.body.error).toBe("Error updating appointment: Error: malformed or invalid value on appointment");
     });
   });
   describe("delete", () => {
@@ -178,8 +171,7 @@ describe("/api/appointments/:id", () => {
       expect(await Appointment.count()).toBe(1);
       const response = await api.delete(`/api/appointments/2`);
       expect(response.status).toBe(400);
-      const responseBody = JSON.parse(response.text);
-      expect(responseBody.error).toBe("Error deleting appointment: Error: no matching appointment id found");
+      expect(response.body.error).toBe("Error deleting appointment: Error: no matching appointment id found");
       expect(await Appointment.count()).toBe(1);
     });
   });
