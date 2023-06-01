@@ -1,15 +1,46 @@
 import { Specialist, Patient, Appointment } from "./models";
-import { PatientInformationAttributes, AppointmentInformationAttributes } from "./types";
+import {
+  PatientInformationAttributes,
+  AppointmentInformationAttributes,
+  SpecialistProperties,
+  PatientProperties,
+  AppointmentProperties,
+} from "./types";
 
-// check for properties and assert type
-
+// specialist
 export const isSpecialistInput = (object: unknown): object is Specialist => {
+  if (typeof object !== "object" || object === null || "specialistId" in object) {
+    return false;
+  }
+  const { name, speciality } = object as Specialist;
+  return typeof name === "string" && typeof speciality === "string";
+};
+
+export const isSpecialist = (object: unknown): object is Specialist => {
   if (typeof object !== "object" || object === null) {
     return false;
   }
+  const { specialistId, name, speciality } = object as Specialist;
+  return typeof specialistId === "number" && typeof name === "string" && typeof speciality === "string";
+};
 
-  const { name, speciality } = object as Specialist;
-  return typeof name === "string" && typeof speciality === "string";
+export const validSpecialistProperties = (object: unknown): object is SpecialistProperties => {
+  for (const key in object as SpecialistProperties) {
+    if (!["specialistId", "name", "speciality"].includes(key)) {
+      return false;
+    }
+  }
+  return true;
+};
+
+// patient
+export const validPatientProperties = (object: unknown): object is PatientProperties => {
+  for (const key in object as PatientProperties) {
+    if (!["name", "email", "phone", "dateOfBirth", "gender", "address", "specialistId"].includes(key)) {
+      return false;
+    }
+  }
+  return true;
 };
 
 export const isPatientInput = (object: unknown): object is Patient => {
@@ -46,6 +77,15 @@ export const isPatientInformation = (object: unknown): object is PatientInformat
     typeof specialist === "object" &&
     typeof specialistName === "string"
   );
+};
+// appointment
+export const validAppointmentProperties = (object: unknown): object is AppointmentProperties => {
+  for (const key in object as AppointmentProperties) {
+    if (!["patientId", "specialistId", "date", "start", "end", "type", "description"].includes(key)) {
+      return false;
+    }
+  }
+  return true;
 };
 
 export const isAppointmentInput = (object: unknown): object is Appointment => {

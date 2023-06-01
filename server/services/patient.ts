@@ -1,15 +1,23 @@
 import { Patient, Specialist } from "../models";
-import { isPatientInput } from "../typeUtils";
+import { isPatientInput, validPatientProperties } from "../typeUtils";
 
-export const create = async (patientInput: object) => {
-  if (!isPatientInput(patientInput)) {
-    throw new Error("Malformed or missing patient input");
+export const create = async (object: unknown): Promise<Patient> => {
+  if (!validPatientProperties(object)) {
+    throw new Error("invalid property on patient input");
   }
 
-  return Patient.create(patientInput);
+  if (!isPatientInput(object)) {
+    throw new Error("malformed or invalid value on patient input");
+  }
+
+  try {
+    return Patient.create(object);
+  } catch (error) {
+    throw new Error("unknown error creating patient: " + error);
+  }
 };
 
-export const getAll = async () => {
+export const getAll = async (): Promise<Patient[]> => {
   return Patient.findAll({
     include: [
       {
@@ -24,7 +32,7 @@ export const getAll = async () => {
   });
 };
 
-export const getOneById = async (id: number) => {
+export const getOneById = async (id: number): Promise<Patient> => {
   const patient = await Patient.findOne({
     where: {
       patientId: id,
@@ -38,7 +46,7 @@ export const getOneById = async (id: number) => {
   });
 
   if (patient === null) {
-    throw new Error("No matching patient id found");
+    throw new Error("no matching patient id found");
   }
 
   return patient;
@@ -48,14 +56,14 @@ export const deleteOneById = async (id: number) => {
   const patient = await Patient.findByPk(id);
 
   if (!patient) {
-    throw new Error("No matching patient id found");
+    throw new Error("no matching patient id found");
   }
 
   await patient.destroy();
   return 1;
 };
 
-export const updateOneById = async (id: number, body: object) => {
+export const updateOneById = async (id: number, object: unknown): Promise<Patient> => {
   const patient = await Patient.findOne({
     where: {
       patientId: id,
@@ -68,7 +76,14 @@ export const updateOneById = async (id: number, body: object) => {
     ],
   });
   if (!patient) {
-    throw new Error("No matching patient id found");
+    throw new Error("no matching patient id found");
   }
-  return patient.update({ ...patient, ...body });
+
+  if (!validPatientProperties(object)) {
+    throw new Error("invalid property");
+  }
+
+  const updatedPatient = Object.assign({}, patient, object);
+
+  return patient.update(updatedPatient);
 };

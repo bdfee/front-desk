@@ -1,15 +1,22 @@
 import { Appointment, Specialist, Patient } from "../models";
-import { isAppointmentInput } from "../typeUtils";
+import { validAppointmentProperties, isAppointmentInput } from "../typeUtils";
 
-export const create = async (appointmentInput: object) => {
-  if (!isAppointmentInput(appointmentInput)) {
-    throw new Error("Malformed or missing appointment input");
+export const create = async (object: unknown): Promise<Appointment> => {
+  if (!validAppointmentProperties(object)) {
+    throw new Error("invalid property on appointment input");
   }
 
-  return Appointment.create(appointmentInput);
+  if (!isAppointmentInput(object)) {
+    throw new Error("malformed or invalid value on appointment input");
+  }
+  try {
+    return Appointment.create(object);
+  } catch (error) {
+    throw new Error("unknown error creating appointment: " + error);
+  }
 };
 
-export const getAll = async () => {
+export const getAll = async (): Promise<Appointment[]> => {
   return Appointment.findAll({
     include: [
       {
@@ -24,7 +31,7 @@ export const getAll = async () => {
   });
 };
 
-export const getOneById = async (id: number) => {
+export const getOneById = async (id: number): Promise<Appointment> => {
   const appointment = await Appointment.findOne({
     where: {
       appointmentId: id,
@@ -42,7 +49,7 @@ export const getOneById = async (id: number) => {
   });
 
   if (appointment === null) {
-    throw new Error("No matching appointment id found");
+    throw new Error("no matching appointment id found");
   }
 
   return appointment;
@@ -52,14 +59,14 @@ export const deleteOneById = async (id: number) => {
   const appointment = await Appointment.findByPk(id);
 
   if (!appointment) {
-    throw new Error("No matching appointment id found");
+    throw new Error("no matching appointment id found");
   }
 
   await appointment.destroy();
   return 1;
 };
 
-export const updateOneById = async (id: number, body: object) => {
+export const updateOneById = async (id: number, object: unknown): Promise<Appointment> => {
   const appointment = await Appointment.findOne({
     where: {
       appointmentId: id,
@@ -77,8 +84,14 @@ export const updateOneById = async (id: number, body: object) => {
   });
 
   if (!appointment) {
-    throw new Error("No matching appointment id found");
+    throw new Error("no matching appointment id found");
   }
 
-  return appointment.update({ ...appointment, ...body });
+  if (!validAppointmentProperties(object)) {
+    throw new Error("invalid property");
+  }
+
+  const updatedAppointment = Object.assign({}, appointment, object);
+
+  return appointment.update(updatedAppointment);
 };

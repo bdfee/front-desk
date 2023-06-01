@@ -2,11 +2,19 @@ import { Specialist } from "../../models";
 import { sequelize } from "../../utils/connectToDb";
 import { createTestSpecialist, dropAllTables } from "../helpers/models";
 import { expectSpecialistInformation } from "../helpers/shape";
-import { deleteOneById, updateOneById, getOneById, create } from "../../services/specialist";
+import { deleteOneById, updateOneById, getOneById, create, getAll } from "../../services/specialist";
+import { SpecialistInformationAttributes } from "../../types";
 
 beforeEach(async () => await dropAllTables());
 
-describe("returned shape", () => {
+describe("returned shape from specialistService", () => {
+  test("getAll()", async () => {
+    await createTestSpecialist();
+    const [specialist] = await getAll();
+
+    expectSpecialistInformation(specialist as SpecialistInformationAttributes);
+  });
+
   test("updateOneById()", async () => {
     const { specialistId } = await createTestSpecialist();
     const update = { name: "update name" };
@@ -21,6 +29,7 @@ describe("returned shape", () => {
       })
     );
   });
+  Specialist.getAttributes();
 
   test("getOneById()", async () => {
     const { specialistId } = await createTestSpecialist();
@@ -45,8 +54,24 @@ describe("create()", () => {
         speciality: "test speciality",
       });
     } catch (error) {
-      error instanceof Error && expect(error.message).toBe("Malformed or missing specialist input");
+      error instanceof Error && expect(error.message).toBe("malformed or invalid value on specialist input");
     }
+  });
+});
+
+describe("getAll()", () => {
+  test("returns all specialists", async () => {
+    await createTestSpecialist();
+    await createTestSpecialist();
+    await createTestSpecialist();
+
+    expect(await Specialist.count()).toBe(3);
+    expect(await getAll()).toHaveLength(3);
+  });
+
+  test("no patients returns empty array", async () => {
+    expect(await Specialist.count()).toBe(0);
+    expect(await getAll()).toHaveLength(0);
   });
 });
 
@@ -66,7 +91,7 @@ describe("getOneById()", () => {
     try {
       await getOneById(2);
     } catch (error) {
-      error instanceof Error && expect(error.message).toBe("No matching specialist id found");
+      error instanceof Error && expect(error.message).toBe("no matching specialist id found");
     }
 
     expect(await Specialist.count()).toBe(1);
@@ -91,7 +116,7 @@ describe("deleteOneById()", () => {
     try {
       await deleteOneById(2);
     } catch (error) {
-      error instanceof Error && expect(error.message).toBe("No matching specialist id found");
+      error instanceof Error && expect(error.message).toBe("no matching specialist id found");
     }
 
     expect(await Specialist.count()).toBe(1);
@@ -118,11 +143,22 @@ describe("updateOneById()", () => {
     try {
       await updateOneById(2, { name: "update name" });
     } catch (error) {
-      error instanceof Error && expect(error.message).toBe("No matching specialist id found");
+      error instanceof Error && expect(error.message).toBe("no matching specialist id found");
     }
     const unchangedSpecialist = await Specialist.findByPk(specialist.specialistId);
     expect(unchangedSpecialist?.name).toBe("test specialist");
     expect(await Specialist.count()).toBe(1);
+  });
+
+  test("invalid property returns expected error message", async () => {
+    await createTestSpecialist();
+    expect(await Specialist.count()).toBe(1);
+
+    try {
+      await updateOneById(1, { invalid: "invalid update" });
+    } catch (error) {
+      error instanceof Error && expect(error.message).toBe("invalid property");
+    }
   });
 });
 

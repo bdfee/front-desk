@@ -8,7 +8,7 @@ import { getAll, deleteOneById, updateOneById, getOneById, create } from "../../
 
 beforeEach(async () => await dropAllTables());
 // we assert to run the expect tests instead of typing the input
-describe("returned shape", () => {
+describe("returned shape from patientService", () => {
   test("getAll()", async () => {
     await createTestPatientAndSpecialist();
     const [patient] = await getAll();
@@ -75,7 +75,7 @@ describe("create()", () => {
         specialistId: 1,
       });
     } catch (error) {
-      error instanceof Error && expect(error.message).toBe("Malformed or missing patient input");
+      error instanceof Error && expect(error.message).toBe("malformed or invalid value on patient input");
     }
     expect(await Patient.count()).toBe(0);
   });
@@ -112,7 +112,7 @@ describe("getOneById()", () => {
     try {
       await getOneById(2);
     } catch (error) {
-      error instanceof Error && expect(error.message).toBe("No matching patient id found");
+      error instanceof Error && expect(error.message).toBe("no matching patient id found");
     }
 
     expect(await Patient.count()).toBe(1);
@@ -137,7 +137,7 @@ describe("deleteOneById()", () => {
     try {
       await deleteOneById(2);
     } catch (error) {
-      error instanceof Error && expect(error.message).toBe("No matching patient id found");
+      error instanceof Error && expect(error.message).toBe("no matching patient id found");
     }
 
     expect(await Patient.count()).toBe(1);
@@ -164,10 +164,21 @@ describe("updateOneById", () => {
     try {
       await updateOneById(2, { name: "update name" });
     } catch (error) {
-      error instanceof Error && expect(error.message).toBe("No matching patient id found");
+      error instanceof Error && expect(error.message).toBe("no matching patient id found");
     }
 
     expect(await Patient.count()).toBe(1);
+  });
+
+  test("invalid property returns expected error message", async () => {
+    await createTestPatientAndSpecialist();
+    expect(await Patient.count()).toBe(1);
+
+    try {
+      await updateOneById(1, { invalid: "invalid update" });
+    } catch (error) {
+      error instanceof Error && expect(error.message).toBe("invalid property");
+    }
   });
 });
 

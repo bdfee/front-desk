@@ -7,7 +7,7 @@ import { AppointmentInformationAttributes, AppointmentAttributes } from "../../t
 
 beforeEach(async () => await dropAllTables());
 
-describe("returned shape", () => {
+describe("returned shape from appointmentService", () => {
   test("getAll()", async () => {
     await createTestSPA();
     const [appointment] = await getAll();
@@ -77,7 +77,7 @@ describe("getOneById()", () => {
     try {
       await getOneById(2);
     } catch (error) {
-      error instanceof Error && expect(error.message).toBe("No matching appointment id found");
+      error instanceof Error && expect(error.message).toBe("no matching appointment id found");
     }
 
     expect(await Appointment.count()).toBe(1);
@@ -113,7 +113,7 @@ describe("create()", () => {
         description: "Appointment description",
       });
     } catch (error) {
-      error instanceof Error && expect(error.message).toBe("Malformed or missing appointment input");
+      error instanceof Error && expect(error.message).toBe("malformed or invalid value on appointment input");
     }
     expect(await Appointment.count()).toBe(0);
   });
@@ -136,7 +136,7 @@ describe("deleteOneById()", () => {
     try {
       await deleteOneById(2);
     } catch (error) {
-      error instanceof Error && expect(error.message).toBe("No matching appointment id found");
+      error instanceof Error && expect(error.message).toBe("no matching appointment id found");
     }
 
     expect(await Appointment.count()).toBe(1);
@@ -165,9 +165,20 @@ describe("updateOneById()", () => {
     try {
       await updateOneById(2, { description: "updated description" });
     } catch (error) {
-      error instanceof Error && expect(error.message).toBe("No matching appointment id found");
+      error instanceof Error && expect(error.message).toBe("no matching appointment id found");
     }
     expect(await Appointment.count()).toBe(1);
+  });
+
+  test("invalid property returns expected error message", async () => {
+    await createTestSPA();
+    expect(await Appointment.count()).toBe(1);
+
+    try {
+      await updateOneById(1, { invalid: "invalid update" });
+    } catch (error) {
+      error instanceof Error && expect(error.message).toBe("invalid property");
+    }
   });
 });
 
