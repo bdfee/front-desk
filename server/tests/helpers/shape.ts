@@ -2,16 +2,18 @@
 // we assign unsafely to allow expect to test the value
 // we assert the object shape returned by the serivce call
 // TODO rename and organize these when business logic is flushed out in services
-import {
-  PatientAttributes,
-  PatientInformationAttributes,
-  SpecialistInformationAttributes,
-  AppointmentAttributes,
-  AppointmentInformationAttributes,
-} from "../../types";
+import { Patient, PatientDetail, Specialist, Appointment, AppointmentDetail } from "../../types";
 
-export const expectPatient = (patient: PatientAttributes) => {
-  expect(patient).toMatchObject<PatientAttributes>({
+export const expectSpecialist = (specialist: Specialist) => {
+  expect(specialist).toMatchObject<Specialist>({
+    specialistId: expect.any(Number),
+    name: expect.any(String),
+    speciality: expect.any(String),
+  });
+};
+
+export const expectPatient = (patient: Patient) => {
+  expect(patient).toMatchObject<Patient>({
     patientId: expect.any(Number),
     name: expect.any(String),
     email: expect.any(String),
@@ -23,8 +25,8 @@ export const expectPatient = (patient: PatientAttributes) => {
   });
 };
 
-export const expectPatientInformation = (patient: PatientInformationAttributes) => {
-  expect(patient).toMatchObject<PatientInformationAttributes>({
+export const expectPatientDetail = (patient: PatientDetail) => {
+  expect(patient).toMatchObject<PatientDetail>({
     patientId: expect.any(Number),
     name: expect.any(String),
     email: expect.any(String),
@@ -38,16 +40,8 @@ export const expectPatientInformation = (patient: PatientInformationAttributes) 
   });
 };
 
-export const expectSpecialistInformation = (specialist: SpecialistInformationAttributes) => {
-  expect(specialist).toMatchObject<SpecialistInformationAttributes>({
-    specialistId: expect.any(Number),
-    name: expect.any(String),
-    speciality: expect.any(String),
-  });
-};
-
-export const expectAppointment = (appointment: AppointmentAttributes) => {
-  expect(appointment).toMatchObject<AppointmentAttributes>({
+export const expectAppointment = (appointment: Appointment) => {
+  expect(appointment).toMatchObject<Appointment>({
     appointmentId: expect.any(Number),
     date: expect.any(String),
     start: expect.any(String),
@@ -59,8 +53,8 @@ export const expectAppointment = (appointment: AppointmentAttributes) => {
   });
 };
 
-export const expectAppointmentInformation = (appointment: AppointmentInformationAttributes) => {
-  expect(appointment).toMatchObject<AppointmentInformationAttributes>({
+export const expectAppointmentDetail = (appointment: AppointmentDetail) => {
+  expect(appointment).toMatchObject<AppointmentDetail>({
     appointmentId: expect.any(Number),
     date: expect.any(String),
     start: expect.any(String),

@@ -1,5 +1,5 @@
 import { Appointment, Specialist, Patient } from "../models";
-import { validAppointmentProperties, isAppointmentInput } from "../typeUtils";
+import { validAppointmentProperties, isAppointmentInput, isAppointmentDetail } from "../typeUtils";
 
 export const create = async (object: unknown): Promise<Appointment> => {
   if (!validAppointmentProperties(object)) {
@@ -91,7 +91,11 @@ export const updateOneById = async (id: number, object: unknown): Promise<Appoin
     throw new Error("invalid property");
   }
 
-  const updatedAppointment = Object.assign({}, appointment, object);
+  appointment.set(object);
 
-  return appointment.update(updatedAppointment);
+  if (!isAppointmentDetail(appointment)) {
+    throw new Error("malformed or invalid value on appointment");
+  }
+
+  return appointment.save();
 };

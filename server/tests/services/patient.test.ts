@@ -1,25 +1,24 @@
-import { Patient } from "../../models";
+import { Patient as PatientModel } from "../../models";
 import { sequelize } from "../../utils/connectToDb";
 import { createTestPatientAndSpecialist, createTestSpecialist, dropAllTables } from "../helpers/models";
-import { expectPatientInformation, expectPatient } from "../helpers/shape";
-import { PatientInformationAttributes, PatientAttributes } from "../../types";
+import { expectPatientDetail, expectPatient } from "../helpers/shape";
 
 import { getAll, deleteOneById, updateOneById, getOneById, create } from "../../services/patient";
+import { Patient, PatientDetail } from "../../types";
+// we assert type to run the expect tests instead of typing the input
 
 beforeEach(async () => await dropAllTables());
-// we assert to run the expect tests instead of typing the input
 describe("returned shape from patientService", () => {
   test("getAll()", async () => {
     await createTestPatientAndSpecialist();
     const [patient] = await getAll();
 
-    expectPatientInformation(patient as PatientInformationAttributes);
+    expectPatientDetail(patient as PatientDetail);
   });
 
   test("getOneById()", async () => {
     await createTestPatientAndSpecialist();
-
-    expectPatientInformation((await getOneById(1)) as PatientInformationAttributes);
+    expectPatientDetail((await getOneById(1)) as PatientDetail);
   });
 
   test("create()", async () => {
@@ -34,7 +33,7 @@ describe("returned shape from patientService", () => {
         gender: "male",
         address: "123 street city state",
         specialistId: 1,
-      })) as PatientAttributes
+      })) as Patient
     );
   });
 
@@ -42,7 +41,7 @@ describe("returned shape from patientService", () => {
     const { patientId } = await createTestPatientAndSpecialist();
     const update = { name: "update name" };
 
-    expectPatientInformation((await updateOneById(patientId, update)) as PatientInformationAttributes);
+    expectPatientDetail((await updateOneById(patientId, update)) as PatientDetail);
   });
 });
 
@@ -50,7 +49,7 @@ describe("create()", () => {
   test("creates patient", async () => {
     await createTestSpecialist();
 
-    expect(await Patient.count()).toBe(0);
+    expect(await PatientModel.count()).toBe(0);
     await create({
       name: "test patient",
       email: "test@test.com",
@@ -60,11 +59,11 @@ describe("create()", () => {
       address: "123 street city state",
       specialistId: 1,
     });
-    expect(await Patient.count()).toBe(1);
+    expect(await PatientModel.count()).toBe(1);
   });
 
   test("no creation returns expected message", async () => {
-    expect(await Patient.count()).toBe(0);
+    expect(await PatientModel.count()).toBe(0);
     try {
       await create({
         name: "test patient",
@@ -77,7 +76,7 @@ describe("create()", () => {
     } catch (error) {
       error instanceof Error && expect(error.message).toBe("malformed or invalid value on patient input");
     }
-    expect(await Patient.count()).toBe(0);
+    expect(await PatientModel.count()).toBe(0);
   });
 });
 
@@ -87,12 +86,12 @@ describe("getAll()", () => {
     await createTestPatientAndSpecialist();
     await createTestPatientAndSpecialist();
 
-    expect(await Patient.count()).toBe(3);
+    expect(await PatientModel.count()).toBe(3);
     expect(await getAll()).toHaveLength(3);
   });
 
   test("no patients returns empty array", async () => {
-    expect(await Patient.count()).toBe(0);
+    expect(await PatientModel.count()).toBe(0);
     expect(await getAll()).toHaveLength(0);
   });
 });
@@ -101,13 +100,13 @@ describe("getOneById()", () => {
   test("returns patient by id", async () => {
     await createTestPatientAndSpecialist();
     const patient = await getOneById(1);
-    expect(await Patient.count()).toBe(1);
+    expect(await PatientModel.count()).toBe(1);
     expect(patient?.patientId).toBe(1);
   });
 
   test("no id match returns expected error message", async () => {
     await createTestPatientAndSpecialist();
-    expect(await Patient.count()).toBe(1);
+    expect(await PatientModel.count()).toBe(1);
 
     try {
       await getOneById(2);
@@ -115,7 +114,7 @@ describe("getOneById()", () => {
       error instanceof Error && expect(error.message).toBe("no matching patient id found");
     }
 
-    expect(await Patient.count()).toBe(1);
+    expect(await PatientModel.count()).toBe(1);
   });
 });
 
@@ -124,15 +123,15 @@ describe("deleteOneById()", () => {
     const { patientId } = await createTestPatientAndSpecialist();
     await createTestPatientAndSpecialist();
 
-    expect(await Patient.count()).toBe(2);
+    expect(await PatientModel.count()).toBe(2);
     await deleteOneById(patientId);
 
-    expect(await Patient.count()).toBe(1);
+    expect(await PatientModel.count()).toBe(1);
   });
 
   test("no id match returns expected error message", async () => {
     await createTestPatientAndSpecialist();
-    expect(await Patient.count()).toBe(1);
+    expect(await PatientModel.count()).toBe(1);
 
     try {
       await deleteOneById(2);
@@ -140,7 +139,7 @@ describe("deleteOneById()", () => {
       error instanceof Error && expect(error.message).toBe("no matching patient id found");
     }
 
-    expect(await Patient.count()).toBe(1);
+    expect(await PatientModel.count()).toBe(1);
   });
 });
 
@@ -149,17 +148,17 @@ describe("updateOneById", () => {
     const { patientId } = await createTestPatientAndSpecialist();
     await updateOneById(patientId, { name: "update name" });
 
-    expect(await Patient.count()).toBe(1);
+    expect(await PatientModel.count()).toBe(1);
 
-    const updatedPatient = await Patient.findByPk(patientId);
+    const updatedPatient = (await PatientModel.findByPk(patientId)) as PatientDetail;
 
     expect(updatedPatient?.name).toEqual("update name");
-    expect(await Patient.count()).toBe(1);
+    expect(await PatientModel.count()).toBe(1);
   });
 
   test("no id match returns expected error message", async () => {
     await createTestPatientAndSpecialist();
-    expect(await Patient.count()).toBe(1);
+    expect(await PatientModel.count()).toBe(1);
 
     try {
       await updateOneById(2, { name: "update name" });
@@ -167,12 +166,12 @@ describe("updateOneById", () => {
       error instanceof Error && expect(error.message).toBe("no matching patient id found");
     }
 
-    expect(await Patient.count()).toBe(1);
+    expect(await PatientModel.count()).toBe(1);
   });
 
   test("invalid property returns expected error message", async () => {
     await createTestPatientAndSpecialist();
-    expect(await Patient.count()).toBe(1);
+    expect(await PatientModel.count()).toBe(1);
 
     try {
       await updateOneById(1, { invalid: "invalid update" });

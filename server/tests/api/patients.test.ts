@@ -5,7 +5,7 @@ import { sequelize } from "../../utils/connectToDb";
 import supertest from "supertest";
 import app from "../../app";
 import { createTestPatientAndSpecialist, createTestSpecialist, dropAllTables } from "../helpers/models";
-import { expectPatient, expectPatientInformation } from "../helpers/shape";
+import { expectPatient, expectPatientDetail } from "../helpers/shape";
 import { Patient } from "../../models";
 
 const api = supertest(app);
@@ -119,7 +119,7 @@ describe("/api/patients/:id", () => {
       const { patientId } = await createTestPatientAndSpecialist();
       const { body } = await api.get(`/api/patients/${patientId}`);
 
-      expectPatientInformation(body);
+      expectPatientDetail(body);
     });
 
     test("no id match returns expected error message", async () => {
@@ -133,7 +133,7 @@ describe("/api/patients/:id", () => {
     test("patient is updated by id", async () => {
       const { patientId } = await createTestPatientAndSpecialist();
       const response = await api.put(`/api/patients/${patientId}`).send({ name: "updated name" });
-      expectPatientInformation(response.body);
+      expectPatientDetail(response.body);
       expect(response.body.name).toBe("updated name");
     });
 
@@ -152,15 +152,13 @@ describe("/api/patients/:id", () => {
       expect(responseBody.error).toBe("Error updating patient: Error: invalid property");
     });
 
-    // test("invalid values return expected message", async () => {
-    //   const { patientId } = await createTestPatientAndSpecialist();
-    //   const response = await api.put(`/api/patients/${patientId}`).send({ name: 1234 });
-    //   expect(response.status).toBe(400);
-    //   const responseBody = JSON.parse(response.text);
-    //   expect(responseBody.error).toBe(
-    //     "Error updating patient: Error: malformed or invalid value on patient input"
-    //   );
-    // });
+    test("invalid values return expected message", async () => {
+      const { patientId } = await createTestPatientAndSpecialist();
+      const response = await api.put(`/api/patients/${patientId}`).send({ name: 1234 });
+      expect(response.status).toBe(400);
+      const responseBody = JSON.parse(response.text);
+      expect(responseBody.error).toBe("Error updating patient: Error: malformed or invalid value on patient");
+    });
   });
   describe("delete", () => {
     //
