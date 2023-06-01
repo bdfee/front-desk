@@ -25,7 +25,7 @@ export const getOneById = async (id: number): Promise<Specialist> => {
   const specialist = await Specialist.findByPk(id);
 
   if (specialist === null) {
-    throw new Error("No matching specialist id found");
+    throw new Error("no matching specialist id found");
   }
 
   return specialist;
@@ -35,7 +35,7 @@ export const deleteOneById = async (id: number) => {
   const specialist = await Specialist.findByPk(id);
 
   if (!specialist) {
-    throw new Error("No matching specialist id found");
+    throw new Error("no matching specialist id found");
   }
 
   await specialist.destroy();
@@ -47,12 +47,14 @@ export const updateOneById = async (id: number, object: unknown): Promise<Specia
   const specialist = await Specialist.findByPk(id);
 
   if (!specialist) {
-    throw new Error("No matching specialist id found");
+    throw new Error("no matching specialist id found");
   }
 
   if (!validSpecialistProperties(object)) {
-    throw new Error("Invalid property");
+    throw new Error("invalid property");
   }
 
-  return specialist.update({ ...specialist, ...object });
+  const updatedSpecialist = Object.assign({}, specialist, object);
+
+  return specialist.update(updatedSpecialist);
 };

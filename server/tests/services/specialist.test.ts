@@ -7,7 +7,7 @@ import { SpecialistInformationAttributes } from "../../types";
 
 beforeEach(async () => await dropAllTables());
 
-describe("returned shape", () => {
+describe("returned shape from specialistService", () => {
   test("getAll()", async () => {
     await createTestSpecialist();
     const [specialist] = await getAll();

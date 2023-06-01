@@ -8,7 +8,7 @@ import { getAll, deleteOneById, updateOneById, getOneById, create } from "../../
 
 beforeEach(async () => await dropAllTables());
 // we assert to run the expect tests instead of typing the input
-describe("returned shape", () => {
+describe("returned shape from patientService", () => {
   test("getAll()", async () => {
     await createTestPatientAndSpecialist();
     const [patient] = await getAll();

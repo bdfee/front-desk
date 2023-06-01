@@ -7,7 +7,7 @@ import { AppointmentInformationAttributes, AppointmentAttributes } from "../../t
 
 beforeEach(async () => await dropAllTables());
 
-describe("returned shape", () => {
+describe("returned shape from appointmentService", () => {
   test("getAll()", async () => {
     await createTestSPA();
     const [appointment] = await getAll();

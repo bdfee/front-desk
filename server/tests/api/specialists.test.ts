@@ -4,7 +4,7 @@
 import { sequelize } from "../../utils/connectToDb";
 import supertest from "supertest";
 import app from "../../app";
-import { dropAllTables } from "../helpers/models";
+import { createTestSpecialist, dropAllTables } from "../helpers/models";
 import { expectSpecialistInformation } from "../helpers/shape";
 import { Specialist } from "../../models";
 const api = supertest(app);
@@ -22,8 +22,8 @@ describe("/api/specialists", () => {
 
   describe("post", () => {
     test("specialist is posted", async () => {
-      const response = await api.post("/api/specialists").send({ name: "test specialist", speciality: "testing" });
-      expectSpecialistInformation(response.body);
+      const { body } = await api.post("/api/specialists").send({ name: "test specialist", speciality: "testing" });
+      expectSpecialistInformation(body);
       expect(await Specialist.count()).toBe(1);
     });
 
@@ -77,13 +77,71 @@ describe("/api/specialists", () => {
 
 describe("/api/specialists/:id", () => {
   describe("get", () => {
-    //
+    test("specialist is returned by ID", async () => {
+      const specialist = await createTestSpecialist();
+      const response = await api.get(`/api/specialists/${specialist.specialistId}`);
+
+      expectSpecialistInformation(response.body);
+    });
+
+    test("no id match returns expected message", async () => {
+      const response = await api.get("/api/specialists/2");
+      expect(response.status).toBe(400);
+      const responseBody = JSON.parse(response.text);
+      expect(responseBody.error).toBe("Error getting specialist: Error: no matching specialist id found");
+    });
   });
   describe("put", () => {
-    //
+    test("specialist is updated by id", async () => {
+      const { specialistId } = await createTestSpecialist();
+      const response = await api.put(`/api/specialists/${specialistId}`).send({ name: "updated name" });
+      expectSpecialistInformation(response.body);
+      expect(response.body.name).toBe("updated name");
+    });
+
+    test("no id match returns expected message", async () => {
+      const response = await api.put("/api/specialists/2").send({ name: "updated name" });
+      expect(response.status).toBe(400);
+      const responseBody = JSON.parse(response.text);
+      expect(responseBody.error).toBe("Error updating specialist: Error: no matching specialist id found");
+    });
+
+    test("invalid properties return expected message", async () => {
+      const { specialistId } = await createTestSpecialist();
+      const response = await api.put(`/api/specialists/${specialistId}`).send({ invalid: "invalid property name" });
+      expect(response.status).toBe(400);
+      const responseBody = JSON.parse(response.text);
+      expect(responseBody.error).toBe("Error updating specialist: Error: invalid property");
+    });
+
+    // test("invalid values return expected message", async () => {
+    //   const { specialistId } = await createTestSpecialist();
+    //   const response = await api.put(`/api/specialists/${specialistId}`).send({ name: 1234 });
+    //   expect(response.status).toBe(400);
+    //   const responseBody = JSON.parse(response.text);
+    //   expect(responseBody.error).toBe(
+    //     "Error updating specialist: Error: malformed or invalid value on specialist input"
+    //   );
+    // });
   });
   describe("delete", () => {
-    //
+    test("specialist is deleted by id", async () => {
+      const { specialistId } = await createTestSpecialist();
+      expect(await Specialist.count()).toBe(1);
+      const response = await api.delete(`/api/specialists/${specialistId}`);
+      expect(response.status).toBe(204);
+      expect(await Specialist.count()).toBe(0);
+    });
+
+    test("no id match returns expected message", async () => {
+      await createTestSpecialist();
+      expect(await Specialist.count()).toBe(1);
+      const response = await api.delete(`/api/specialists/2`);
+
+      expect(response.status).toBe(400);
+
+      expect(await Specialist.count()).toBe(1);
+    });
   });
 });
 
