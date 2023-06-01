@@ -1,6 +1,7 @@
 import { Router } from "express";
-const router = Router();
 import * as appointmentService from "../services/appointment";
+
+const router = Router();
 
 router.get("/", async (_req, res) => {
   try {

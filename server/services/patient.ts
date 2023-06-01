@@ -1,5 +1,5 @@
-import { Patient, Specialist } from "../models";
-import { isPatientDetail, isPatientInput, validPatientProperties } from "../typeUtils";
+import { Specialist, Patient } from "../models";
+import { isPatientInput, isPatientDetail, validPatientProperties } from "../typeUtils";
 
 export const create = async (object: unknown): Promise<Patient> => {
   if (!validPatientProperties(object)) {

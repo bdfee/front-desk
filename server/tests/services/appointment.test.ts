@@ -1,9 +1,9 @@
-import { Appointment as AppointmentModel } from "../../models";
-import { sequelize } from "../../utils/connectToDb";
-import { createTestPatientAndSpecialist, createTestSPA, createTestSpecificSPA, dropAllTables } from "../helpers/models";
-import { getAll, getOneById, create, updateOneById, deleteOneById } from "../../services/appointment";
-import { expectAppointment, expectAppointmentDetail } from "../helpers/shape";
 import { Appointment, AppointmentDetail } from "../../types";
+import { sequelize } from "../../utils/connectToDb";
+import { getAll, getOneById, create, updateOneById, deleteOneById } from "../../services/appointment";
+import { Appointment as AppointmentModel } from "../../models";
+import { createTestPatientAndSpecialist, createTestSPA, createTestSpecificSPA, dropAllTables } from "../helpers/models";
+import { expectAppointment, expectAppointmentDetail } from "../helpers/shape";
 
 beforeEach(async () => await dropAllTables());
 

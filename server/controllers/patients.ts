@@ -1,5 +1,6 @@
 import { Router } from "express";
 import * as patientService from "../services/patient";
+
 const router = Router();
 
 router.get("/", async (_req, res) => {

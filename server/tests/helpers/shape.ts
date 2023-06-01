@@ -1,7 +1,5 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
-// we assign unsafely to allow expect to test the value
-// we assert the object shape returned by the serivce call
-// TODO rename and organize these when business logic is flushed out in services
+
 import { Patient, PatientDetail, Specialist, Appointment, AppointmentDetail } from "../../types";
 
 export const expectSpecialist = (specialist: Specialist) => {

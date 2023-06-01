@@ -1,15 +1,17 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
-// we pass and assign unsafe values and allow expect to test
+
 import { sequelize } from "../../utils/connectToDb";
+import { Specialist } from "../../models";
 import supertest from "supertest";
 import app from "../../app";
 import { createTestSpecialist, dropAllTables } from "../helpers/models";
 import { expectSpecialist } from "../helpers/shape";
-import { Specialist } from "../../models";
+
 const api = supertest(app);
 
 beforeEach(async () => await dropAllTables());
+
 describe("/api/specialists", () => {
   describe("get", () => {
     test("specialist are returned as json", async () => {

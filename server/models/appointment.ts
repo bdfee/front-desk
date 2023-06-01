@@ -7,9 +7,10 @@ import {
   DataTypes,
   ForeignKey,
 } from "sequelize";
+import { sequelize } from "../utils/connectToDb";
+
 import Specialist from "./specialist";
 import Patient from "./patient";
-import { sequelize } from "../utils/connectToDb";
 
 class Appointment extends Model<InferAttributes<Appointment>, InferCreationAttributes<Appointment>> {
   declare appointmentId: CreationOptional<number>;

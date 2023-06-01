@@ -1,5 +1,5 @@
-import { Appointment, Specialist, Patient } from "../models";
-import { validAppointmentProperties, isAppointmentInput, isAppointmentDetail } from "../typeUtils";
+import { Specialist, Patient, Appointment } from "../models";
+import { isAppointmentInput, isAppointmentDetail, validAppointmentProperties } from "../typeUtils";
 
 export const create = async (object: unknown): Promise<Appointment> => {
   if (!validAppointmentProperties(object)) {

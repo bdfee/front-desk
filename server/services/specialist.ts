@@ -1,5 +1,5 @@
 import { Specialist } from "../models";
-import { isSpecialist, isSpecialistInput, validSpecialistProperties } from "../typeUtils";
+import { isSpecialistInput, isSpecialist, validSpecialistProperties } from "../typeUtils";
 
 export const create = async (object: unknown): Promise<Specialist> => {
   if (!validSpecialistProperties(object)) {

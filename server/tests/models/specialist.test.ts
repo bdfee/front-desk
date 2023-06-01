@@ -1,5 +1,5 @@
-import { Specialist, Appointment, Patient } from "../../models";
 import { sequelize } from "../../utils/connectToDb";
+import { Specialist, Appointment, Patient } from "../../models";
 import {
   createTestSpecialist,
   createTestPatientAndSpecialist,
