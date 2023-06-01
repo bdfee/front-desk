@@ -2,12 +2,13 @@ import {
   Model,
   InferAttributes,
   InferCreationAttributes,
+  NonAttribute,
   CreationOptional,
   DataTypes,
   ForeignKey,
-  NonAttribute,
 } from "sequelize";
 import { sequelize } from "../utils/connectToDb";
+
 import Specialist from "./specialist";
 
 class Patient extends Model<InferAttributes<Patient>, InferCreationAttributes<Patient>> {

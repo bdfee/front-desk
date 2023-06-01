@@ -1,8 +1,8 @@
 import { Specialist } from "../../models";
 import { sequelize } from "../../utils/connectToDb";
+import { deleteOneById, updateOneById, getOneById, create, getAll } from "../../services/specialist";
 import { createTestSpecialist, dropAllTables } from "../helpers/models";
 import { expectSpecialist } from "../helpers/shape";
-import { deleteOneById, updateOneById, getOneById, create, getAll } from "../../services/specialist";
 
 beforeEach(async () => await dropAllTables());
 

@@ -1,11 +1,9 @@
-import { Patient as PatientModel } from "../../models";
+import { Patient, PatientDetail } from "../../types";
 import { sequelize } from "../../utils/connectToDb";
+import { getAll, deleteOneById, updateOneById, getOneById, create } from "../../services/patient";
+import { Patient as PatientModel } from "../../models";
 import { createTestPatientAndSpecialist, createTestSpecialist, dropAllTables } from "../helpers/models";
 import { expectPatientDetail, expectPatient } from "../helpers/shape";
-
-import { getAll, deleteOneById, updateOneById, getOneById, create } from "../../services/patient";
-import { Patient, PatientDetail } from "../../types";
-// we assert type to run the expect tests instead of typing the input
 
 beforeEach(async () => await dropAllTables());
 describe("returned shape from patientService", () => {

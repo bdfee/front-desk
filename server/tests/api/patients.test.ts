@@ -2,11 +2,11 @@
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 
 import { sequelize } from "../../utils/connectToDb";
+import { Patient } from "../../models";
 import supertest from "supertest";
 import app from "../../app";
 import { createTestPatientAndSpecialist, createTestSpecialist, dropAllTables } from "../helpers/models";
 import { expectPatient, expectPatientDetail } from "../helpers/shape";
-import { Patient } from "../../models";
 
 const api = supertest(app);
 
