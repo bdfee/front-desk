@@ -1,5 +1,5 @@
 import { Patient, Specialist } from "../models";
-import { isPatientInput, validPatientProperties } from "../typeUtils";
+import { isPatientDetail, isPatientInput, validPatientProperties } from "../typeUtils";
 
 export const create = async (object: unknown): Promise<Patient> => {
   if (!validPatientProperties(object)) {
@@ -83,7 +83,11 @@ export const updateOneById = async (id: number, object: unknown): Promise<Patien
     throw new Error("invalid property");
   }
 
-  const updatedPatient = Object.assign({}, patient, object);
+  patient.set(object);
 
-  return patient.update(updatedPatient);
+  if (!isPatientDetail(patient)) {
+    throw new Error("malformed or invalid value on patient");
+  }
+
+  return patient.save();
 };

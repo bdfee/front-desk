@@ -1,10 +1,12 @@
-import { Specialist, Patient, Appointment } from "./models";
 import {
-  PatientInformationAttributes,
-  AppointmentInformationAttributes,
-  SpecialistProperties,
+  Patient,
+  PatientDetail,
   PatientProperties,
+  AppointmentDetail,
   AppointmentProperties,
+  Appointment,
+  Specialist,
+  SpecialistProperties,
 } from "./types";
 
 // specialist
@@ -34,17 +36,8 @@ export const validSpecialistProperties = (object: unknown): object is Specialist
 };
 
 // patient
-export const validPatientProperties = (object: unknown): object is PatientProperties => {
-  for (const key in object as PatientProperties) {
-    if (!["name", "email", "phone", "dateOfBirth", "gender", "address", "specialistId"].includes(key)) {
-      return false;
-    }
-  }
-  return true;
-};
-
 export const isPatientInput = (object: unknown): object is Patient => {
-  if (typeof object !== "object" || object === null) {
+  if (typeof object !== "object" || object === null || "patientId" in object) {
     return false;
   }
   const { name, email, phone, dateOfBirth, gender, address, specialistId } = object as Patient;
@@ -59,12 +52,12 @@ export const isPatientInput = (object: unknown): object is Patient => {
   );
 };
 
-export const isPatientInformation = (object: unknown): object is PatientInformationAttributes => {
+export const isPatientDetail = (object: unknown): object is PatientDetail => {
   if (typeof object !== "object" || object === null) {
     return false;
   }
 
-  const { name, email, phone, dateOfBirth, gender, address, specialist } = object as PatientInformationAttributes;
+  const { name, email, phone, dateOfBirth, gender, address, specialist } = object as PatientDetail;
   const { name: specialistName } = specialist as { name: string };
 
   return (
@@ -78,18 +71,19 @@ export const isPatientInformation = (object: unknown): object is PatientInformat
     typeof specialistName === "string"
   );
 };
-// appointment
-export const validAppointmentProperties = (object: unknown): object is AppointmentProperties => {
-  for (const key in object as AppointmentProperties) {
-    if (!["patientId", "specialistId", "date", "start", "end", "type", "description"].includes(key)) {
+
+export const validPatientProperties = (object: unknown): object is PatientProperties => {
+  for (const key in object as PatientProperties) {
+    if (!["name", "email", "phone", "dateOfBirth", "gender", "address", "specialistId"].includes(key)) {
       return false;
     }
   }
   return true;
 };
 
+// appointment
 export const isAppointmentInput = (object: unknown): object is Appointment => {
-  if (typeof object !== "object" || object === null) {
+  if (typeof object !== "object" || object === null || "appointmentId" in object) {
     return false;
   }
   const { patientId, specialistId, date, start, end, type, description } = object as Appointment;
@@ -105,12 +99,12 @@ export const isAppointmentInput = (object: unknown): object is Appointment => {
   );
 };
 
-export const isAppointmentInformation = (object: unknown): object is AppointmentInformationAttributes => {
+export const isAppointmentDetail = (object: unknown): object is AppointmentDetail => {
   if (typeof object !== "object" || object === null) {
     return false;
   }
 
-  const { date, start, end, type, description, specialist, patient } = object as AppointmentInformationAttributes;
+  const { date, start, end, type, description, specialist, patient } = object as AppointmentDetail;
   const { name: specialistName } = specialist as { name: string };
   const { name: patientName } = patient as { name: string };
 
@@ -125,4 +119,13 @@ export const isAppointmentInformation = (object: unknown): object is Appointment
     typeof specialistName === "string" &&
     typeof patientName === "string"
   );
+};
+
+export const validAppointmentProperties = (object: unknown): object is AppointmentProperties => {
+  for (const key in object as AppointmentProperties) {
+    if (!["patientId", "specialistId", "date", "start", "end", "type", "description"].includes(key)) {
+      return false;
+    }
+  }
+  return true;
 };

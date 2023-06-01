@@ -1,13 +1,9 @@
 import { InferAttributes } from "sequelize";
-import { Appointment, Patient, Specialist } from "./models";
+import { Appointment as AppointmentModel, Patient as PatientModel, Specialist as SpecialistModel } from "./models";
 
-export type PatientAttributes = InferAttributes<Patient>;
+export type Patient = InferAttributes<PatientModel>;
 
-export type PatientInformationAttributes = Omit<PatientAttributes, "specialistId"> & {
-  specialist: object;
-};
-
-export type PatientProperties = InferAttributes<Patient> & {
+export type PatientProperties = Patient & {
   name?: string;
   email?: string;
   phone?: string;
@@ -17,14 +13,16 @@ export type PatientProperties = InferAttributes<Patient> & {
   specialistId?: number;
 };
 
-export type SpecialistInformationAttributes = InferAttributes<Specialist>;
+export type Specialist = InferAttributes<SpecialistModel>;
 
-export type SpecialistProperties = InferAttributes<Specialist> & {
+export type SpecialistProperties = Specialist & {
   name?: string;
   speciality?: string;
 };
 
-export type AppointmentProperties = InferAttributes<Appointment> & {
+export type Appointment = InferAttributes<AppointmentModel>;
+
+export type AppointmentProperties = Appointment & {
   patientId?: number;
   specialistId?: number;
   date?: string;
@@ -34,9 +32,12 @@ export type AppointmentProperties = InferAttributes<Appointment> & {
   description?: string;
 };
 
-export type AppointmentAttributes = InferAttributes<Appointment>;
+// association inclusions and exclusions
+export type PatientDetail = Omit<Patient, "specialistId"> & {
+  specialist: Omit<Specialist, "specialistId" | "speciality">;
+};
 
-export type AppointmentInformationAttributes = Omit<AppointmentAttributes, "specialistId" | "patientId"> & {
-  specialist: object;
-  patient: object;
+export type AppointmentDetail = Omit<Appointment, "specialistId" | "patientId"> & {
+  specialist: Omit<Specialist, "specialistId" | "speciality">;
+  patient: Omit<Patient, "patientId" | "email" | "phone" | "dateOfBirth" | "gender" | "address" | "specialistId">;
 };

@@ -5,7 +5,7 @@ import { sequelize } from "../../utils/connectToDb";
 import supertest from "supertest";
 import app from "../../app";
 import { createTestSpecialist, dropAllTables } from "../helpers/models";
-import { expectSpecialistInformation } from "../helpers/shape";
+import { expectSpecialist } from "../helpers/shape";
 import { Specialist } from "../../models";
 const api = supertest(app);
 
@@ -23,7 +23,7 @@ describe("/api/specialists", () => {
   describe("post", () => {
     test("specialist is posted", async () => {
       const { body } = await api.post("/api/specialists").send({ name: "test specialist", speciality: "testing" });
-      expectSpecialistInformation(body);
+      expectSpecialist(body);
       expect(await Specialist.count()).toBe(1);
     });
 
@@ -81,7 +81,7 @@ describe("/api/specialists/:id", () => {
       const specialist = await createTestSpecialist();
       const response = await api.get(`/api/specialists/${specialist.specialistId}`);
 
-      expectSpecialistInformation(response.body);
+      expectSpecialist(response.body);
     });
 
     test("no id match returns expected message", async () => {
@@ -95,7 +95,7 @@ describe("/api/specialists/:id", () => {
     test("specialist is updated by id", async () => {
       const { specialistId } = await createTestSpecialist();
       const response = await api.put(`/api/specialists/${specialistId}`).send({ name: "updated name" });
-      expectSpecialistInformation(response.body);
+      expectSpecialist(response.body);
       expect(response.body.name).toBe("updated name");
     });
 
@@ -114,15 +114,13 @@ describe("/api/specialists/:id", () => {
       expect(responseBody.error).toBe("Error updating specialist: Error: invalid property");
     });
 
-    // test("invalid values return expected message", async () => {
-    //   const { specialistId } = await createTestSpecialist();
-    //   const response = await api.put(`/api/specialists/${specialistId}`).send({ name: 1234 });
-    //   expect(response.status).toBe(400);
-    //   const responseBody = JSON.parse(response.text);
-    //   expect(responseBody.error).toBe(
-    //     "Error updating specialist: Error: malformed or invalid value on specialist input"
-    //   );
-    // });
+    test("invalid values return expected message", async () => {
+      const { specialistId } = await createTestSpecialist();
+      const response = await api.put(`/api/specialists/${specialistId}`).send({ name: 1234 });
+      expect(response.status).toBe(400);
+      const responseBody = JSON.parse(response.text);
+      expect(responseBody.error).toBe("Error updating specialist: Error: malformed or invalid value on specialist");
+    });
   });
   describe("delete", () => {
     test("specialist is deleted by id", async () => {

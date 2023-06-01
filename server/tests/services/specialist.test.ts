@@ -1,9 +1,8 @@
 import { Specialist } from "../../models";
 import { sequelize } from "../../utils/connectToDb";
 import { createTestSpecialist, dropAllTables } from "../helpers/models";
-import { expectSpecialistInformation } from "../helpers/shape";
+import { expectSpecialist } from "../helpers/shape";
 import { deleteOneById, updateOneById, getOneById, create, getAll } from "../../services/specialist";
-import { SpecialistInformationAttributes } from "../../types";
 
 beforeEach(async () => await dropAllTables());
 
@@ -12,17 +11,17 @@ describe("returned shape from specialistService", () => {
     await createTestSpecialist();
     const [specialist] = await getAll();
 
-    expectSpecialistInformation(specialist as SpecialistInformationAttributes);
+    expectSpecialist(specialist);
   });
 
   test("updateOneById()", async () => {
     const { specialistId } = await createTestSpecialist();
     const update = { name: "update name" };
-    expectSpecialistInformation(await updateOneById(specialistId, update));
+    expectSpecialist(await updateOneById(specialistId, update));
   });
 
   test("create()", async () => {
-    expectSpecialistInformation(
+    expectSpecialist(
       await create({
         name: "test specialist",
         speciality: "testing",
@@ -33,7 +32,7 @@ describe("returned shape from specialistService", () => {
 
   test("getOneById()", async () => {
     const { specialistId } = await createTestSpecialist();
-    expectSpecialistInformation(await getOneById(specialistId));
+    expectSpecialist(await getOneById(specialistId));
   });
 });
 

@@ -5,7 +5,7 @@ import { sequelize } from "../../utils/connectToDb";
 import supertest from "supertest";
 import app from "../../app";
 import { createTestPatientAndSpecialist, createTestSPA, dropAllTables } from "../helpers/models";
-import { expectAppointment, expectAppointmentInformation } from "../helpers/shape";
+import { expectAppointment, expectAppointmentDetail } from "../helpers/shape";
 import { Appointment } from "../../models";
 
 const api = supertest(app);
@@ -121,7 +121,7 @@ describe("/api/appointments/:id", () => {
     test("appointments is returned by id", async () => {
       const { appointmentId } = await createTestSPA();
       const { body } = await api.get(`/api/appointments/${appointmentId}`);
-      expectAppointmentInformation(body);
+      expectAppointmentDetail(body);
     });
 
     test("no id match returns expected error message", async () => {
@@ -136,7 +136,7 @@ describe("/api/appointments/:id", () => {
     test("appointments is updated by id", async () => {
       const { appointmentId } = await createTestSPA();
       const response = await api.put(`/api/appointments/${appointmentId}`).send({ date: "2020-03-03" });
-      expectAppointmentInformation(response.body);
+      expectAppointmentDetail(response.body);
       expect(response.body.date).toBe("2020-03-03");
     });
 
@@ -155,15 +155,13 @@ describe("/api/appointments/:id", () => {
       expect(responseBody.error).toBe("Error updating appointment: Error: invalid property");
     });
 
-    // test("invalid values return expected message", async () => {
-    //   const { appointmentId } = await createTestSPA();
-    //   const response = await api.put(`/api/appointments/${appointmentId}`).send({ date: 1234 });
-    //   expect(response.status).toBe(400);
-    //   const responseBody = JSON.parse(response.text);
-    //   expect(responseBody.error).toBe(
-    //     "Error updating appointment: Error: malformed or invalid value on appointment input"
-    //   );
-    // });
+    test("invalid values return expected message", async () => {
+      const { appointmentId } = await createTestSPA();
+      const response = await api.put(`/api/appointments/${appointmentId}`).send({ date: 1234 });
+      expect(response.status).toBe(400);
+      const responseBody = JSON.parse(response.text);
+      expect(responseBody.error).toBe("Error updating appointment: Error: malformed or invalid value on appointment");
+    });
   });
   describe("delete", () => {
     //
