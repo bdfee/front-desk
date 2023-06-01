@@ -1,12 +1,19 @@
 import { Appointment, Specialist, Patient } from "../models";
-import { appointmentProperties, isAppointmentInput } from "../typeUtils";
+import { validAppointmentProperties, isAppointmentInput } from "../typeUtils";
 
-export const create = async (appointmentInput: object): Promise<Appointment> => {
-  if (!isAppointmentInput(appointmentInput)) {
-    throw new Error("Malformed or missing appointment input");
+export const create = async (object: unknown): Promise<Appointment> => {
+  if (!validAppointmentProperties(object)) {
+    throw new Error("invalid property on appointment input");
   }
 
-  return Appointment.create(appointmentInput);
+  if (!isAppointmentInput(object)) {
+    throw new Error("malformed or invalid value on appointment input");
+  }
+  try {
+    return Appointment.create(object);
+  } catch (error) {
+    throw new Error("unknown error creating appointment: " + error);
+  }
 };
 
 export const getAll = async (): Promise<Appointment[]> => {
@@ -42,7 +49,7 @@ export const getOneById = async (id: number): Promise<Appointment> => {
   });
 
   if (appointment === null) {
-    throw new Error("No matching appointment id found");
+    throw new Error("no matching appointment id found");
   }
 
   return appointment;
@@ -52,7 +59,7 @@ export const deleteOneById = async (id: number) => {
   const appointment = await Appointment.findByPk(id);
 
   if (!appointment) {
-    throw new Error("No matching appointment id found");
+    throw new Error("no matching appointment id found");
   }
 
   await appointment.destroy();
@@ -77,12 +84,14 @@ export const updateOneById = async (id: number, object: unknown): Promise<Appoin
   });
 
   if (!appointment) {
-    throw new Error("No matching appointment id found");
+    throw new Error("no matching appointment id found");
   }
 
-  if (!appointmentProperties(object)) {
-    throw new Error("Invalid property");
+  if (!validAppointmentProperties(object)) {
+    throw new Error("invalid property");
   }
 
-  return appointment.update({ ...appointment, ...object });
+  const updatedAppointment = Object.assign({}, appointment, object);
+
+  return appointment.update(updatedAppointment);
 };

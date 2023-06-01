@@ -18,8 +18,8 @@ router.post("/", async (req, res) => {
     const specialist = await specialistService.create(req.body);
     res.json(specialist);
   } catch (error) {
-    console.log("Error creating specialists: ", error);
-    res.status(400).json({ error: "Error creating specialists: " + error });
+    console.log("Error posting specialists: ", error);
+    res.status(400).json({ error: "Error posting specialists: " + error });
   }
 });
 

@@ -12,7 +12,6 @@ export const isSpecialistInput = (object: unknown): object is Specialist => {
   if (typeof object !== "object" || object === null || "specialistId" in object) {
     return false;
   }
-
   const { name, speciality } = object as Specialist;
   return typeof name === "string" && typeof speciality === "string";
 };
@@ -21,17 +20,12 @@ export const isSpecialist = (object: unknown): object is Specialist => {
   if (typeof object !== "object" || object === null) {
     return false;
   }
-
   const { specialistId, name, speciality } = object as Specialist;
   return typeof specialistId === "number" && typeof name === "string" && typeof speciality === "string";
 };
 
 export const validSpecialistProperties = (object: unknown): object is SpecialistProperties => {
-  if (typeof object !== "object" || object === null) {
-    return false;
-  }
-
-  for (const key in object) {
+  for (const key in object as SpecialistProperties) {
     if (!["specialistId", "name", "speciality"].includes(key)) {
       return false;
     }
@@ -39,13 +33,11 @@ export const validSpecialistProperties = (object: unknown): object is Specialist
   return true;
 };
 
-export const patientProperties = (object: unknown): object is PatientProperties => {
-  if (typeof object !== "object" || object === null) {
-    throw new Error("malformed or missing object");
-  }
-  for (const key in object) {
+// patient
+export const validPatientProperties = (object: unknown): object is PatientProperties => {
+  for (const key in object as PatientProperties) {
     if (!["name", "email", "phone", "dateOfBirth", "gender", "address", "specialistId"].includes(key)) {
-      throw new Error("invalid property");
+      return false;
     }
   }
   return true;
@@ -53,7 +45,7 @@ export const patientProperties = (object: unknown): object is PatientProperties 
 
 export const isPatientInput = (object: unknown): object is Patient => {
   if (typeof object !== "object" || object === null) {
-    throw new Error("malformed or missing object");
+    return false;
   }
   const { name, email, phone, dateOfBirth, gender, address, specialistId } = object as Patient;
   return (
@@ -69,7 +61,7 @@ export const isPatientInput = (object: unknown): object is Patient => {
 
 export const isPatientInformation = (object: unknown): object is PatientInformationAttributes => {
   if (typeof object !== "object" || object === null) {
-    throw new Error("malformed or missing object");
+    return false;
   }
 
   const { name, email, phone, dateOfBirth, gender, address, specialist } = object as PatientInformationAttributes;
@@ -86,14 +78,11 @@ export const isPatientInformation = (object: unknown): object is PatientInformat
     typeof specialistName === "string"
   );
 };
-
-export const appointmentProperties = (object: unknown): object is AppointmentProperties => {
-  if (typeof object !== "object" || object === null) {
-    throw new Error("malformed or missing object");
-  }
-  for (const key in object) {
+// appointment
+export const validAppointmentProperties = (object: unknown): object is AppointmentProperties => {
+  for (const key in object as AppointmentProperties) {
     if (!["patientId", "specialistId", "date", "start", "end", "type", "description"].includes(key)) {
-      throw new Error("invalid property");
+      return false;
     }
   }
   return true;
@@ -101,7 +90,7 @@ export const appointmentProperties = (object: unknown): object is AppointmentPro
 
 export const isAppointmentInput = (object: unknown): object is Appointment => {
   if (typeof object !== "object" || object === null) {
-    throw new Error("malformed or missing object");
+    return false;
   }
   const { patientId, specialistId, date, start, end, type, description } = object as Appointment;
 
@@ -118,7 +107,7 @@ export const isAppointmentInput = (object: unknown): object is Appointment => {
 
 export const isAppointmentInformation = (object: unknown): object is AppointmentInformationAttributes => {
   if (typeof object !== "object" || object === null) {
-    throw new Error("malformed or missing object");
+    return false;
   }
 
   const { date, start, end, type, description, specialist, patient } = object as AppointmentInformationAttributes;

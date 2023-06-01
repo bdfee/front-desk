@@ -1,12 +1,20 @@
 import { Patient, Specialist } from "../models";
-import { isPatientInput, patientProperties } from "../typeUtils";
+import { isPatientInput, validPatientProperties } from "../typeUtils";
 
-export const create = async (patientInput: object) => {
-  if (!isPatientInput(patientInput)) {
-    throw new Error("Malformed or missing patient input");
+export const create = async (object: unknown): Promise<Patient> => {
+  if (!validPatientProperties(object)) {
+    throw new Error("invalid property on patient input");
   }
 
-  return Patient.create(patientInput);
+  if (!isPatientInput(object)) {
+    throw new Error("malformed or invalid value on patient input");
+  }
+
+  try {
+    return Patient.create(object);
+  } catch (error) {
+    throw new Error("unknown error creating patient: " + error);
+  }
 };
 
 export const getAll = async (): Promise<Patient[]> => {
@@ -38,7 +46,7 @@ export const getOneById = async (id: number): Promise<Patient> => {
   });
 
   if (patient === null) {
-    throw new Error("No matching patient id found");
+    throw new Error("no matching patient id found");
   }
 
   return patient;
@@ -48,7 +56,7 @@ export const deleteOneById = async (id: number) => {
   const patient = await Patient.findByPk(id);
 
   if (!patient) {
-    throw new Error("No matching patient id found");
+    throw new Error("no matching patient id found");
   }
 
   await patient.destroy();
@@ -68,12 +76,14 @@ export const updateOneById = async (id: number, object: unknown): Promise<Patien
     ],
   });
   if (!patient) {
-    throw new Error("No matching patient id found");
+    throw new Error("no matching patient id found");
   }
 
-  if (!patientProperties(object)) {
-    throw new Error("Invalid property");
+  if (!validPatientProperties(object)) {
+    throw new Error("invalid property");
   }
 
-  return patient.update({ ...patient, ...object });
+  const updatedPatient = Object.assign({}, patient, object);
+
+  return patient.update(updatedPatient);
 };

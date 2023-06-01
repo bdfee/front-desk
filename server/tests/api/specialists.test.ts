@@ -34,7 +34,7 @@ describe("/api/specialists", () => {
 
       expect(response.status).toBe(400);
       const responseBody = JSON.parse(response.text);
-      expect(responseBody.error).toBe("Error creating specialists: Error: invalid property on specialist input");
+      expect(responseBody.error).toBe("Error posting specialists: Error: invalid property on specialist input");
       expect(await Specialist.count()).toBe(0);
     });
 
@@ -44,7 +44,7 @@ describe("/api/specialists", () => {
       expect(response.status).toBe(400);
       const responseBody = JSON.parse(response.text);
       expect(responseBody.error).toBe(
-        "Error creating specialists: Error: malformed or invalid value on specialist input"
+        "Error posting specialists: Error: malformed or invalid value on specialist input"
       );
       expect(await Specialist.count()).toBe(0);
     });
@@ -55,7 +55,7 @@ describe("/api/specialists", () => {
       expect(response.status).toBe(400);
       const responseBody = JSON.parse(response.text);
       expect(responseBody.error).toBe(
-        "Error creating specialists: Error: malformed or invalid value on specialist input"
+        "Error posting specialists: Error: malformed or invalid value on specialist input"
       );
       expect(await Specialist.count()).toBe(0);
     });
@@ -68,7 +68,7 @@ describe("/api/specialists", () => {
       expect(response.status).toBe(400);
       const responseBody = JSON.parse(response.text);
       expect(responseBody.error).toBe(
-        "Error creating specialists: Error: malformed or invalid value on specialist input"
+        "Error posting specialists: Error: malformed or invalid value on specialist input"
       );
       expect(await Specialist.count()).toBe(0);
     });

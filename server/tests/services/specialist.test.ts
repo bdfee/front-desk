@@ -91,7 +91,7 @@ describe("getOneById()", () => {
     try {
       await getOneById(2);
     } catch (error) {
-      error instanceof Error && expect(error.message).toBe("No matching specialist id found");
+      error instanceof Error && expect(error.message).toBe("no matching specialist id found");
     }
 
     expect(await Specialist.count()).toBe(1);
@@ -116,7 +116,7 @@ describe("deleteOneById()", () => {
     try {
       await deleteOneById(2);
     } catch (error) {
-      error instanceof Error && expect(error.message).toBe("No matching specialist id found");
+      error instanceof Error && expect(error.message).toBe("no matching specialist id found");
     }
 
     expect(await Specialist.count()).toBe(1);
@@ -143,7 +143,7 @@ describe("updateOneById()", () => {
     try {
       await updateOneById(2, { name: "update name" });
     } catch (error) {
-      error instanceof Error && expect(error.message).toBe("No matching specialist id found");
+      error instanceof Error && expect(error.message).toBe("no matching specialist id found");
     }
     const unchangedSpecialist = await Specialist.findByPk(specialist.specialistId);
     expect(unchangedSpecialist?.name).toBe("test specialist");
@@ -157,7 +157,7 @@ describe("updateOneById()", () => {
     try {
       await updateOneById(1, { invalid: "invalid update" });
     } catch (error) {
-      error instanceof Error && expect(error.message).toBe("Invalid property");
+      error instanceof Error && expect(error.message).toBe("invalid property");
     }
   });
 });
