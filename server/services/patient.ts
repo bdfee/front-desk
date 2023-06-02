@@ -1,93 +1,29 @@
-import { Specialist, Patient } from "../models";
-import { isPatientInput, isPatientDetail, validPatientProperties } from "../typeUtils";
+import { Patient } from "../models";
+import { findOne, findAll, findOneByPk } from "./utils/patient";
+import { validateDetail, validateInput, validateProperties } from "./validation/patient";
 
-export const create = async (object: unknown): Promise<Patient> => {
-  if (!validPatientProperties(object)) {
-    throw new Error("invalid property on patient input");
-  }
+export const getAll = async (): Promise<Patient[]> => findAll();
 
-  if (!isPatientInput(object)) {
-    throw new Error("malformed or invalid value on patient input");
-  }
-
-  try {
-    return Patient.create(object);
-  } catch (error) {
-    throw new Error("unknown error creating patient: " + error);
-  }
-};
-
-export const getAll = async (): Promise<Patient[]> => {
-  return Patient.findAll({
-    include: [
-      {
-        model: Specialist,
-        as: "specialist",
-        attributes: ["name"],
-      },
-    ],
-    attributes: {
-      exclude: ["specialistId"],
-    },
-  });
-};
-
-export const getOneById = async (id: number): Promise<Patient> => {
-  const patient = await Patient.findOne({
-    where: {
-      patientId: id,
-    },
-    include: [
-      {
-        model: Specialist,
-        attributes: ["name"],
-      },
-    ],
-  });
-
-  if (patient === null) {
-    throw new Error("no matching patient id found");
-  }
-
-  return patient;
-};
+export const getOneById = async (id: number): Promise<Patient> => findOne(id);
 
 export const deleteOneById = async (id: number) => {
-  const patient = await Patient.findByPk(id);
-
-  if (!patient) {
-    throw new Error("no matching patient id found");
-  }
-
-  await patient.destroy();
+  await findOneByPk(id).then((patient) => patient.destroy());
   return 1;
 };
 
 export const updateOneById = async (id: number, object: unknown): Promise<Patient> => {
-  const patient = await Patient.findOne({
-    where: {
-      patientId: id,
-    },
-    include: [
-      {
-        model: Specialist,
-        attributes: ["name"],
-      },
-    ],
-  });
-  if (!patient) {
-    throw new Error("no matching patient id found");
+  const patient = await findOne(id);
+
+  if (validateProperties(object)) {
+    patient.set(object);
   }
 
-  if (!validPatientProperties(object)) {
-    throw new Error("invalid property");
-  }
+  if (validateDetail(patient)) {
+    return patient.save();
+  } else throw new Error("Unknown error updating patient");
+};
 
-  patient.set(object);
-
-  if (!isPatientDetail(patient)) {
-    throw new Error("malformed or invalid value on patient");
-  }
-
-  return patient.save();
+export const create = async (object: unknown): Promise<Patient> => {
+  if (validateProperties(object) && validateInput(object)) return Patient.create(object);
+  else throw new Error("Unknown error creating patient");
 };
