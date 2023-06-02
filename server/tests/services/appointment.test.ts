@@ -177,7 +177,7 @@ describe("updateOneById()", () => {
     try {
       await updateOneById(1, { invalid: "invalid update" });
     } catch (error) {
-      error instanceof Error && expect(error.message).toBe("invalid property");
+      error instanceof Error && expect(error.message).toBe("invalid property on appointment input");
     }
   });
 });

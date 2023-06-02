@@ -146,7 +146,7 @@ describe("/api/appointments/:id", () => {
       const { appointmentId } = await createTestSPA();
       const response = await api.put(`/api/appointments/${appointmentId}`).send({ invalid: "invalid property name" });
       expect(response.status).toBe(400);
-      expect(response.body.error).toBe("Error updating appointment: Error: invalid property");
+      expect(response.body.error).toBe("Error updating appointment: Error: invalid property on appointment input");
     });
 
     test("invalid values return expected message", async () => {

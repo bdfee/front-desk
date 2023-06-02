@@ -106,7 +106,7 @@ describe("/api/specialists/:id", () => {
       const { specialistId } = await createTestSpecialist();
       const response = await api.put(`/api/specialists/${specialistId}`).send({ invalid: "invalid property name" });
       expect(response.status).toBe(400);
-      expect(response.body.error).toBe("Error updating specialist: Error: invalid property");
+      expect(response.body.error).toBe("Error updating specialist: Error: invalid property on specialist input");
     });
 
     test("invalid values return expected message", async () => {

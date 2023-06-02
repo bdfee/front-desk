@@ -142,7 +142,7 @@ describe("/api/patients/:id", () => {
       const { patientId } = await createTestPatientAndSpecialist();
       const response = await api.put(`/api/patients/${patientId}`).send({ invalid: "invalid property name" });
       expect(response.status).toBe(400);
-      expect(response.body.error).toBe("Error updating patient: Error: invalid property");
+      expect(response.body.error).toBe("Error updating patient: Error: invalid property on patient input");
     });
 
     test("invalid values return expected message", async () => {
