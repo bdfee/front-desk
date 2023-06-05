@@ -179,4 +179,25 @@ describe("updateOneById", () => {
   });
 });
 
+describe("getCountBySpecialist", () => {
+  test("returns count by specialist", async () => {
+    //
+  });
+
+  test("returns zero when no patients", async () => {
+    //
+  });
+});
+
+describe("getAllBySpecialist", () => {
+  test("returns patients by specialist", async () => {
+    //
+  });
+
+  test("returns empty array when no patients"),
+    async () => {
+      //
+    };
+});
+
 afterAll(async () => await sequelize.close());

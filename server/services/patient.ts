@@ -1,8 +1,10 @@
 import { Patient } from "../models";
-import { findOne, findAll, findOneByPk } from "./utils/patient";
+import { findOne, findAll, findOneByPk, findAllBySpecialist, countAllBySpecialist } from "./utils/patient";
 import { validateDetail, validateInput, validateProperties } from "./validation/patient";
 
 export const getAll = async (): Promise<Patient[]> => findAll();
+
+export const getAllBySpecialist = async (specialistId: number): Promise<Patient[]> => findAllBySpecialist(specialistId);
 
 export const getOneById = async (id: number): Promise<Patient> => findOne(id);
 
@@ -27,3 +29,5 @@ export const create = async (object: unknown): Promise<Patient> => {
   if (validateProperties(object) && validateInput(object)) return Patient.create(object);
   else throw new Error("Unknown error creating patient");
 };
+
+export const getCountBySpecialist = async (specialistId: number): Promise<number> => countAllBySpecialist(specialistId);
