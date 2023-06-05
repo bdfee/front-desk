@@ -129,3 +129,7 @@ export const validAppointmentProperties = (object: unknown): object is Appointme
   }
   return true;
 };
+
+export const isDate = (date: string): boolean => {
+  return Boolean(Date.parse(date));
+};

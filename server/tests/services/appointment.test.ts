@@ -36,6 +36,18 @@ describe("returned shape from appointmentService", () => {
     );
   });
 
+  test("getAllBySpecialist", async () => {
+    //
+  });
+
+  test("getAllByPatient", async () => {
+    //
+  });
+
+  test("getAllByTimeframe", async () => {
+    //
+  });
+
   test("updateOneById()", async () => {
     await createTestSPA();
     const update = {
@@ -179,6 +191,40 @@ describe("updateOneById()", () => {
     } catch (error) {
       error instanceof Error && expect(error.message).toBe("invalid property on appointment input");
     }
+  });
+});
+
+describe("getAllBySpecialist", () => {
+  test("returns appointments by specialist", async () => {
+    //
+  });
+
+  test("returns empty array if no appointments", async () => {
+    //
+  });
+});
+
+describe("getAllByPatient", () => {
+  test("returns appointments by patient", async () => {
+    //
+  });
+  test("returns empty array if no appointments", async () => {
+    //
+  });
+});
+
+describe("getAllByTimeframe", () => {
+  test("returns appointments by timeframe", async () => {
+    //
+  });
+  test("returns empty array if no appointments", async () => {
+    //
+  });
+  test("invalid date string returns expected error message", async () => {
+    // start and end
+  });
+  test("invalid dateframe returns expected error message", async () => {
+    //
   });
 });
 

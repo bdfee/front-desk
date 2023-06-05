@@ -1,3 +1,4 @@
+import { isDate } from "util/types";
 import { Appointment, AppointmentDetail, AppointmentProperties } from "../../types";
 import { isAppointmentDetail, isAppointmentInput, validAppointmentProperties } from "../../typeUtils";
 
@@ -18,6 +19,17 @@ export const validateInput = (object: unknown): object is Appointment => {
 export const validateDetail = (object: unknown): object is AppointmentDetail => {
   if (!isAppointmentDetail(object)) {
     throw new Error("malformed or invalid value on appointment");
+  }
+  return true;
+};
+
+export const validateTimeframe = (start: string, end: string) => {
+  if (!isDate(start) || !isDate(end) || !start || !end) {
+    throw new Error("invalid date on timeframe");
+  }
+
+  if (new Date(start) > new Date(end)) {
+    throw new Error("start date must come before end date");
   }
   return true;
 };
