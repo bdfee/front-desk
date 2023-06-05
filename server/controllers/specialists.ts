@@ -1,5 +1,6 @@
 import { Router } from "express";
 import * as specialistService from "../services/specialist";
+import * as patientService from "../services/patient";
 
 const router = Router();
 
@@ -34,6 +35,30 @@ router.get("/:id", async (req, res, next) => {
   } catch (error) {
     if (error instanceof Error) {
       error.message = "Error getting specialist: " + error;
+      next(error);
+    }
+  }
+});
+
+router.get("/:id/patients", async (req, res, next) => {
+  try {
+    const patientList = await patientService.getAllBySpecialist(+req.params.id);
+    res.json(patientList);
+  } catch (error) {
+    if (error instanceof Error) {
+      error.message = "Error getting patient list: " + error;
+      next(error);
+    }
+  }
+});
+
+router.get("/:id/patients/count", async (req, res, next) => {
+  try {
+    const patientCount = await patientService.getCountBySpecialist(+req.params.id);
+    res.json(patientCount);
+  } catch (error) {
+    if (error instanceof Error) {
+      error.message = "Error getting patient count: " + error;
       next(error);
     }
   }
