@@ -1,6 +1,15 @@
 import { Appointment, AppointmentDetail } from "../../types";
 import { sequelize } from "../../utils/connectToDb";
-import { getAll, getOneById, create, updateOneById, deleteOneById } from "../../services/appointment";
+import {
+  getAll,
+  getOneById,
+  create,
+  updateOneById,
+  deleteOneById,
+  getAllBySpecialist,
+  getAllByPatient,
+  getAllByDateframe,
+} from "../../services/appointment";
 import { Appointment as AppointmentModel } from "../../models";
 import { createTestPatientAndSpecialist, createTestSPA, createTestSpecificSPA, dropAllTables } from "../helpers/models";
 import { expectAppointment, expectAppointmentDetail } from "../helpers/shape";
@@ -37,15 +46,23 @@ describe("returned shape from appointmentService", () => {
   });
 
   test("getAllBySpecialist", async () => {
-    //
+    const { specialistId } = await createTestSPA();
+    const appointmentList = await getAllBySpecialist(specialistId);
+    expectAppointment(appointmentList[0] as Appointment);
   });
 
   test("getAllByPatient", async () => {
-    //
+    const { patientId } = await createTestSPA();
+    const appointmentList = await getAllByPatient(patientId);
+    expectAppointment(appointmentList[0] as Appointment);
   });
 
   test("getAllByTimeframe", async () => {
-    //
+    // 2020-02-02
+    await createTestSPA();
+
+    const appointmentList = await getAllByDateframe("2020-01-01", "2020-10-10");
+    expectAppointment(appointmentList[0] as Appointment);
   });
 
   test("updateOneById()", async () => {
@@ -196,35 +213,71 @@ describe("updateOneById()", () => {
 
 describe("getAllBySpecialist", () => {
   test("returns appointments by specialist", async () => {
-    //
+    await createTestSPA();
+
+    const { specialistId, patientId } = await createTestSPA();
+    await createTestSpecificSPA(specialistId, patientId);
+
+    const appointmentList = await getAllBySpecialist(specialistId);
+
+    expect(appointmentList).toHaveLength(2);
   });
 
   test("returns empty array if no appointments", async () => {
-    //
+    const { specialistId } = await createTestPatientAndSpecialist();
+    const appointmentList = await getAllBySpecialist(specialistId);
+    expect(appointmentList).toHaveLength(0);
   });
 });
 
 describe("getAllByPatient", () => {
   test("returns appointments by patient", async () => {
-    //
+    await createTestSPA();
+
+    const { specialistId, patientId } = await createTestSPA();
+    await createTestSpecificSPA(specialistId, patientId);
+
+    const appointmentList = await getAllByPatient(patientId);
+
+    expect(appointmentList).toHaveLength(2);
   });
   test("returns empty array if no appointments", async () => {
-    //
+    const { patientId } = await createTestPatientAndSpecialist();
+    const appointmentList = await getAllByPatient(patientId);
+    expect(appointmentList).toHaveLength(0);
   });
 });
 
 describe("getAllByTimeframe", () => {
   test("returns appointments by timeframe", async () => {
-    //
+    const { patientId, specialistId } = await createTestSPA();
+    await createTestSpecificSPA(patientId, specialistId, "2021-02-02");
+    await createTestSpecificSPA(patientId, specialistId, "2022-02-02");
+
+    const appointmentList = await getAllByDateframe("2021-01-01", "2021-11-31");
+    expect(appointmentList).toHaveLength(1);
   });
   test("returns empty array if no appointments", async () => {
-    //
+    //2020-02-02
+    await createTestSPA();
+    const appointmentList = await getAllByDateframe("2021-01-01", "2021-11-31");
+    expect(appointmentList).toHaveLength(0);
   });
   test("invalid date string returns expected error message", async () => {
-    // start and end
+    await createTestSPA();
+    try {
+      await getAllByDateframe("2021-12-01", "2022-11-31");
+    } catch (error) {
+      error instanceof Error && expect(error.message).toBe("invalid date on dateframe");
+    }
   });
   test("invalid dateframe returns expected error message", async () => {
-    //
+    await createTestSPA();
+    try {
+      await getAllByDateframe("2021-02-02", "2020-02-02");
+    } catch (error) {
+      error instanceof Error && expect(error.message).toBe("start date must come before end date");
+    }
   });
 });
 

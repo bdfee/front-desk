@@ -1,6 +1,5 @@
-import { isDate } from "util/types";
 import { Appointment, AppointmentDetail, AppointmentProperties } from "../../types";
-import { isAppointmentDetail, isAppointmentInput, validAppointmentProperties } from "../../typeUtils";
+import { isAppointmentDetail, isAppointmentInput, validAppointmentProperties, isDate } from "../../typeUtils";
 
 export const validateProperties = (object: unknown): object is AppointmentProperties => {
   if (!validAppointmentProperties(object)) {
@@ -23,9 +22,9 @@ export const validateDetail = (object: unknown): object is AppointmentDetail => 
   return true;
 };
 
-export const validateTimeframe = (start: string, end: string) => {
+export const validateDateframe = (start: string, end: string) => {
   if (!isDate(start) || !isDate(end) || !start || !end) {
-    throw new Error("invalid date on timeframe");
+    throw new Error("invalid date on dateframe");
   }
 
   if (new Date(start) > new Date(end)) {
