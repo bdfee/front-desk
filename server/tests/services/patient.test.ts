@@ -1,8 +1,21 @@
 import { Patient, PatientDetail } from "../../types";
 import { sequelize } from "../../utils/connectToDb";
-import { getAll, deleteOneById, updateOneById, getOneById, create } from "../../services/patient";
+import {
+  getAll,
+  deleteOneById,
+  updateOneById,
+  getOneById,
+  create,
+  getAllBySpecialist,
+  getCountBySpecialist,
+} from "../../services/patient";
 import { Patient as PatientModel } from "../../models";
-import { createTestPatientAndSpecialist, createTestSpecialist, dropAllTables } from "../helpers/models";
+import {
+  createTestPatient,
+  createTestPatientAndSpecialist,
+  createTestSpecialist,
+  dropAllTables,
+} from "../helpers/models";
 import { expectPatientDetail, expectPatient } from "../helpers/shape";
 
 beforeEach(async () => await dropAllTables());
@@ -40,6 +53,14 @@ describe("returned shape from patientService", () => {
     const update = { name: "update name" };
 
     expectPatientDetail((await updateOneById(patientId, update)) as PatientDetail);
+  });
+
+  test("getAllBySpecialist", async () => {
+    const { specialistId } = await createTestPatientAndSpecialist();
+
+    const patientList = await getAllBySpecialist(specialistId);
+
+    expectPatient(patientList[0] as Patient);
   });
 });
 
@@ -176,6 +197,41 @@ describe("updateOneById", () => {
     } catch (error) {
       error instanceof Error && expect(error.message).toBe("invalid property on patient input");
     }
+  });
+});
+
+describe("getCountBySpecialist", () => {
+  test("returns count by specialist", async () => {
+    await createTestPatientAndSpecialist();
+
+    const { specialistId } = await createTestPatientAndSpecialist();
+    await createTestPatient(specialistId);
+    await createTestPatient(specialistId);
+
+    expect(await getCountBySpecialist(specialistId)).toBe(3);
+  });
+
+  test("returns zero when no patients", async () => {
+    const { specialistId } = await createTestSpecialist();
+    expect(await getCountBySpecialist(specialistId)).toBe(0);
+  });
+});
+
+describe("getAllBySpecialist", () => {
+  test("returns patients by specialist", async () => {
+    await createTestPatientAndSpecialist();
+
+    const { specialistId } = await createTestPatientAndSpecialist();
+    await createTestPatient(specialistId);
+    await createTestPatient(specialistId);
+
+    const patientList = await getAllBySpecialist(specialistId);
+    expect(patientList).toHaveLength(3);
+  });
+
+  test("returns empty array when no patients", async () => {
+    const { specialistId } = await createTestSpecialist();
+    expect(await getAllBySpecialist(specialistId)).toHaveLength(0);
   });
 });
 

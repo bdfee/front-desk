@@ -30,3 +30,15 @@ export const findAll = async () => {
     },
   });
 };
+
+export const findAllBySpecialist = async (specialistId: number) => {
+  return Patient.findAll({
+    where: { specialistId },
+  });
+};
+
+export const countAllBySpecialist = async (specialistId: number) => {
+  return Patient.count({
+    where: { specialistId },
+  });
+};

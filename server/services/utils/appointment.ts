@@ -1,4 +1,11 @@
-import { findOneById, findByPk, findAll as find } from "../../queries/appointment";
+import {
+  findOneById,
+  findByPk,
+  findAll as find,
+  findAllByPatient as findByPatient,
+  findAllBySpecialist as findBySpecialist,
+  findAllByTimeframe as findByTimeframe,
+} from "../../queries/appointment";
 
 export const findOne = async (id: number) => {
   const appointment = await findOneById(id);
@@ -18,3 +25,9 @@ export const findOneByPk = async (id: number) => {
 };
 
 export const findAll = async () => find();
+
+export const findAllByPatient = async (patientId: number) => findByPatient(patientId);
+
+export const findAllBySpecialist = async (specialistId: number) => findBySpecialist(specialistId);
+
+export const findAllByTimeframe = async (start: string, end: string) => findByTimeframe(start, end);
