@@ -10,6 +10,8 @@ import {
   createTestPatientAndSpecialist,
   createTestSpecialist,
   dropAllTables,
+  createTestSPA,
+  createTestSpecificSPA,
 } from "../helpers/models";
 import { expectSpecialist } from "../helpers/shape";
 
@@ -160,6 +162,17 @@ describe("/api/specialists/:id/patients/count", () => {
     const response = await api.get(`/api/specialists/${specialistId}/patients/count`);
     expect(response.status).toBe(200);
     expect(response.body).toBe(2);
+  });
+});
+
+describe("/api/specialists/:id/appointments", () => {
+  test("appointments are returned by specialist", async () => {
+    const { patientId, specialistId } = await createTestSPA();
+    await createTestSpecificSPA(patientId, specialistId);
+
+    const response = await api.get(`/api/specialists/${specialistId}/appointments`);
+    expect(response.status).toBe(200);
+    expect(response.body).toHaveLength(2);
   });
 });
 
