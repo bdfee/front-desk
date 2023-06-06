@@ -5,7 +5,13 @@ import { sequelize } from "../../utils/connectToDb";
 import { Patient } from "../../models";
 import supertest from "supertest";
 import app from "../../app";
-import { createTestPatientAndSpecialist, createTestSpecialist, dropAllTables } from "../helpers/models";
+import {
+  createTestPatientAndSpecialist,
+  createTestSpecialist,
+  dropAllTables,
+  createTestSpecificSPA,
+  createTestSPA,
+} from "../helpers/models";
 import { expectPatient, expectPatientDetail } from "../helpers/shape";
 
 const api = supertest(app);
@@ -170,6 +176,17 @@ describe("/api/patients/:id", () => {
       expect(response.body.error).toBe("Error deleting patient: Error: no matching patient id found");
       expect(await Patient.count()).toBe(1);
     });
+  });
+});
+
+describe("/api/patients/:id/appointments", () => {
+  test("appointments are returned by patient id", async () => {
+    const { patientId, specialistId } = await createTestSPA();
+    await createTestSpecificSPA(patientId, specialistId);
+
+    const response = await api.get(`/api/patients/${patientId}/appointments`);
+    expect(response.status).toBe(200);
+    expect(response.body).toHaveLength(2);
   });
 });
 

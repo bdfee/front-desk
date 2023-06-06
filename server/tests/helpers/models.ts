@@ -47,9 +47,9 @@ export const createTestSPA = async () => {
   });
 };
 
-export const createTestSpecificSPA = async (patientId: number, specialistId: number, date = "2020-02-02") => {
+export const createTestSpecificSPA = async (patientId: number, specialistId: number) => {
   return Appointment.create({
-    date,
+    date: "2020-02-02",
     start: "09:00:00",
     end: "10:00:00",
     type: "intake",

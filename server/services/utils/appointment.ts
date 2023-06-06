@@ -4,7 +4,7 @@ import {
   findAll as find,
   findAllByPatient as findByPatient,
   findAllBySpecialist as findBySpecialist,
-  findAllByTimeframe as findByTimeframe,
+  findAllByDateframe as findByDateframe,
 } from "../../queries/appointment";
 
 export const findOne = async (id: number) => {
@@ -30,4 +30,4 @@ export const findAllByPatient = async (patientId: number) => findByPatient(patie
 
 export const findAllBySpecialist = async (specialistId: number) => findBySpecialist(specialistId);
 
-export const findAllByTimeframe = async (start: string, end: string) => findByTimeframe(start, end);
+export const findAllByDateframe = async (start: string, end: string) => findByDateframe(start, end);

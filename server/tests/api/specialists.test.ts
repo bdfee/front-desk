@@ -5,7 +5,14 @@ import { sequelize } from "../../utils/connectToDb";
 import { Specialist } from "../../models";
 import supertest from "supertest";
 import app from "../../app";
-import { createTestSpecialist, dropAllTables } from "../helpers/models";
+import {
+  createTestPatient,
+  createTestPatientAndSpecialist,
+  createTestSpecialist,
+  dropAllTables,
+  createTestSPA,
+  createTestSpecificSPA,
+} from "../helpers/models";
 import { expectSpecialist } from "../helpers/shape";
 
 const api = supertest(app);
@@ -133,6 +140,39 @@ describe("/api/specialists/:id", () => {
       expect(response.body.error).toBe("Error deleting specialist: Error: no matching specialist id found");
       expect(await Specialist.count()).toBe(1);
     });
+  });
+});
+
+describe("/api/specialists/:id/patients", () => {
+  test("patient list is returned", async () => {
+    const { specialistId } = await createTestPatientAndSpecialist();
+    await createTestPatient(specialistId);
+
+    const response = await api.get(`/api/specialists/${specialistId}/patients`);
+    expect(response.status).toBe(200);
+    expect(response.body).toHaveLength(2);
+  });
+});
+
+describe("/api/specialists/:id/patients/count", () => {
+  test("patient count is returned", async () => {
+    const { specialistId } = await createTestPatientAndSpecialist();
+    await createTestPatient(specialistId);
+
+    const response = await api.get(`/api/specialists/${specialistId}/patients/count`);
+    expect(response.status).toBe(200);
+    expect(response.body).toBe(2);
+  });
+});
+
+describe("/api/specialists/:id/appointments", () => {
+  test("appointments are returned by specialist", async () => {
+    const { patientId, specialistId } = await createTestSPA();
+    await createTestSpecificSPA(patientId, specialistId);
+
+    const response = await api.get(`/api/specialists/${specialistId}/appointments`);
+    expect(response.status).toBe(200);
+    expect(response.body).toHaveLength(2);
   });
 });
 

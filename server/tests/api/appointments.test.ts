@@ -5,7 +5,7 @@ import { sequelize } from "../../utils/connectToDb";
 import { Appointment } from "../../models";
 import supertest from "supertest";
 import app from "../../app";
-import { createTestPatientAndSpecialist, createTestSPA, dropAllTables } from "../helpers/models";
+import { createTestPatientAndSpecialist, createTestSPA, createTestSpecificSPA, dropAllTables } from "../helpers/models";
 import { expectAppointment, expectAppointmentDetail } from "../helpers/shape";
 
 const api = supertest(app);
@@ -174,6 +174,52 @@ describe("/api/appointments/:id", () => {
       expect(response.body.error).toBe("Error deleting appointment: Error: no matching appointment id found");
       expect(await Appointment.count()).toBe(1);
     });
+  });
+});
+
+describe("/api/appointments/entries?", () => {
+  test("appointments are returned within dateframe", async () => {
+    const { specialistId, patientId } = await createTestSPA();
+    await createTestSpecificSPA(patientId, specialistId);
+
+    await Appointment.create({
+      date: "2022-02-02",
+      start: "09:00:00",
+      end: "10:00:00",
+      type: "intake",
+      description: "Appointment description",
+      specialistId,
+      patientId,
+    });
+
+    const response = await api.get(`/api/appointments/entries?startDate=2020-01-01&endDate=2020-10-10`);
+    expect(response.status).toBe(200);
+    expect(response.body).toHaveLength(2);
+  });
+
+  test("no appointments returns empty array", async () => {
+    // 2020-02-02
+    await createTestSPA();
+
+    const response = await api.get(`/api/appointments/entries?startDate=2021-01-01&endDate=2021-10-10`);
+    expect(response.status).toBe(200);
+    expect(response.body).toHaveLength(0);
+  });
+
+  test("invalid date returns expected message", async () => {
+    await createTestSPA();
+    const response = await api.get(`/api/appointments/entries?startDate=20211-01&endDate=2021-10-10`);
+    expect(response.status).toBe(400);
+    expect(response.body.error).toBe("Error getting appointments by dateframe: Error: malformed date");
+  });
+
+  test("invalid dateframe return expected message", async () => {
+    await createTestSPA();
+    const response = await api.get(`/api/appointments/entries?startDate=2021-02-02&endDate=2020-02-02`);
+    expect(response.status).toBe(400);
+    expect(response.body.error).toBe(
+      "Error getting appointments by dateframe: Error: start date must come before end date"
+    );
   });
 });
 

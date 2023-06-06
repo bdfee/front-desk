@@ -1,4 +1,5 @@
-import { Router } from "express";
+import { Request, Router } from "express";
+import { isDate, isString } from "../typeUtils";
 import * as appointmentService from "../services/appointment";
 
 const router = Router();
@@ -22,6 +23,22 @@ router.post("/", async (req, res, next) => {
   } catch (error) {
     if (error instanceof Error) {
       error.message = "Error posting appointment: " + error;
+      next(error);
+    }
+  }
+});
+
+router.get("/entries", async (req: Request, res, next) => {
+  const { startDate, endDate } = req.query;
+  try {
+    if (!isString(startDate) || !isString(endDate) || !isDate(startDate) || !isDate(endDate)) {
+      throw new Error("malformed date");
+    }
+    const appointmentList = await appointmentService.getAllByDateframe(startDate.toString(), endDate.toString());
+    res.json(appointmentList);
+  } catch (error) {
+    if (error instanceof Error) {
+      error.message = "Error getting appointments by dateframe: " + error;
       next(error);
     }
   }

@@ -251,10 +251,17 @@ describe("getAllByPatient", () => {
 describe("getAllByTimeframe", () => {
   test("returns appointments by timeframe", async () => {
     const { patientId, specialistId } = await createTestSPA();
-    await createTestSpecificSPA(patientId, specialistId, "2021-02-02");
-    await createTestSpecificSPA(patientId, specialistId, "2022-02-02");
+    await AppointmentModel.create({
+      date: "2022-02-02",
+      start: "09:00:00",
+      end: "10:00:00",
+      type: "intake",
+      description: "Appointment description",
+      specialistId,
+      patientId,
+    });
 
-    const appointmentList = await getAllByDateframe("2021-01-01", "2021-11-31");
+    const appointmentList = await getAllByDateframe("2022-01-01", "2022-11-31");
     expect(appointmentList).toHaveLength(1);
   });
   test("returns empty array if no appointments", async () => {

@@ -1,5 +1,5 @@
-import { Op } from "sequelize";
 import { Appointment, Specialist, Patient } from "../models";
+import { Op } from "sequelize";
 
 export const findByPk = async (id: number) => Appointment.findByPk(id);
 
@@ -64,18 +64,11 @@ export const findAllBySpecialist = async (specialistId: number) => {
   });
 };
 
-export const findAllByTimeframe = async (start: string, end: string) => {
+export const findAllByDateframe = async (startDate: string, endDate: string) => {
   return Appointment.findAll({
     where: {
       date: {
-        [Op.and]: [
-          {
-            [Op.gte]: new Date(start),
-          },
-          {
-            [Op.lt]: new Date(end),
-          },
-        ],
+        [Op.between]: [startDate, endDate],
       },
     },
   });

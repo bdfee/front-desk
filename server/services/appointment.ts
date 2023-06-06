@@ -5,7 +5,7 @@ import {
   findAll,
   findAllByPatient,
   findAllBySpecialist,
-  findAllByTimeframe,
+  findAllByDateframe,
 } from "./utils/appointment";
 import { validateInput, validateProperties, validateDetail, validateDateframe } from "./validation/appointment";
 
@@ -18,7 +18,7 @@ export const getAllByPatient = async (patientId: number): Promise<Appointment[]>
 
 export const getAllByDateframe = async (start: string, end: string): Promise<Appointment[]> => {
   if (validateDateframe(start, end)) {
-    return findAllByTimeframe(start, end);
+    return findAllByDateframe(start, end);
   }
   throw new Error("Unknown error getting appointments");
 };

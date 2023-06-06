@@ -131,5 +131,11 @@ export const validAppointmentProperties = (object: unknown): object is Appointme
 };
 
 export const isDate = (date: string): boolean => {
-  return Boolean(Date.parse(date));
+  const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+  const parsedDate = Date.parse(date);
+  return dateRegex.test(date) && !isNaN(parsedDate);
+};
+
+export const isString = (value: unknown): value is string => {
+  return typeof value === "string";
 };
