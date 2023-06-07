@@ -1,4 +1,4 @@
-import { Specialist, Patient, Appointment } from "../../models";
+import { Specialist, Patient, Appointment, User } from "../../models";
 import { sequelize } from "../../utils/connectToDb";
 // DB helpers
 export const createTestSpecialist = async () => {
@@ -64,4 +64,8 @@ export const dropAllTables = async () => {
   await Patient.drop({ cascade: true });
   await Appointment.drop({ cascade: true });
   await sequelize.sync();
+};
+
+export const dropUserTable = async () => {
+  await User.drop();
 };
