@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 
-import { Patient, PatientDetail, Specialist, Appointment, AppointmentDetail } from "../../types";
+import { Patient, PatientDetail, Specialist, Appointment, AppointmentDetail, User } from "../../types";
 
 export const expectSpecialist = (specialist: Specialist) => {
   expect(specialist).toMatchObject<Specialist>({
@@ -65,5 +65,14 @@ export const expectAppointmentDetail = (appointment: AppointmentDetail) => {
     patient: {
       name: expect.any(String),
     },
+  });
+};
+
+export const expectUser = (user: User) => {
+  expect(user).toMatchObject<User>({
+    id: expect.any(Number),
+    name: expect.any(String),
+    username: expect.any(String),
+    password: expect.any(String),
   });
 };

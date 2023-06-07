@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { sequelize } from "../../utils/connectToDb";
 import { User } from "../../models";
-import { User as UserType } from "../../types";
-import { dropUserTable } from "../helpers/models";
+import { dropUserTable, createTestUser } from "../helpers/models";
+import { expectUser } from "../helpers/shape";
 
 beforeEach(async () => await dropUserTable());
 
@@ -119,22 +119,5 @@ describe("model validators", () => {
     });
   });
 });
-
-const expectUser = (user: UserType) => {
-  expect(user).toMatchObject<UserType>({
-    id: expect.any(Number),
-    name: expect.any(String),
-    username: expect.any(String),
-    password: expect.any(String),
-  });
-};
-
-const createTestUser = async () => {
-  return User.create({
-    name: "test user",
-    username: "testusername",
-    password: "secretpassword",
-  });
-};
 
 afterAll(async () => await sequelize.close());

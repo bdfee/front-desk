@@ -11,5 +11,9 @@ export const findOneById = async (id: number) => {
 export const findAll = async () => find();
 
 export const findOneByUsername = async (username: string) => {
-  return findByUsername(username);
+  const user = await findByUsername(username);
+  if (!user) {
+    throw new Error("no matching username found");
+  }
+  return user;
 };

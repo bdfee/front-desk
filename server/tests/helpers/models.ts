@@ -59,6 +59,22 @@ export const createTestSpecificSPA = async (patientId: number, specialistId: num
   });
 };
 
+export const createTestUser = async () => {
+  return User.create({
+    name: "test user",
+    username: "testusername",
+    password: "secretpassword",
+  });
+};
+
+export const createTestSpecificUser = async (username: string) => {
+  return User.create({
+    username,
+    name: "test user",
+    password: "secretpassword",
+  });
+};
+
 export const dropAllTables = async () => {
   await Specialist.drop({ cascade: true });
   await Patient.drop({ cascade: true });

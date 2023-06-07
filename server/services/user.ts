@@ -1,8 +1,10 @@
 import { User } from "../models";
-import { findAll, findOneById } from "./utils/user";
+import { findAll, findOneById, findOneByUsername } from "./utils/user";
 import { validateInput, validateProperties } from "./validation/user";
 
 export const getAll = async (): Promise<User[]> => findAll();
+
+export const getOneByUsername = async (username: string): Promise<User> => findOneByUsername(username);
 
 export const getOneById = async (id: number): Promise<User> => findOneById(id);
 

@@ -1,6 +1,6 @@
 import { AuthenticatedUser } from "../types";
 import { validUserLogin, comparePassword, authenticateUser } from "./validation/user";
-import { findOneByUsername } from "./utils/user";
+import { getOneByUsername } from "./user";
 import { JWT_SECRET } from "../utils/config";
 
 export const login = async (object: unknown): Promise<AuthenticatedUser> => {
@@ -10,11 +10,7 @@ export const login = async (object: unknown): Promise<AuthenticatedUser> => {
     }
     const { username, password } = object;
 
-    const user = await findOneByUsername(username);
-
-    if (!user) {
-      throw new Error("invalid username or password");
-    }
+    const user = await getOneByUsername(username);
 
     const passwordCorrect = await comparePassword(password, user.password);
 
