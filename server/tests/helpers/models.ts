@@ -67,5 +67,6 @@ export const dropAllTables = async () => {
 };
 
 export const dropUserTable = async () => {
-  await User.drop();
+  await User.drop({ cascade: true });
+  await sequelize.sync();
 };
