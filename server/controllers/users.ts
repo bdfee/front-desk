@@ -9,7 +9,7 @@ router.get("/", async (_req, res, next) => {
     res.json(users);
   } catch (error) {
     if (error instanceof Error) {
-      error.message = "Error getting specialists: " + error;
+      error.message = "Error getting users: " + error;
       next(error);
     }
   }
@@ -20,7 +20,10 @@ router.post("/", async (req, res, next) => {
     const user = await User.create(req.body as User);
     res.json(user);
   } catch (error) {
-    res.status(400).json({ error });
+    if (error instanceof Error) {
+      error.message = "Error creating user: " + error;
+      next(error);
+    }
     next(error);
   }
 });
