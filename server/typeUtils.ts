@@ -7,6 +7,9 @@ import {
   Appointment,
   Specialist,
   SpecialistProperties,
+  User,
+  UserProperties,
+  UserLogin,
 } from "./types";
 
 // specialist
@@ -128,6 +131,35 @@ export const validAppointmentProperties = (object: unknown): object is Appointme
     }
   }
   return true;
+};
+
+export const isUserInput = (object: unknown): object is User => {
+  if (typeof object !== "object" || object === null || "id" in object) {
+    return false;
+  }
+
+  const { name, username, password } = object as User;
+
+  return typeof name === "string" && typeof username === "string" && typeof password === "string";
+};
+
+export const validUserProperties = (object: unknown): object is UserProperties => {
+  for (const key in object as UserProperties) {
+    if (!["name", "username", "password"].includes(key)) {
+      return false;
+    }
+  }
+  return true;
+};
+
+export const isUserLogin = (object: unknown): object is UserLogin => {
+  if (typeof object !== "object" || object === null) {
+    return false;
+  }
+
+  const { username, password } = object as UserLogin;
+
+  return typeof username === "string" && typeof password === "string";
 };
 
 export const isDate = (date: string): boolean => {

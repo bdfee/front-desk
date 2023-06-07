@@ -30,4 +30,4 @@ Patient.sync({ alter: isDev }).catch((error) => console.log("error syncing Patie
 Specialist.sync({ alter: isDev }).catch((error) => console.log("error syncing Specialist: " + error));
 Appointment.sync({ alter: isDev }).catch((error) => console.log("error syncing Appointment: " + error));
 
-export { Patient, Appointment, Specialist };
+export { Patient, Appointment, Specialist, User };

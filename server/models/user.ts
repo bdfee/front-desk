@@ -13,20 +13,6 @@ class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
     const hashedPassword = await bcrypt.hash(user.password, saltRounds);
     user.password = hashedPassword;
   }
-
-  public static async comparePassword(user: User): Promise<void> {
-    if (user.password && user.changed("password")) {
-      const storedUser = await User.findByPk(user.id);
-
-      if (storedUser) {
-        const passwordMatch = await bcrypt.compare(user.password, storedUser.password);
-
-        if (!passwordMatch) {
-          throw new Error("Invalid password");
-        }
-      }
-    }
-  }
 }
 
 User.init(
@@ -54,7 +40,6 @@ User.init(
   {
     hooks: {
       beforeCreate: (user: User) => User.hashPassword(user),
-      beforeValidate: (user: User) => User.comparePassword(user),
     },
     sequelize,
     underscored: true,

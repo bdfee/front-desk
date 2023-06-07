@@ -1,11 +1,11 @@
 import { Router } from "express";
-import User from "../models/user";
+import * as userService from "../services/user";
 
 const router = Router();
 
 router.get("/", async (_req, res, next) => {
   try {
-    const users = await User.findAll();
+    const users = await userService.getAll();
     res.json(users);
   } catch (error) {
     if (error instanceof Error) {
@@ -14,10 +14,10 @@ router.get("/", async (_req, res, next) => {
     }
   }
 });
-// temporary
+
 router.post("/", async (req, res, next) => {
   try {
-    const user = await User.create(req.body as User);
+    const user = await userService.create(req.body);
     res.json(user);
   } catch (error) {
     if (error instanceof Error) {
@@ -30,7 +30,7 @@ router.post("/", async (req, res, next) => {
 
 router.get("/:id", async (req, res, next) => {
   try {
-    const user = await User.findByPk(req.params.id);
+    const user = await userService.getOneById(+req.params.id);
     if (user) {
       res.json(user);
     } else {
