@@ -1,6 +1,7 @@
 import { UserLogin, AuthenticatedUser, UserForToken, UserProperties, User } from "../../types";
 import { validUserProperties, isUserInput } from "../../typeUtils";
 import { isUserLogin } from "../../typeUtils";
+import { JWT_SECRET } from "../../utils/config";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
@@ -27,16 +28,21 @@ export const comparePassword = async (password: string, hash: string): Promise<b
   return match;
 };
 
-export const authenticateUser = (user: UserForToken, secret: string): AuthenticatedUser => {
-  const token = jwt.sign(user, secret);
+export const authenticateUser = (user: UserForToken): AuthenticatedUser => {
+  if (!JWT_SECRET) {
+    throw new Error("JWT_SECRET is not defined");
+  }
+
+  const token = jwt.sign(user, JWT_SECRET);
 
   if (!token) {
-    throw new Error("Unknown server error");
-  } else
-    return {
-      token,
-      id: user.id,
-      username: user.username,
-      name: user.name,
-    };
+    throw new Error("Failed to generate token");
+  }
+
+  return {
+    token,
+    id: user.id,
+    username: user.username,
+    name: user.name,
+  };
 };

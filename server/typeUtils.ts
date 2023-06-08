@@ -10,6 +10,7 @@ import {
   User,
   UserProperties,
   UserLogin,
+  AuthenticatedUser,
 } from "./types";
 
 // specialist
@@ -160,6 +161,18 @@ export const isUserLogin = (object: unknown): object is UserLogin => {
   const { username, password } = object as UserLogin;
 
   return typeof username === "string" && typeof password === "string";
+};
+
+export const isAuthenticatedUser = (object: unknown): object is AuthenticatedUser => {
+  if (typeof object !== "object" || object === null || "password" in object) {
+    return false;
+  }
+
+  const { username, id, name, token } = object as AuthenticatedUser;
+
+  return (
+    typeof username === "string" && typeof name === "string" && typeof id === "number" && typeof token === "string"
+  );
 };
 
 export const isDate = (date: string): boolean => {
