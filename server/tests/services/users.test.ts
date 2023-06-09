@@ -29,7 +29,6 @@ describe("returned shape from userService", () => {
       username: "testusername",
       password: "secretpassword",
     });
-    console.log("create", user);
     expectSafeUser(user);
   });
 });

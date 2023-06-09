@@ -31,14 +31,12 @@ router.post("/", async (req, res, next) => {
 router.get("/:id", async (req, res, next) => {
   try {
     const user = await userService.getOneById(+req.params.id);
-    if (user) {
-      res.json(user);
-    } else {
-      res.status(404).json({ error: "User not found" });
-    }
+    res.json(user);
   } catch (error) {
-    res.status(500).json({ error: "Internal server error" });
-    next(error);
+    if (error instanceof Error) {
+      error.message = "Error getting user: " + error;
+      next(error);
+    }
   }
 });
 

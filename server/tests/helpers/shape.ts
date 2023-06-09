@@ -87,7 +87,6 @@ export const expectDangerousUser = (user: User) => {
 };
 
 export const expectSafeUser = (user: SafeUser) => {
-  console.log("expected", user);
   expect(user).toMatchObject<SafeUser>({
     id: expect.any(Number),
     name: expect.any(String),

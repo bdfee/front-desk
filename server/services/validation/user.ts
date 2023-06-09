@@ -24,7 +24,6 @@ export const validateInput = (object: unknown): object is User => {
 };
 
 export const validateSafeUser = (object: unknown): object is SafeUser => {
-  console.log("made it here", object);
   if (!isSafeUser(object)) {
     throw new Error("invalid value returned from creation");
   }

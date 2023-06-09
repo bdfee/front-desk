@@ -11,11 +11,8 @@ export const getOneById = async (id: number): Promise<User> => findOneByPk(id);
 
 export const create = async (object: unknown): Promise<SafeUser> => {
   if (validateProperties(object) && validateInput(object)) {
-    console.log("valid", object);
     const { id } = await User.create(object);
-    console.log("id", id);
     const user = await findCreatedByPk(id);
-    console.log("user", user);
     if (validateSafeUser(user)) {
       return user;
     } else {
