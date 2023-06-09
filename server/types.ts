@@ -41,6 +41,8 @@ export type User = InferAttributes<UserModel>;
 
 export type UserLogin = Omit<User, "name">;
 
+export type SafeUser = Omit<User, "password">;
+
 export type UserForToken = Omit<User, "password">;
 
 export type AuthenticatedUser = Omit<User, "password"> & {

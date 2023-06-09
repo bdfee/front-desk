@@ -1,5 +1,5 @@
-import { UserLogin, AuthenticatedUser, UserForToken, UserProperties, User } from "../../types";
-import { validUserProperties, isUserInput } from "../../typeUtils";
+import { UserLogin, AuthenticatedUser, UserForToken, UserProperties, User, SafeUser } from "../../types";
+import { validUserProperties, isUserInput, isSafeUser } from "../../typeUtils";
 import { isUserLogin } from "../../typeUtils";
 import { JWT_SECRET } from "../../utils/config";
 import bcrypt from "bcrypt";
@@ -19,6 +19,14 @@ export const validateProperties = (object: unknown): object is UserProperties =>
 export const validateInput = (object: unknown): object is User => {
   if (!isUserInput(object)) {
     throw new Error("malformed or invalid value on user input");
+  }
+  return true;
+};
+
+export const validateSafeUser = (object: unknown): object is SafeUser => {
+  console.log("made it here", object);
+  if (!isSafeUser(object)) {
+    throw new Error("invalid value returned from creation");
   }
   return true;
 };

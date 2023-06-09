@@ -1,7 +1,7 @@
 import { sequelize } from "../../utils/connectToDb";
 import { dropUserTable, createTestUser, createTestSpecificUser } from "../helpers/models";
 import { create, getAll, getOneById, getOneByUsername } from "../../services/user";
-import { expectUser } from "../helpers/shape";
+import { expectSafeUser, expectDangerousUser } from "../helpers/shape";
 import { User } from "../../models";
 
 beforeEach(async () => await dropUserTable());
@@ -10,27 +10,27 @@ describe("returned shape from userService", () => {
   test("getAll()", async () => {
     await createTestUser();
     const userList = await getAll();
-    expectUser(userList[0]);
+    expectDangerousUser(userList[0]);
   });
 
   test("getOneById()", async () => {
     const { id } = await createTestUser();
-    expectUser(await getOneById(id));
+    expectDangerousUser(await getOneById(id));
   });
 
   test("getOneByUsername()", async () => {
     const { username } = await createTestUser();
-    expectUser(await getOneByUsername(username));
+    expectDangerousUser(await getOneByUsername(username));
   });
 
   test("create()", async () => {
-    expectUser(
-      await create({
-        name: "test user",
-        username: "testusername",
-        password: "secretpassword",
-      })
-    );
+    const user = await create({
+      name: "test user",
+      username: "testusername",
+      password: "secretpassword",
+    });
+    console.log("create", user);
+    expectSafeUser(user);
   });
 });
 

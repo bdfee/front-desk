@@ -15,3 +15,11 @@ export const findOneByUsername = async (username: string) => {
     },
   });
 };
+
+export const findCreatedByPk = async (id: number) => {
+  return User.findByPk(id, {
+    attributes: {
+      exclude: ["password"],
+    },
+  });
+};

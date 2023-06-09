@@ -11,6 +11,7 @@ import {
   UserProperties,
   UserLogin,
   AuthenticatedUser,
+  SafeUser,
 } from "./types";
 
 // specialist
@@ -39,7 +40,6 @@ export const validSpecialistProperties = (object: unknown): object is Specialist
   return true;
 };
 
-// patient
 export const isPatientInput = (object: unknown): object is Patient => {
   if (typeof object !== "object" || object === null || "patientId" in object) {
     return false;
@@ -161,6 +161,22 @@ export const isUserLogin = (object: unknown): object is UserLogin => {
   const { username, password } = object as UserLogin;
 
   return typeof username === "string" && typeof password === "string";
+};
+
+export const isSafeUser = (object: unknown): object is SafeUser => {
+  if (typeof object !== "object" || object === null) {
+    return false;
+  }
+
+  for (const key in object) {
+    if (["password"].includes(key)) {
+      return false;
+    }
+  }
+
+  const { username, name, id } = object as SafeUser;
+
+  return typeof username === "string" && typeof name === "string" && typeof id === "number";
 };
 
 export const isAuthenticatedUser = (object: unknown): object is AuthenticatedUser => {

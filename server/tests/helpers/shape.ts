@@ -8,6 +8,7 @@ import {
   AppointmentDetail,
   User,
   AuthenticatedUser,
+  SafeUser,
 } from "../../types";
 
 export const expectSpecialist = (specialist: Specialist) => {
@@ -76,12 +77,21 @@ export const expectAppointmentDetail = (appointment: AppointmentDetail) => {
   });
 };
 
-export const expectUser = (user: User) => {
+export const expectDangerousUser = (user: User) => {
   expect(user).toMatchObject<User>({
     id: expect.any(Number),
     name: expect.any(String),
     username: expect.any(String),
     password: expect.any(String),
+  });
+};
+
+export const expectSafeUser = (user: SafeUser) => {
+  console.log("expected", user);
+  expect(user).toMatchObject<SafeUser>({
+    id: expect.any(Number),
+    name: expect.any(String),
+    username: expect.any(String),
   });
 };
 

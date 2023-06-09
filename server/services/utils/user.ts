@@ -1,11 +1,24 @@
-import { findAll as find, findByPk, findOneByUsername as findByUsername } from "../../queries/user";
+import {
+  findAll as find,
+  findByPk,
+  findOneByUsername as findByUsername,
+  findCreatedByPk as findCreated,
+} from "../../queries/user";
 
-export const findOneById = async (id: number) => {
+export const findOneByPk = async (id: number) => {
   const user = await findByPk(id);
   if (!user) {
     throw new Error("no matching user id found");
   }
   return user;
+};
+
+export const findCreatedByPk = async (id: number) => {
+  const safeUser = await findCreated(id);
+  if (!safeUser) {
+    throw new Error("no matching user id found");
+  }
+  return safeUser;
 };
 
 export const findAll = async () => find();
