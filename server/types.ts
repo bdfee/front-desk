@@ -1,5 +1,10 @@
 import { InferAttributes } from "sequelize";
-import { Appointment as AppointmentModel, Patient as PatientModel, Specialist as SpecialistModel } from "./models";
+import {
+  Appointment as AppointmentModel,
+  Patient as PatientModel,
+  Specialist as SpecialistModel,
+  User as UserModel,
+} from "./models";
 
 export type Patient = InferAttributes<PatientModel>;
 
@@ -30,6 +35,24 @@ export type AppointmentProperties = Appointment & {
   end?: string;
   type?: string;
   description?: string;
+};
+
+export type User = InferAttributes<UserModel>;
+
+export type UserLogin = Omit<User, "name">;
+
+export type SafeUser = Omit<User, "password">;
+
+export type UserForToken = Omit<User, "password">;
+
+export type AuthenticatedUser = Omit<User, "password"> & {
+  token: string;
+};
+
+export type UserProperties = User & {
+  name?: string;
+  username?: string;
+  password?: string;
 };
 
 // association inclusions and exclusions

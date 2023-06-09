@@ -1,6 +1,15 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
 
-import { Patient, PatientDetail, Specialist, Appointment, AppointmentDetail } from "../../types";
+import {
+  Patient,
+  PatientDetail,
+  Specialist,
+  Appointment,
+  AppointmentDetail,
+  User,
+  AuthenticatedUser,
+  SafeUser,
+} from "../../types";
 
 export const expectSpecialist = (specialist: Specialist) => {
   expect(specialist).toMatchObject<Specialist>({
@@ -65,5 +74,31 @@ export const expectAppointmentDetail = (appointment: AppointmentDetail) => {
     patient: {
       name: expect.any(String),
     },
+  });
+};
+
+export const expectDangerousUser = (user: User) => {
+  expect(user).toMatchObject<User>({
+    id: expect.any(Number),
+    name: expect.any(String),
+    username: expect.any(String),
+    password: expect.any(String),
+  });
+};
+
+export const expectSafeUser = (user: SafeUser) => {
+  expect(user).toMatchObject<SafeUser>({
+    id: expect.any(Number),
+    name: expect.any(String),
+    username: expect.any(String),
+  });
+};
+
+export const expectAuthenticatedUser = (user: AuthenticatedUser) => {
+  expect(user).toMatchObject<AuthenticatedUser>({
+    id: expect.any(Number),
+    name: expect.any(String),
+    username: expect.any(String),
+    token: expect.any(String),
   });
 };
