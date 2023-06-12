@@ -6,11 +6,13 @@ import {
   TableHead,
   TableRow,
   Paper,
+  Button,
 } from '@mui/material'
 import { Specialist } from '../../types'
 
 interface SpecialistListProps {
   specialistList: Specialist[]
+  deleteSpecialist: (id: number) => void
 }
 
 const SpecialistList = (props: SpecialistListProps) => {
@@ -21,6 +23,7 @@ const SpecialistList = (props: SpecialistListProps) => {
           <TableRow>
             <TableCell>Name</TableCell>
             <TableCell>Specialty</TableCell>
+            <TableCell>Actions</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -29,6 +32,15 @@ const SpecialistList = (props: SpecialistListProps) => {
               <TableRow key={specialist.specialistId}>
                 <TableCell>{specialist.name}</TableCell>
                 <TableCell>{specialist.speciality}</TableCell>
+                <TableCell>
+                  <Button
+                    onClick={() =>
+                      props.deleteSpecialist(specialist.specialistId)
+                    }
+                  >
+                    delete
+                  </Button>
+                </TableCell>
               </TableRow>
             )
           })}

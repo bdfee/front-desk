@@ -1,5 +1,7 @@
+/* eslint-disable @typescript-eslint/no-unsafe-call */
 import express from "express";
 import { errorHandler, requestLogger, unknownEndpoint } from "./middleware";
+import cors from "cors";
 
 import patientsRouter from "./controllers/patients";
 import specialistsRouter from "./controllers/specialists";
@@ -9,8 +11,9 @@ import loginRouter from "./controllers/login";
 
 const app = express();
 
-app.use(express.json());
+app.use(cors());
 
+app.use(express.json());
 app.use(requestLogger);
 
 app.use("/api/login", loginRouter);
