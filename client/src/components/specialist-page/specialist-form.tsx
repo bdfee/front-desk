@@ -29,8 +29,8 @@ const SpecialistForm = (props: SpecialistFormProps) => {
       <form onSubmit={addSpecialist}>
         <TextField
           id="name"
-          label="Standard"
-          variant="standard"
+          label="Name"
+          fullWidth
           value={name}
           onChange={({ target }) => {
             setName(target.value)
@@ -38,8 +38,8 @@ const SpecialistForm = (props: SpecialistFormProps) => {
         />
         <TextField
           id="speciality"
-          label="Standard"
-          variant="standard"
+          label="Specialty"
+          fullWidth
           value={speciality}
           onChange={({ target }) => setSpeciality(target.value)}
         />
