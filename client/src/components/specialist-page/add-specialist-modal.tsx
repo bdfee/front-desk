@@ -6,7 +6,7 @@ import {
   Alert,
 } from '@mui/material'
 import SpecialistForm from './specialist-form'
-import { SpecialistInput } from '../../../types'
+import { SpecialistInput } from '../../types'
 import { SetStateAction } from 'react'
 
 interface ModalProps {

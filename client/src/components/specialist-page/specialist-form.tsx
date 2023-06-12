@@ -1,6 +1,6 @@
 import { TextField, Grid, Button } from '@mui/material'
 import { SyntheticEvent, useState } from 'react'
-import { SpecialistFormProps } from '../../../types'
+import { SpecialistFormProps } from '../../types'
 import {
   validateTextInput,
   sanitizeTextInput,

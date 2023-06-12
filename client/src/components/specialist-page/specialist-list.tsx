@@ -8,7 +8,7 @@ import {
   Paper,
   Button,
 } from '@mui/material'
-import { Specialist } from '../../../types'
+import { Specialist } from '../../types'
 
 interface SpecialistListProps {
   specialistList: Specialist[]

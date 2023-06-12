@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import SpecialistList from './specialist-list'
 import AddSpecialistModal from './add-specialist-modal'
 import axios from 'axios'
-import { Specialist, SpecialistInput } from '../../../types'
+import { Specialist, SpecialistInput } from '../../types'
 import specialistService from '../../services/specialist'
 import { Button } from '@mui/material'
 
@@ -14,7 +14,8 @@ const SpecialistPage = () => {
   useEffect(() => {
     const fetchSpecialists = async () => {
       try {
-        setSpecialistList(await specialistService.getAll())
+        const specialists = await specialistService.getAll()
+        setSpecialistList(specialists)
       } catch (error) {
         if (axios.isAxiosError(error)) {
           console.log('axios error' + error.message)
