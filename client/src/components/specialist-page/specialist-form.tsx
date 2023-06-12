@@ -1,6 +1,6 @@
 import { TextField, Grid, Button } from '@mui/material'
 import { SyntheticEvent, useState } from 'react'
-import { SpecialistFormProps } from '../../types'
+import { SpecialistFormProps } from '../../../types'
 
 const SpecialistForm = (props: SpecialistFormProps) => {
   const [name, setName] = useState('')
@@ -12,6 +12,8 @@ const SpecialistForm = (props: SpecialistFormProps) => {
       name,
       speciality,
     })
+    setName('')
+    setSpeciality('')
   }
 
   return (
