@@ -1,6 +1,10 @@
 import { TextField, Grid, Button } from '@mui/material'
 import { SyntheticEvent, useState } from 'react'
 import { SpecialistFormProps } from '../../../types'
+import {
+  validateTextInput,
+  sanitizeTextInput,
+} from '../../validations/specialist'
 
 const SpecialistForm = (props: SpecialistFormProps) => {
   const [name, setName] = useState('')
@@ -8,9 +12,13 @@ const SpecialistForm = (props: SpecialistFormProps) => {
 
   const addSpecialist = (event: SyntheticEvent) => {
     event.preventDefault()
+    if (!validateTextInput(name) || !validateTextInput(speciality)) {
+      return props.setError('invalid value provided')
+    }
+
     props.onSubmit({
-      name,
-      speciality,
+      name: sanitizeTextInput(name),
+      speciality: sanitizeTextInput(speciality),
     })
     setName('')
     setSpeciality('')

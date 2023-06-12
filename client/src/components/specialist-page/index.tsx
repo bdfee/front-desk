@@ -1,52 +1,26 @@
 import { useEffect, useState } from 'react'
 import SpecialistList from './specialist-list'
-import SpecialistForm from './specialist-form'
+import AddSpecialistModal from './add-specialist-modal'
 import axios from 'axios'
 import { Specialist, SpecialistInput } from '../../../types'
 import specialistService from '../../services/specialist'
-import {
-  Dialog,
-  DialogContent,
-  DialogTitle,
-  Divider,
-  Alert,
-  Button,
-} from '@mui/material'
-
-interface ModalProps {
-  modalOpen: boolean
-  onClose: () => void
-  onSubmit: (values: SpecialistInput) => void
-  error?: string
-}
-
-const AddSpecialistModal = ({
-  modalOpen,
-  onClose,
-  onSubmit,
-  error,
-}: ModalProps) => (
-  <Dialog fullWidth={true} open={modalOpen} onClose={() => onClose()}>
-    <DialogTitle>Add a new patient</DialogTitle>
-    <Divider />
-    <DialogContent>
-      {error && <Alert severity="error">{error}</Alert>}
-      <SpecialistForm onSubmit={onSubmit} onCancel={onClose} />
-    </DialogContent>
-  </Dialog>
-)
+import { Button } from '@mui/material'
 
 const SpecialistPage = () => {
   const [specialistList, setSpecialistList] = useState<Specialist[]>([])
   const [modalOpen, setModalOpen] = useState(false)
-  const [error, setError] = useState<string>()
+  const [error, setError] = useState<string | undefined>()
 
   useEffect(() => {
     const fetchSpecialists = async () => {
       try {
         setSpecialistList(await specialistService.getAll())
       } catch (error) {
-        console.log(error)
+        if (axios.isAxiosError(error)) {
+          console.log('axios error' + error.message)
+        } else {
+          console.log('unknown error fetching specialists')
+        }
       }
     }
     fetchSpecialists()
@@ -56,6 +30,7 @@ const SpecialistPage = () => {
     try {
       const specialist = await specialistService.create(values)
       setSpecialistList(specialistList.concat(specialist))
+      setModalOpen(false)
     } catch (error: unknown) {
       if (axios.isAxiosError(error)) {
         console.log('axios error' + error.message)
@@ -94,13 +69,14 @@ const SpecialistPage = () => {
         deleteSpecialist={deleteSpecialist}
       />
       <Button variant="contained" onClick={() => openModal()}>
-        Add Entry
+        Add Specialist
       </Button>
       <AddSpecialistModal
         modalOpen={modalOpen}
         onClose={closeModal}
         onSubmit={submitNewSpecialist}
         error={error}
+        setError={setError}
       />
     </>
   )
