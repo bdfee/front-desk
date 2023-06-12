@@ -4,9 +4,42 @@ import SpecialistForm from './specialist-form'
 import axios from 'axios'
 import { Specialist, SpecialistInput } from '../../../types'
 import specialistService from '../../services/specialist'
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  Divider,
+  Alert,
+  Button,
+} from '@mui/material'
+
+interface ModalProps {
+  modalOpen: boolean
+  onClose: () => void
+  onSubmit: (values: SpecialistInput) => void
+  error?: string
+}
+
+const AddSpecialistModal = ({
+  modalOpen,
+  onClose,
+  onSubmit,
+  error,
+}: ModalProps) => (
+  <Dialog fullWidth={true} open={modalOpen} onClose={() => onClose()}>
+    <DialogTitle>Add a new patient</DialogTitle>
+    <Divider />
+    <DialogContent>
+      {error && <Alert severity="error">{error}</Alert>}
+      <SpecialistForm onSubmit={onSubmit} onCancel={onClose} />
+    </DialogContent>
+  </Dialog>
+)
 
 const SpecialistPage = () => {
   const [specialistList, setSpecialistList] = useState<Specialist[]>([])
+  const [modalOpen, setModalOpen] = useState(false)
+  const [error, setError] = useState<string>()
 
   useEffect(() => {
     const fetchSpecialists = async () => {
@@ -47,13 +80,28 @@ const SpecialistPage = () => {
     }
   }
 
+  const closeModal = (): void => {
+    setModalOpen(false)
+    setError(undefined)
+  }
+
+  const openModal = (): void => setModalOpen(true)
+
   return (
     <>
       <SpecialistList
         specialistList={specialistList}
         deleteSpecialist={deleteSpecialist}
       />
-      <SpecialistForm onSubmit={submitNewSpecialist} />
+      <Button variant="contained" onClick={() => openModal()}>
+        Add Entry
+      </Button>
+      <AddSpecialistModal
+        modalOpen={modalOpen}
+        onClose={closeModal}
+        onSubmit={submitNewSpecialist}
+        error={error}
+      />
     </>
   )
 }

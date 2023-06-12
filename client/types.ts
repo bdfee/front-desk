@@ -8,4 +8,5 @@ export type SpecialistInput = Omit<Specialist, 'specialistId'>
 
 export interface SpecialistFormProps {
   onSubmit: (values: SpecialistInput) => void
+  onCancel: () => void
 }

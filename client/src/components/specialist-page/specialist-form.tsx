@@ -42,6 +42,7 @@ const SpecialistForm = (props: SpecialistFormProps) => {
               variant="contained"
               style={{ float: 'left' }}
               type="button"
+              onClick={props.onCancel}
             >
               Cancel
             </Button>
