@@ -12,7 +12,7 @@ router.get("/is-test", (_req, res, next) => {
   }
 });
 
-router.get("/drop-all-tables", async (_req, res, next) => {
+router.post("/drop-all-tables", async (_req, res, next) => {
   try {
     res.send(await dropTables());
   } catch (error) {
