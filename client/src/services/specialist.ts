@@ -1,4 +1,4 @@
-import axios from 'axios'
+import axios, { isAxiosError } from 'axios'
 import { Specialist, SpecialistInput } from '../types'
 import { apiBaseUrl } from '../constants'
 import { isSpecialist } from '../typeUtils'
@@ -10,21 +10,29 @@ const getAll = async () => {
 }
 
 const create = async (object: SpecialistInput) => {
-  const { data } = await axios.post<SpecialistInput>(url, object)
-  if (!isSpecialist(data)) {
-    throw new Error('invalid specialist data')
+  try {
+    const { data } = await axios.post<SpecialistInput>(url, object)
+    if (!isSpecialist(data)) {
+      throw new Error('invalid specialist data')
+    }
+    return data
+  } catch (error) {
+    if (isAxiosError(error)) {
+      throw new Error(error.response?.data.error)
+    } else {
+      throw new Error('Unknown error creating specialist')
+    }
   }
-  return data
 }
 
 const deleteById = async (id: number) => {
   try {
     await axios.delete(url + id)
   } catch (error) {
-    if (axios.isAxiosError(error)) {
-      console.log('axios error' + error.message)
+    if (isAxiosError(error)) {
+      throw new Error(error.response?.data.error)
     } else {
-      console.log('unknown error deleting specialists')
+      throw new Error('Unknown error deleting specialist')
     }
   }
 }
