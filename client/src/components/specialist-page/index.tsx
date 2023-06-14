@@ -56,6 +56,16 @@ const SpecialistPage = () => {
     }
   }
 
+  const setErrorWithTimeout = (errorMessage: string) => {
+    setError(errorMessage)
+
+    const id = setTimeout(() => {
+      setError(undefined)
+    }, 3000)
+
+    return () => clearTimeout(id)
+  }
+
   const closeModal = (): void => {
     setModalOpen(false)
     setError(undefined)
@@ -77,7 +87,7 @@ const SpecialistPage = () => {
         onClose={closeModal}
         onSubmit={submitNewSpecialist}
         error={error}
-        setError={setError}
+        setError={setErrorWithTimeout}
       />
     </>
   )
