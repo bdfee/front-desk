@@ -12,8 +12,13 @@ const SpecialistForm = (props: SpecialistFormProps) => {
 
   const addSpecialist = (event: SyntheticEvent) => {
     event.preventDefault()
-    if (!validateTextInput(name) || !validateTextInput(speciality)) {
-      return props.setError('invalid value provided')
+
+    if (!validateTextInput(name)) {
+      props.setError('invalid or missing name')
+    }
+
+    if (!validateTextInput(speciality)) {
+      props.setError('invalid or missing speciality')
     }
 
     props.onSubmit({
@@ -23,6 +28,8 @@ const SpecialistForm = (props: SpecialistFormProps) => {
     setName('')
     setSpeciality('')
   }
+
+  const fieldsFilled = !name.trim() || !speciality.trim()
 
   return (
     <form onSubmit={addSpecialist} aria-label="Specialist form">
@@ -65,6 +72,7 @@ const SpecialistForm = (props: SpecialistFormProps) => {
             type="submit"
             variant="contained"
             aria-label="Add button"
+            disabled={fieldsFilled}
           >
             Add
           </Button>
