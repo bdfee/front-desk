@@ -33,7 +33,11 @@ const AddSpecialistModal = ({
     <DialogTitle id="dialog-title">Add a new specialist</DialogTitle>
     <Divider />
     <DialogContent id="dialog-description">
-      {error && <Alert severity="error">{error}</Alert>}
+      {error && (
+        <Alert severity="error" role="alert">
+          {error}
+        </Alert>
+      )}
       <SpecialistForm
         onSubmit={onSubmit}
         onCancel={onClose}

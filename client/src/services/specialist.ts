@@ -37,8 +37,25 @@ const deleteById = async (id: number) => {
   }
 }
 
+const updateById = async (id: number, object: unknown) => {
+  try {
+    const { data } = await axios.put(url + id, object)
+    if (!isSpecialist(data)) {
+      throw new Error('invalid specialist data')
+    }
+    return data
+  } catch (error) {
+    if (isAxiosError(error)) {
+      throw new Error(error.response?.data.error)
+    } else {
+      throw new Error('Unknown error updating specialists')
+    }
+  }
+}
+
 export default {
   getAll,
   create,
   deleteById,
+  updateById,
 }
