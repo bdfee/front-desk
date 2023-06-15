@@ -81,7 +81,7 @@ const SpecialistList = (props: SpecialistListProps) => {
   }
   return (
     <TableContainer component={Paper}>
-      <Typography variant="h2">Specialists</Typography>
+      <Typography variant="h3">Specialists</Typography>
       <Table>
         <TableHead>
           <TableRow>
@@ -100,7 +100,8 @@ const SpecialistList = (props: SpecialistListProps) => {
                       type="text"
                       value={editRowData.name}
                       onChange={(e) => handleCellEdit(e, 'name')}
-                    ></TextField>
+                      aria-label="Edit name"
+                    />
                   ) : (
                     specialist.name
                   )}
@@ -111,7 +112,8 @@ const SpecialistList = (props: SpecialistListProps) => {
                       type="text"
                       value={editRowData.speciality}
                       onChange={(e) => handleCellEdit(e, 'speciality')}
-                    ></TextField>
+                      aria-label="Edit specialty"
+                    />
                   ) : (
                     specialist.speciality
                   )}
@@ -121,17 +123,33 @@ const SpecialistList = (props: SpecialistListProps) => {
                     onClick={() =>
                       props.deleteSpecialist(specialist.specialistId)
                     }
+                    aria-label="Delete specialist"
                   >
                     delete
                   </Button>
                   {editMode && editRowIdx === idx ? (
                     <>
-                      <Button onClick={() => handleSaveRow()}>save</Button>
-                      <Button onClick={() => handleRowEdit(idx)}>cancel</Button>
+                      <Button
+                        onClick={() => handleSaveRow()}
+                        aria-label="Save changes"
+                      >
+                        save
+                      </Button>
+                      <Button
+                        onClick={() => handleRowEdit(idx)}
+                        aria-label="Cancel edit"
+                      >
+                        cancel
+                      </Button>
                     </>
                   ) : (
                     !editMode && (
-                      <Button onClick={() => handleRowEdit(idx)}>edit</Button>
+                      <Button
+                        onClick={() => handleRowEdit(idx)}
+                        aria-label="Edit row"
+                      >
+                        edit
+                      </Button>
                     )
                   )}
                 </TableCell>
