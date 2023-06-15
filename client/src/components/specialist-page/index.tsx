@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import SpecialistList from './specialist-list'
+import SpecialistList from './specialist-table'
 import AddSpecialistModal from './add-specialist-modal'
 import axios from 'axios'
 import { Specialist, SpecialistInput } from '../../types'
