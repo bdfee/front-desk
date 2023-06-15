@@ -6,8 +6,10 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  TextField,
   Paper,
   Button,
+  Typography,
 } from '@mui/material'
 import { Specialist, SpecialistInput } from '../../types'
 import {
@@ -35,7 +37,7 @@ const SpecialistList = (props: SpecialistListProps) => {
   }
 
   const handleCellEdit = (
-    event: React.ChangeEvent<HTMLInputElement>,
+    event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>,
     colName: string,
   ) => {
     if (editRowData) {
@@ -79,6 +81,7 @@ const SpecialistList = (props: SpecialistListProps) => {
   }
   return (
     <TableContainer component={Paper}>
+      <Typography variant="h2">Specialists</Typography>
       <Table>
         <TableHead>
           <TableRow>
@@ -93,22 +96,22 @@ const SpecialistList = (props: SpecialistListProps) => {
               <TableRow key={specialist.specialistId}>
                 <TableCell>
                   {editMode && editRowIdx === idx && editRowData ? (
-                    <input
+                    <TextField
                       type="text"
                       value={editRowData.name}
                       onChange={(e) => handleCellEdit(e, 'name')}
-                    />
+                    ></TextField>
                   ) : (
                     specialist.name
                   )}
                 </TableCell>
                 <TableCell>
                   {editMode && editRowIdx === idx && editRowData ? (
-                    <input
+                    <TextField
                       type="text"
                       value={editRowData.speciality}
                       onChange={(e) => handleCellEdit(e, 'speciality')}
-                    />
+                    ></TextField>
                   ) : (
                     specialist.speciality
                   )}
