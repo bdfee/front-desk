@@ -15,9 +15,6 @@ const SpecialistPage = () => {
   const [specialistList, setSpecialistList] = useState<Specialist[]>([])
   const [modalOpen, setModalOpen] = useState(false)
   const [error, setError] = useState<string | undefined>()
-  const [editMode, setEditMode] = useState(false)
-  const [editRowIdx, setEditRowIdx] = useState(-1)
-  const [editRowData, setEditRowData] = useState<Specialist | undefined>()
 
   useEffect(() => {
     const fetchSpecialists = async () => {
@@ -93,44 +90,6 @@ const SpecialistPage = () => {
     }
   }
 
-  const handleRowEdit = (rowIdx: number) => {
-    setEditMode(!editMode)
-    setEditRowIdx(editRowIdx === -1 ? rowIdx : -1)
-    setEditRowData(specialistList[rowIdx])
-  }
-
-  const handleCellEdit = (
-    event: React.ChangeEvent<HTMLInputElement>,
-    colName: string,
-  ) => {
-    if (editRowData) {
-      const data = { ...editRowData }
-      data[colName] = event.target.value
-      setEditRowData(data)
-    }
-  }
-
-  const handleSaveRow = async () => {
-    if (editRowData) {
-      try {
-        await updateSpecialist(editRowData.specialistId, editRowData)
-        setEditMode(false)
-        setEditRowIdx(-1)
-      } catch (error) {
-        console.error('Error saving changes:', error)
-      }
-    }
-  }
-
-  const tableEditor = {
-    handleRowEdit,
-    handleCellEdit,
-    handleSaveRow,
-    editMode,
-    editRowIdx,
-    editRowData,
-  }
-
   const setErrorWithTimeout = (errorMessage: string) => {
     setError(errorMessage)
 
@@ -153,7 +112,7 @@ const SpecialistPage = () => {
       <SpecialistList
         specialistList={specialistList}
         deleteSpecialist={deleteSpecialist}
-        tableEditor={tableEditor}
+        updateSpecialist={updateSpecialist}
       />
       <Button variant="contained" onClick={() => openModal()}>
         Add Specialist

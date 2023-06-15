@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import {
   Table,
   TableBody,
@@ -10,25 +11,45 @@ import {
 } from '@mui/material'
 import { Specialist } from '../../types'
 
-interface TableEditorProps {
-  handleRowEdit: (rowIds: number) => void
-  handleCellEdit: (
-    event: React.ChangeEvent<HTMLInputElement>,
-    colName: string,
-  ) => void
-  handleSaveRow: () => void
-  editMode: boolean
-  editRowIdx: number
-  editRowData: Specialist | undefined
-}
-
 interface SpecialistListProps {
   specialistList: Specialist[]
   deleteSpecialist: (id: number) => void
-  tableEditor: TableEditorProps
+  updateSpecialist: (id: number, object: unknown) => void
 }
 
 const SpecialistList = (props: SpecialistListProps) => {
+  const [editMode, setEditMode] = useState(false)
+  const [editRowIdx, setEditRowIdx] = useState(-1)
+  const [editRowData, setEditRowData] = useState<Specialist | undefined>()
+
+  const handleRowEdit = (rowIdx: number) => {
+    setEditMode(!editMode)
+    setEditRowIdx(editRowIdx === -1 ? rowIdx : -1)
+    setEditRowData(props.specialistList[rowIdx])
+  }
+
+  const handleCellEdit = (
+    event: React.ChangeEvent<HTMLInputElement>,
+    colName: string,
+  ) => {
+    if (editRowData) {
+      const data = { ...editRowData }
+      data[colName] = event.target.value
+      setEditRowData(data)
+    }
+  }
+
+  const handleSaveRow = () => {
+    if (editRowData) {
+      try {
+        props.updateSpecialist(editRowData.specialistId, editRowData)
+        setEditMode(false)
+        setEditRowIdx(-1)
+      } catch (error) {
+        console.error('Error saving changes:', error)
+      }
+    }
+  }
   return (
     <TableContainer component={Paper}>
       <Table>
@@ -44,30 +65,22 @@ const SpecialistList = (props: SpecialistListProps) => {
             return (
               <TableRow key={specialist.specialistId}>
                 <TableCell>
-                  {props.tableEditor.editMode &&
-                  props.tableEditor.editRowIdx === idx &&
-                  props.tableEditor.editRowData ? (
+                  {editMode && editRowIdx === idx && editRowData ? (
                     <input
                       type="text"
-                      value={props.tableEditor.editRowData.name}
-                      onChange={(e) =>
-                        props.tableEditor.handleCellEdit(e, 'name')
-                      }
+                      value={editRowData.name}
+                      onChange={(e) => handleCellEdit(e, 'name')}
                     />
                   ) : (
                     specialist.name
                   )}
                 </TableCell>
                 <TableCell>
-                  {props.tableEditor.editMode &&
-                  props.tableEditor.editRowIdx === idx &&
-                  props.tableEditor.editRowData ? (
+                  {editMode && editRowIdx === idx && editRowData ? (
                     <input
                       type="text"
-                      value={props.tableEditor.editRowData.speciality}
-                      onChange={(e) =>
-                        props.tableEditor.handleCellEdit(e, 'speciality')
-                      }
+                      value={editRowData.speciality}
+                      onChange={(e) => handleCellEdit(e, 'speciality')}
                     />
                   ) : (
                     specialist.speciality
@@ -81,25 +94,14 @@ const SpecialistList = (props: SpecialistListProps) => {
                   >
                     delete
                   </Button>
-                  {props.tableEditor.editMode &&
-                  props.tableEditor.editRowIdx === idx ? (
+                  {editMode && editRowIdx === idx ? (
                     <>
-                      <Button onClick={() => props.tableEditor.handleSaveRow()}>
-                        save
-                      </Button>
-                      <Button
-                        onClick={() => props.tableEditor.handleRowEdit(idx)}
-                      >
-                        cancel
-                      </Button>
+                      <Button onClick={() => handleSaveRow()}>save</Button>
+                      <Button onClick={() => handleRowEdit(idx)}>cancel</Button>
                     </>
                   ) : (
-                    !props.tableEditor.editMode && (
-                      <Button
-                        onClick={() => props.tableEditor.handleRowEdit(idx)}
-                      >
-                        edit
-                      </Button>
+                    !editMode && (
+                      <Button onClick={() => handleRowEdit(idx)}>edit</Button>
                     )
                   )}
                 </TableCell>
