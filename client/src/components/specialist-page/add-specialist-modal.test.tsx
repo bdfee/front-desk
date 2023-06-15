@@ -2,7 +2,7 @@ import { screen, render } from '@testing-library/react'
 import '@testing-library/jest-dom/extend-expect'
 import AddSpecialistModal from './add-specialist-modal'
 
-test('modal opens props', () => {
+const renderModal = () =>
   render(
     <AddSpecialistModal
       modalOpen={true}
@@ -17,6 +17,13 @@ test('modal opens props', () => {
     />,
   )
 
-  const modal = screen.getByRole('dialog')
-  expect(modal).toBeDefined()
+test('get elements', () => {
+  renderModal()
+  expect(screen.getByLabelText('dialog-title')).toBeDefined()
+  expect(screen.getByText('Add a new specialist')).toBeDefined()
+})
+
+test('modal renders specialist form', () => {
+  renderModal()
+  expect(screen.getByLabelText('Specialist form'))
 })

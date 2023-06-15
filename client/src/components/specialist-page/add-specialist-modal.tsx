@@ -7,14 +7,13 @@ import {
 } from '@mui/material'
 import SpecialistForm from './specialist-form'
 import { SpecialistInput } from '../../types'
-import { SetStateAction } from 'react'
 
 interface ModalProps {
   modalOpen: boolean
   onClose: () => void
   onSubmit: (values: SpecialistInput) => void
   error?: string
-  setError: React.Dispatch<SetStateAction<string | undefined>>
+  setError: (errorMessage: string) => void
 }
 
 const AddSpecialistModal = ({
@@ -24,11 +23,21 @@ const AddSpecialistModal = ({
   error,
   setError,
 }: ModalProps) => (
-  <Dialog fullWidth={true} open={modalOpen} onClose={() => onClose()}>
-    <DialogTitle>Add a new specialist</DialogTitle>
+  <Dialog
+    fullWidth={true}
+    open={modalOpen}
+    onClose={() => onClose()}
+    aria-labelledby="dialog-title"
+    aria-describedby="dialog-description"
+  >
+    <DialogTitle id="dialog-title">Add a new specialist</DialogTitle>
     <Divider />
-    <DialogContent>
-      {error && <Alert severity="error">{error}</Alert>}
+    <DialogContent id="dialog-description">
+      {error && (
+        <Alert severity="error" role="alert">
+          {error}
+        </Alert>
+      )}
       <SpecialistForm
         onSubmit={onSubmit}
         onCancel={onClose}
