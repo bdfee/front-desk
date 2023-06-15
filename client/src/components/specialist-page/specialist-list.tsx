@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import {
   Table,
   TableBody,
@@ -5,32 +6,82 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  TextField,
   Paper,
   Button,
+  Typography,
 } from '@mui/material'
-import { Specialist } from '../../types'
-
-interface TableEditorProps {
-  handleRowEdit: (rowIds: number) => void
-  handleCellEdit: (
-    event: React.ChangeEvent<HTMLInputElement>,
-    colName: string,
-  ) => void
-  handleSaveRow: () => void
-  editMode: boolean
-  editRowIdx: number
-  editRowData: Specialist | undefined
-}
+import { Specialist, SpecialistInput } from '../../types'
+import {
+  sanitizeTextInput,
+  validateTextInput,
+} from '../../validations/specialist'
+import { isSpecialist } from '../../typeUtils'
 
 interface SpecialistListProps {
   specialistList: Specialist[]
   deleteSpecialist: (id: number) => void
-  tableEditor: TableEditorProps
+  updateSpecialist: (id: number, object: SpecialistInput) => void
+  setError: (errorMessage: string) => void
 }
 
 const SpecialistList = (props: SpecialistListProps) => {
+  const [editMode, setEditMode] = useState(false)
+  const [editRowIdx, setEditRowIdx] = useState(-1)
+  const [editRowData, setEditRowData] = useState<Specialist | undefined>()
+
+  const handleRowEdit = (rowIdx: number) => {
+    setEditMode(!editMode)
+    setEditRowIdx(editRowIdx === -1 ? rowIdx : -1)
+    setEditRowData(props.specialistList[rowIdx])
+  }
+
+  const handleCellEdit = (
+    event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>,
+    colName: string,
+  ) => {
+    if (editRowData) {
+      const data = { ...editRowData }
+      data[colName] = event.target.value
+      setEditRowData(data)
+    }
+  }
+
+  const handleSaveRow = () => {
+    if (editRowData === undefined) {
+      throw new Error('update row undefined')
+    }
+
+    let name
+    let speciality
+
+    if (!validateTextInput(editRowData.name)) {
+      props.setError('invalid update to name')
+      return
+    } else if (!validateTextInput(editRowData.speciality)) {
+      props.setError('invalid update to speciality')
+      return
+    } else {
+      name = sanitizeTextInput(editRowData.name)
+      speciality = sanitizeTextInput(editRowData.speciality)
+    }
+
+    try {
+      if (isSpecialist(editRowData)) {
+        props.updateSpecialist(editRowData.specialistId, {
+          name,
+          speciality,
+        })
+        setEditMode(false)
+        setEditRowIdx(-1)
+      }
+    } catch (error) {
+      props.setError('Error saving changes:' + error)
+    }
+  }
   return (
     <TableContainer component={Paper}>
+      <Typography variant="h3">Specialists</Typography>
       <Table>
         <TableHead>
           <TableRow>
@@ -44,30 +95,24 @@ const SpecialistList = (props: SpecialistListProps) => {
             return (
               <TableRow key={specialist.specialistId}>
                 <TableCell>
-                  {props.tableEditor.editMode &&
-                  props.tableEditor.editRowIdx === idx &&
-                  props.tableEditor.editRowData ? (
-                    <input
+                  {editMode && editRowIdx === idx && editRowData ? (
+                    <TextField
                       type="text"
-                      value={props.tableEditor.editRowData.name}
-                      onChange={(e) =>
-                        props.tableEditor.handleCellEdit(e, 'name')
-                      }
+                      value={editRowData.name}
+                      onChange={(e) => handleCellEdit(e, 'name')}
+                      aria-label="Edit name"
                     />
                   ) : (
                     specialist.name
                   )}
                 </TableCell>
                 <TableCell>
-                  {props.tableEditor.editMode &&
-                  props.tableEditor.editRowIdx === idx &&
-                  props.tableEditor.editRowData ? (
-                    <input
+                  {editMode && editRowIdx === idx && editRowData ? (
+                    <TextField
                       type="text"
-                      value={props.tableEditor.editRowData.speciality}
-                      onChange={(e) =>
-                        props.tableEditor.handleCellEdit(e, 'speciality')
-                      }
+                      value={editRowData.speciality}
+                      onChange={(e) => handleCellEdit(e, 'speciality')}
+                      aria-label="Edit specialty"
                     />
                   ) : (
                     specialist.speciality
@@ -78,27 +123,34 @@ const SpecialistList = (props: SpecialistListProps) => {
                     onClick={() =>
                       props.deleteSpecialist(specialist.specialistId)
                     }
+                    aria-label="Delete specialist"
                   >
                     delete
                   </Button>
-                  {props.tableEditor.editMode &&
-                  props.tableEditor.editRowIdx === idx ? (
+                  {editMode && editRowIdx === idx ? (
                     <>
-                      <Button onClick={() => props.tableEditor.handleSaveRow()}>
+                      <Button
+                        onClick={() => handleSaveRow()}
+                        aria-label="Save changes"
+                      >
                         save
                       </Button>
                       <Button
-                        onClick={() => props.tableEditor.handleRowEdit(idx)}
+                        onClick={() => handleRowEdit(idx)}
+                        aria-label="Cancel edit"
                       >
                         cancel
                       </Button>
                     </>
                   ) : (
-                    <Button
-                      onClick={() => props.tableEditor.handleRowEdit(idx)}
-                    >
-                      edit
-                    </Button>
+                    !editMode && (
+                      <Button
+                        onClick={() => handleRowEdit(idx)}
+                        aria-label="Edit row"
+                      >
+                        edit
+                      </Button>
+                    )
                   )}
                 </TableCell>
               </TableRow>
