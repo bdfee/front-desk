@@ -1,5 +1,7 @@
-export const validateTextInput = (input: unknown): boolean => {
-  if (typeof input !== 'string' || input.length === 0) {
+export const validateTextInput = (
+  input: unknown | undefined,
+): input is string => {
+  if (typeof input !== 'string' || input.length === 0 || input === undefined) {
     return false
   }
   return nameRegex.test(input)

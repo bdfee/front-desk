@@ -4,12 +4,7 @@ import AddSpecialistModal from './add-specialist-modal'
 import axios from 'axios'
 import { Specialist, SpecialistInput } from '../../types'
 import specialistService from '../../services/specialist'
-import { Button } from '@mui/material'
-import {
-  validateTextInput,
-  sanitizeTextInput,
-} from '../../validations/specialist'
-import { isSpecialist } from '../../typeUtils'
+import { Button, Alert } from '@mui/material'
 
 const SpecialistPage = () => {
   const [specialistList, setSpecialistList] = useState<Specialist[]>([])
@@ -61,26 +56,20 @@ const SpecialistPage = () => {
     }
   }
 
-  const updateSpecialist = async (id: number, object: unknown) => {
+  const updateSpecialist = async (id: number, specialist: SpecialistInput) => {
+    const { name, speciality } = specialist
     try {
-      if (
-        isSpecialist(object) &&
-        validateTextInput(object.name) &&
-        validateTextInput(object.speciality)
-      ) {
-        const update = {
-          name: sanitizeTextInput(object.name),
-          speciality: sanitizeTextInput(object.speciality),
-        }
-        const updatedSpecialist = await specialistService.updateById(id, update)
-        setSpecialistList(
-          specialistList.map((s) =>
-            s.specialistId === updatedSpecialist.specialistId
-              ? updatedSpecialist
-              : s,
-          ),
-        )
-      }
+      const updatedSpecialist = await specialistService.updateById(id, {
+        name,
+        speciality,
+      })
+      setSpecialistList(
+        specialistList.map((s) =>
+          s.specialistId === updatedSpecialist.specialistId
+            ? updatedSpecialist
+            : s,
+        ),
+      )
     } catch (error) {
       if (axios.isAxiosError(error)) {
         console.log('axios error' + error.message)
@@ -109,10 +98,16 @@ const SpecialistPage = () => {
 
   return (
     <>
+      {!modalOpen && error && (
+        <Alert severity="error" role="alert">
+          {error}
+        </Alert>
+      )}
       <SpecialistList
         specialistList={specialistList}
         deleteSpecialist={deleteSpecialist}
         updateSpecialist={updateSpecialist}
+        setError={setErrorWithTimeout}
       />
       <Button variant="contained" onClick={() => openModal()}>
         Add Specialist

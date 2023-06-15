@@ -9,12 +9,18 @@ import {
   Paper,
   Button,
 } from '@mui/material'
-import { Specialist } from '../../types'
+import { Specialist, SpecialistInput } from '../../types'
+import {
+  sanitizeTextInput,
+  validateTextInput,
+} from '../../validations/specialist'
+import { isSpecialist } from '../../typeUtils'
 
 interface SpecialistListProps {
   specialistList: Specialist[]
   deleteSpecialist: (id: number) => void
-  updateSpecialist: (id: number, object: unknown) => void
+  updateSpecialist: (id: number, object: SpecialistInput) => void
+  setError: (errorMessage: string) => void
 }
 
 const SpecialistList = (props: SpecialistListProps) => {
@@ -40,14 +46,35 @@ const SpecialistList = (props: SpecialistListProps) => {
   }
 
   const handleSaveRow = () => {
-    if (editRowData) {
-      try {
-        props.updateSpecialist(editRowData.specialistId, editRowData)
+    if (editRowData === undefined) {
+      throw new Error('update row undefined')
+    }
+
+    let name
+    let speciality
+
+    if (!validateTextInput(editRowData.name)) {
+      props.setError('invalid update to name')
+      return
+    } else if (!validateTextInput(editRowData.speciality)) {
+      props.setError('invalid update to speciality')
+      return
+    } else {
+      name = sanitizeTextInput(editRowData.name)
+      speciality = sanitizeTextInput(editRowData.speciality)
+    }
+
+    try {
+      if (isSpecialist(editRowData)) {
+        props.updateSpecialist(editRowData.specialistId, {
+          name,
+          speciality,
+        })
         setEditMode(false)
         setEditRowIdx(-1)
-      } catch (error) {
-        console.error('Error saving changes:', error)
       }
+    } catch (error) {
+      props.setError('Error saving changes:' + error)
     }
   }
   return (
