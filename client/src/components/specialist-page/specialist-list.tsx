@@ -94,11 +94,13 @@ const SpecialistList = (props: SpecialistListProps) => {
                       </Button>
                     </>
                   ) : (
-                    <Button
-                      onClick={() => props.tableEditor.handleRowEdit(idx)}
-                    >
-                      edit
-                    </Button>
+                    !props.tableEditor.editMode && (
+                      <Button
+                        onClick={() => props.tableEditor.handleRowEdit(idx)}
+                      >
+                        edit
+                      </Button>
+                    )
                   )}
                 </TableCell>
               </TableRow>

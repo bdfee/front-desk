@@ -5,6 +5,11 @@ import axios from 'axios'
 import { Specialist, SpecialistInput } from '../../types'
 import specialistService from '../../services/specialist'
 import { Button } from '@mui/material'
+import {
+  validateTextInput,
+  sanitizeTextInput,
+} from '../../validations/specialist'
+import { isSpecialist } from '../../typeUtils'
 
 const SpecialistPage = () => {
   const [specialistList, setSpecialistList] = useState<Specialist[]>([])
@@ -61,14 +66,24 @@ const SpecialistPage = () => {
 
   const updateSpecialist = async (id: number, object: unknown) => {
     try {
-      const updatedSpecialist = await specialistService.updateById(id, object)
-      setSpecialistList(
-        specialistList.map((s) =>
-          s.specialistId === updatedSpecialist.specialistId
-            ? updatedSpecialist
-            : s,
-        ),
-      )
+      if (
+        isSpecialist(object) &&
+        validateTextInput(object.name) &&
+        validateTextInput(object.speciality)
+      ) {
+        const update = {
+          name: sanitizeTextInput(object.name),
+          speciality: sanitizeTextInput(object.speciality),
+        }
+        const updatedSpecialist = await specialistService.updateById(id, update)
+        setSpecialistList(
+          specialistList.map((s) =>
+            s.specialistId === updatedSpecialist.specialistId
+              ? updatedSpecialist
+              : s,
+          ),
+        )
+      }
     } catch (error) {
       if (axios.isAxiosError(error)) {
         console.log('axios error' + error.message)
