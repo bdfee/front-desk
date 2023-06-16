@@ -19,14 +19,21 @@ const renderSpecialistTable = (specialistList: Specialist[]) => {
     />,
   )
 
-  return screen.getByTestId('specialist-table')
+  return {
+    screen: screen.getByTestId('specialist-table'),
+    functions: {
+      delete: mockDeleteSpecialist(),
+      update: mockUpdateSpecialist(),
+      error: mockSetError(),
+    },
+  }
 }
 
 describe('table elements', () => {
   test('table rows and columns are rendered', async () => {
     const specialistList = createLocalSpecialistList(1)
 
-    const table = renderSpecialistTable(specialistList)
+    const table = renderSpecialistTable(specialistList).screen
 
     const tableHead = Array.from(table.querySelectorAll('th'))
     expect(tableHead).toHaveLength(3)
@@ -47,13 +54,13 @@ describe('table elements', () => {
   })
 })
 
-describe('actions update table structure', () => {
-  const getActionButtons = (table: HTMLElement) =>
-    Array.from(table.querySelectorAll('td'))[2].querySelectorAll('button')
+const getActionButtons = (table: HTMLElement) =>
+  Array.from(table.querySelectorAll('td'))[2].querySelectorAll('button')
 
+describe('actions update table structure', () => {
   test('edit button toggles target cells into inputs', async () => {
     const specialistList = createLocalSpecialistList(1)
-    const table = renderSpecialistTable(specialistList)
+    const table = renderSpecialistTable(specialistList).screen
     const actionButtons = getActionButtons(table)
 
     userEvent.click(actionButtons[1])
@@ -61,25 +68,55 @@ describe('actions update table structure', () => {
   })
 
   test('edit button adds save to target row', () => {
-    //
-  })
+    const specialistList = createLocalSpecialistList(1)
+    const table = renderSpecialistTable(specialistList).screen
+    const actionButtons = getActionButtons(table)
 
-  test('edit button adds cancel to target row', () => {
-    //
+    userEvent.click(actionButtons[1])
+    expect(screen.getByText('cancel'))
+    expect(screen.getByText('save'))
+    expect(screen.getByText('delete'))
   })
 
   test('edit button removes edit button from other rows', () => {
-    //
+    const specialistList = createLocalSpecialistList(2)
+    const table = renderSpecialistTable(specialistList).screen
+    const actionButtonsRowOne = getActionButtons(table)
+    userEvent.click(actionButtonsRowOne[1])
+    expect(screen.getAllByText('cancel')).toHaveLength(1)
+    expect(screen.queryByText('edit')).not.toBeInTheDocument()
   })
 })
 
 describe('user actions in edit mode', () => {
   test('name input can be edited', () => {
-    //
+    const specialistList = createLocalSpecialistList(1)
+    const table = renderSpecialistTable(specialistList).screen
+    const actionButtons = getActionButtons(table)
+
+    userEvent.click(actionButtons[1])
+
+    const name = screen.getByDisplayValue('test specialist')
+    userEvent.type(name, '{selectall}')
+    userEvent.type(name, '{backspace}')
+    userEvent.type(name, 'edited name')
+
+    expect(screen.getByDisplayValue('edited name'))
   })
 
   test('speciality can be edited', () => {
-    //
+    const specialistList = createLocalSpecialistList(1)
+    const table = renderSpecialistTable(specialistList).screen
+    const actionButtons = getActionButtons(table)
+
+    userEvent.click(actionButtons[1])
+
+    const speciality = screen.getByDisplayValue('test speciality')
+    userEvent.type(speciality, '{selectall}')
+    userEvent.type(speciality, '{backspace}')
+    userEvent.type(speciality, 'edited speciality')
+
+    expect(screen.getByDisplayValue('edited speciality'))
   })
 
   test('edited name calls updateSpecialist', () => {
