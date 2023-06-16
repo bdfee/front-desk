@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import SpecialistList from './specialist-list'
+import SpecialistTable from './specialist-table'
 import AddSpecialistModal from './add-specialist-modal'
 import axios from 'axios'
 import { Specialist, SpecialistInput } from '../../types'
@@ -103,7 +103,7 @@ const SpecialistPage = () => {
           {error}
         </Alert>
       )}
-      <SpecialistList
+      <SpecialistTable
         specialistList={specialistList}
         deleteSpecialist={deleteSpecialist}
         updateSpecialist={updateSpecialist}

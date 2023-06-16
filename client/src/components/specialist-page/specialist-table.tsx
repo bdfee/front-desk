@@ -25,7 +25,7 @@ interface SpecialistListProps {
   setError: (errorMessage: string) => void
 }
 
-const SpecialistList = (props: SpecialistListProps) => {
+const SpecialistTable = (props: SpecialistListProps) => {
   const [editMode, setEditMode] = useState(false)
   const [editRowIdx, setEditRowIdx] = useState(-1)
   const [editRowData, setEditRowData] = useState<Specialist | undefined>()
@@ -80,7 +80,7 @@ const SpecialistList = (props: SpecialistListProps) => {
     }
   }
   return (
-    <TableContainer component={Paper}>
+    <TableContainer component={Paper} data-testid="specialist-table">
       <Typography variant="h3">Specialists</Typography>
       <Table>
         <TableHead>
@@ -162,4 +162,4 @@ const SpecialistList = (props: SpecialistListProps) => {
   )
 }
 
-export default SpecialistList
+export default SpecialistTable

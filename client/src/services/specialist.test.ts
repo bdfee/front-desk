@@ -1,9 +1,9 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-import { isTestDb, dropAllTables } from './db'
+import { dropAllTables } from '../testHelpers/services/db'
 import specialistService from './specialist'
-import { createTestSpecialist, expectSpecialist } from './testHelpers'
-
-beforeAll(async () => expect(await isTestDb()).toBe(true))
+import {
+  createTestSpecialist,
+  expectSpecialist,
+} from '../testHelpers/specialists'
 
 beforeEach(async () => expect(await dropAllTables()).toBe(true))
 
@@ -46,7 +46,7 @@ describe('create()', () => {
 
   test('returns expected error message if input error', async () => {
     try {
-      await await specialistService.create({
+      await specialistService.create({
         name: 'test specialist',
         speciality: '',
       })
@@ -58,7 +58,7 @@ describe('create()', () => {
     }
 
     try {
-      await await specialistService.create({
+      await specialistService.create({
         name: '',
         speciality: 'test speciality',
       })
