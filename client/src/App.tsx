@@ -1,6 +1,6 @@
 import SpecialistPage from './components/specialist-page'
 import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom'
-import { Typography, Container, Divider, Button, Box } from '@mui/material'
+import { Typography, Container, Divider, Button } from '@mui/material'
 
 const App = () => {
   return (
