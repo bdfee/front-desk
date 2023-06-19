@@ -1,4 +1,5 @@
 import SpecialistPage from './components/specialist-page'
+import PatientPage from './components/patients-page'
 import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom'
 import { Typography, Container, Divider, Button } from '@mui/material'
 
@@ -16,9 +17,13 @@ const App = () => {
           <Button component={Link} to="/specialists">
             specialists
           </Button>
+          <Button component={Link} to="/patients">
+            patients
+          </Button>
           <Divider style={{ marginBottom: '1em' }} />
           <Routes>
             <Route path="/specialists" element={<SpecialistPage />} />
+            <Route path="/patients" element={<PatientPage />} />
           </Routes>
         </Container>
       </Router>

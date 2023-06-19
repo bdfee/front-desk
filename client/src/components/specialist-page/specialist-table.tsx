@@ -12,10 +12,7 @@ import {
   Typography,
 } from '@mui/material'
 import { Specialist, SpecialistInput } from '../../types'
-import {
-  sanitizeTextInput,
-  validateTextInput,
-} from '../../validations/specialist'
+import { sanitizeTextInput, validateTextInput } from '../../validations/inputs'
 import { isSpecialist } from '../../typeUtils'
 
 interface SpecialistListProps {

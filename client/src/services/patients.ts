@@ -1,5 +1,5 @@
 import axios, { isAxiosError } from 'axios'
-import { Patient, PatientInput } from '../types'
+import { Patient, PatientDetail, PatientInput } from '../types'
 import { apiBaseUrl } from '../constants'
 import { isPatient } from '../typeUtils'
 
@@ -7,6 +7,11 @@ const url = `${apiBaseUrl}/patients/`
 
 const getAll = async () => {
   const { data } = await axios.get<Patient[]>(url)
+  return data
+}
+
+const getOneById = async (id: number) => {
+  const { data } = await axios.get<PatientDetail>(url + id)
   return data
 }
 
@@ -56,6 +61,7 @@ const updateById = async (id: number, object: unknown) => {
 
 export default {
   getAll,
+  getOneById,
   create,
   deleteById,
   updateById,
