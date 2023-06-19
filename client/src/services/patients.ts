@@ -1,12 +1,12 @@
 import axios, { isAxiosError } from 'axios'
-import { Patient, PatientDetail, PatientInput } from '../types'
+import { PatientDetail, PatientInput } from '../types'
 import { apiBaseUrl } from '../constants'
 import { isPatient } from '../typeUtils'
 
 const url = `${apiBaseUrl}/patients/`
 
 const getAll = async () => {
-  const { data } = await axios.get<Patient[]>(url)
+  const { data } = await axios.get<PatientDetail[]>(url)
   return data
 }
 
