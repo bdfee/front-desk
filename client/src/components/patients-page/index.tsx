@@ -1,13 +1,13 @@
 import { useEffect, useState } from 'react'
 import axios from 'axios'
 import { Button } from '@mui/material'
-import { Patient, PatientInput } from '../../types'
+import { PatientDetail, PatientInput } from '../../types'
 import patientService from '../../services/patients'
 import PatientTable from './patient-table'
 import AddPatientModal from './add-patient-modal'
 
 const PatientPage = () => {
-  const [patientList, setPatientList] = useState<Patient[]>([])
+  const [patientList, setPatientList] = useState<PatientDetail[]>([])
   const [modalOpen, setModalOpen] = useState(false)
   const [error, setError] = useState<string | undefined>()
 
@@ -29,7 +29,8 @@ const PatientPage = () => {
 
   const submitNewPatient = async (values: PatientInput) => {
     try {
-      const patient = await patientService.create(values)
+      const { patientId } = await patientService.create(values)
+      const patient = await patientService.getOneById(patientId)
       setPatientList(patientList.concat(patient))
       closeModal()
     } catch (error) {
@@ -56,7 +57,8 @@ const PatientPage = () => {
 
   const updatePatient = async (id: number, patient: PatientInput) => {
     try {
-      const updatedPatient = await patientService.updateById(id, patient)
+      const { patientId } = await patientService.updateById(id, patient)
+      const updatedPatient = await patientService.getOneById(patientId)
       setPatientList(
         patientList.map((patient) =>
           patient.patientId === updatedPatient.patientId

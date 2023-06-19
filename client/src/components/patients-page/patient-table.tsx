@@ -9,16 +9,17 @@ import {
   Typography,
 } from '@mui/material'
 import { Link } from 'react-router-dom'
-import { Patient, PatientInput } from '../../types'
+import { PatientDetail, PatientInput } from '../../types'
 import { formatPhone } from '../../validations/inputs'
 
 interface PatientListProps {
-  patientList: Patient[]
+  patientList: PatientDetail[]
   updatePatient: (id: number, object: PatientInput) => void
   deletePatient: (id: number) => void
 }
 
 const PatientTable = (props: PatientListProps) => {
+  console.log(props.patientList)
   return (
     <TableContainer component={Paper}>
       <Typography variant="h3">Patients</Typography>
@@ -43,7 +44,7 @@ const PatientTable = (props: PatientListProps) => {
                 </TableCell>
                 <TableCell>{patient.email}</TableCell>
                 <TableCell>{formatPhone(patient.phone)}</TableCell>
-                <TableCell>{patient.specialistId}</TableCell>
+                <TableCell>{patient.specialist.name}</TableCell>
                 <TableCell>todo</TableCell>
               </TableRow>
             )

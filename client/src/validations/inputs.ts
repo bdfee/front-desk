@@ -30,3 +30,15 @@ export const validateEmail = (email: string) => {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
   return emailRegex.test(email)
 }
+
+export const sanitizeEmail = (email: unknown): string => {
+  if (typeof email !== 'string') {
+    throw new Error('Invalid input. Expected a string.')
+  }
+
+  const trimmedEmail = email.trim()
+  const sanitizedEmail = trimmedEmail.toLowerCase()
+  const sanitizedEmailWithoutSpaces = sanitizedEmail.replace(/\s/g, '')
+
+  return sanitizedEmailWithoutSpaces
+}
