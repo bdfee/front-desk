@@ -31,6 +31,7 @@ const PatientPage = () => {
     try {
       const patient = await patientService.create(values)
       setPatientList(patientList.concat(patient))
+      closeModal()
     } catch (error) {
       if (axios.isAxiosError(error)) {
         console.log('axios error' + error.message)
