@@ -1,6 +1,18 @@
-import { TextField, Grid, Button } from '@mui/material'
-import { SyntheticEvent, useState } from 'react'
-import { PatientFormProps } from '../../types'
+import {
+  TextField,
+  Grid,
+  Button,
+  Select,
+  MenuItem,
+  InputLabel,
+} from '@mui/material'
+import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers'
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
+import { Dayjs } from 'dayjs'
+import specialistService from '../../services/specialist'
+
+import { SyntheticEvent, useEffect, useState } from 'react'
+import { Gender, PatientFormProps, Specialist } from '../../types'
 import { validateTextInput, sanitizeTextInput } from '../../validations/inputs'
 
 const PatientForm = (props: PatientFormProps) => {
@@ -8,12 +20,33 @@ const PatientForm = (props: PatientFormProps) => {
   const [lastName, setLastName] = useState('')
   const [email, setEmail] = useState('')
   const [phone, setPhone] = useState('')
-  const [dateOfBirth, setDateOfBirth] = useState('')
-  const [gender, setGender] = useState('')
+  const [dateOfBirth, setDateOfBirth] = useState<Dayjs | null>(null)
+  const [gender, setGender] = useState<string>('')
   const [address, setAddress] = useState('')
-  const [specialistId, setSpecialistId] = useState<number | undefined>(
-    undefined,
-  )
+  const [specialists, setSpecialists] = useState<Specialist[]>()
+  const [specialistId, setSpecialistId] = useState<string>('')
+
+  useEffect(() => {
+    const fetchSpecialists = async () => {
+      const specialists = await specialistService.getAll()
+      setSpecialists(specialists)
+    }
+    fetchSpecialists()
+  }, [])
+
+  const formatPhone = (input: string) => {
+    const digitsOnly = input.replace(/\D/g, '')
+
+    let formattedPhone = ''
+    for (let i = 0; i < digitsOnly.length && i < 10; i++) {
+      if (i === 3 || i === 6) {
+        formattedPhone += '-'
+      }
+      formattedPhone += digitsOnly[i]
+    }
+
+    return formattedPhone
+  }
 
   const addPatient = (event: SyntheticEvent) => {
     event.preventDefault()
@@ -30,59 +63,46 @@ const PatientForm = (props: PatientFormProps) => {
       return
     }
 
-    if (!validateTextInput(email)) {
-      props.setError('invalid email')
-      setEmail('')
-      return
-    }
-
-    if (!validateTextInput(phone)) {
-      props.setError('invalid phone')
-      setFirstName('')
-      return
-    }
-
-    if (!validateTextInput(dateOfBirth)) {
-      props.setError('invalid date of birth')
-      setLastName('')
-      return
-    }
-
-    if (!validateTextInput(gender)) {
-      props.setError('invalid gender')
-      setEmail('')
-      return
-    }
-
-    if (!validateTextInput(address)) {
-      props.setError('invalid gender')
-      setEmail('')
+    if (!specialists) {
+      props.setError('error fetching specialists')
       return
     }
 
     if (!specialistId) {
       props.setError('invalid selection')
-      setSpecialistId(undefined)
+      setSpecialistId('')
       return
     }
 
+    if (!dateOfBirth) {
+      props.setError('dob needed')
+      return
+    }
+
+    if (!gender) {
+      props.setError('gender needed')
+      return
+    }
+
+    console.log(dateOfBirth.toDate())
+
     props.onSubmit({
       name: sanitizeTextInput(firstName) + ' ' + sanitizeTextInput(lastName),
-      email: sanitizeTextInput(email),
-      phone: sanitizeTextInput(phone),
-      dateOfBirth: sanitizeTextInput(dateOfBirth),
-      gender: sanitizeTextInput(gender),
+      email,
+      phone: phone.replace(/-/g, ''),
+      dateOfBirth: '2020-02-02',
+      gender,
       address: sanitizeTextInput(address),
-      specialistId: specialistId,
+      specialistId: +specialistId,
     })
     setFirstName('')
     setLastName('')
     setEmail('')
     setPhone('')
-    setDateOfBirth('')
+    setDateOfBirth(null)
     setGender('')
     setAddress('')
-    setSpecialistId(undefined)
+    setSpecialistId('')
   }
 
   // const fieldsFilled =
@@ -101,6 +121,7 @@ const PatientForm = (props: PatientFormProps) => {
         label="First name"
         value={firstName}
         onChange={({ target }) => setFirstName(target.value)}
+        fullWidth
       />
       <TextField
         label="Last name"
@@ -117,19 +138,7 @@ const PatientForm = (props: PatientFormProps) => {
       <TextField
         label="Phone"
         value={phone}
-        onChange={({ target }) => setPhone(target.value)}
-        fullWidth
-      />
-      <TextField
-        label="Date of birth"
-        value={dateOfBirth}
-        onChange={({ target }) => setDateOfBirth(target.value)}
-        fullWidth
-      />
-      <TextField
-        label="Gender"
-        value={gender}
-        onChange={({ target }) => setGender(target.value)}
+        onChange={({ target }) => setPhone(formatPhone(target.value))}
         fullWidth
       />
       <TextField
@@ -138,12 +147,48 @@ const PatientForm = (props: PatientFormProps) => {
         onChange={({ target }) => setAddress(target.value)}
         fullWidth
       />
-      {/* <TextField
-        label="Specialist"
+      <LocalizationProvider dateAdapter={AdapterDayjs}>
+        <DatePicker
+          label="Date of birth"
+          value={dateOfBirth}
+          onChange={(e) => {
+            setDateOfBirth(e)
+          }}
+        />
+      </LocalizationProvider>
+      <InputLabel id="gender">Gender</InputLabel>
+
+      <Select
+        labelId="gender"
+        value={gender}
+        onChange={({ target }) => setGender(target.value)}
+      >
+        {Object.values(Gender).map((value) => {
+          return (
+            <MenuItem key={value} value={value}>
+              {value}
+            </MenuItem>
+          )
+        })}
+      </Select>
+
+      <InputLabel id="specialist">Assign Specialist</InputLabel>
+      <Select
+        labelId="specialist"
         value={specialistId}
         onChange={({ target }) => setSpecialistId(target.value)}
-        fullWidth
-      /> */}
+      >
+        {specialists?.map((specialist) => {
+          return (
+            <MenuItem
+              key={specialist.specialistId}
+              value={specialist.specialistId}
+            >
+              {specialist.name}
+            </MenuItem>
+          )
+        })}
+      </Select>
       <Grid>
         <Grid item>
           <Button

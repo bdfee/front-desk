@@ -7,7 +7,7 @@ import patientService from '../services/patients'
 
 const PatientInformation = () => {
   const [patient, setPatient] = useState<PatientDetail>()
-  const { id } = useParams()
+  const { id } = useParams<{ id: string }>()
 
   useEffect(() => {
     const fetchPatient = async () => {
@@ -25,7 +25,7 @@ const PatientInformation = () => {
       }
     }
     void fetchPatient()
-  }, [])
+  }, [id])
 
   if (!patient) {
     return <div>fetching patient information</div>

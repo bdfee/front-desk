@@ -1,5 +1,6 @@
 import SpecialistPage from './components/specialist-page'
 import PatientPage from './components/patients-page'
+import PatientInformation from './components/patient-information'
 import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom'
 import { Typography, Container, Divider, Button } from '@mui/material'
 
@@ -24,6 +25,8 @@ const App = () => {
           <Routes>
             <Route path="/specialists" element={<SpecialistPage />} />
             <Route path="/patients" element={<PatientPage />} />
+            <Route path="/patients/:id" element={<PatientInformation />} />
+            <Route path="/" element={<div>home</div>} />
           </Routes>
         </Container>
       </Router>

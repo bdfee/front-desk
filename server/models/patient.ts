@@ -64,7 +64,7 @@ Patient.init(
       },
     },
     gender: {
-      type: DataTypes.ENUM("male", "female", "nonbinary", "other"),
+      type: DataTypes.ENUM("male", "female", "non-binary", "transgender"),
       allowNull: false,
       validate: {
         notEmpty: true,

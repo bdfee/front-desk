@@ -35,3 +35,10 @@ export type PatientInput = Omit<Patient, 'patientId'>
 export type PatientDetail = Omit<Patient, 'specialistId'> & {
   specialist: Omit<Specialist, 'specialistId | speciality'>
 }
+
+export enum Gender {
+  Male = 'male',
+  Female = 'female',
+  NonBinary = 'non-binary',
+  Transgender = 'transgender',
+}
