@@ -13,7 +13,11 @@ import specialistService from '../../services/specialist'
 
 import { SyntheticEvent, useEffect, useState } from 'react'
 import { Gender, PatientFormProps, Specialist } from '../../types'
-import { validateTextInput, sanitizeTextInput } from '../../validations/inputs'
+import {
+  validateTextInput,
+  sanitizeTextInput,
+  sanitizeEmail,
+} from '../../validations/inputs'
 
 import { formatPhone, validateEmail } from '../../validations/inputs'
 
@@ -68,10 +72,10 @@ const PatientForm = (props: PatientFormProps) => {
 
     props.onSubmit({
       name: sanitizeTextInput(firstName) + ' ' + sanitizeTextInput(lastName),
-      email,
+      email: sanitizeEmail(email),
       phone: phone.replace(/-/g, ''),
       dateOfBirth: dateOfBirth.format('YYYY-MM-DD'),
-      gender,
+      gender: sanitizeTextInput(gender),
       address: sanitizeTextInput(address),
       specialistId: +specialistId,
     })
