@@ -74,7 +74,7 @@ const SpecialistPage = () => {
       if (axios.isAxiosError(error)) {
         console.log('axios error' + error.message)
       } else {
-        console.log('unknown error deleting specialist')
+        console.log('unknown error updating specialist')
       }
     }
   }

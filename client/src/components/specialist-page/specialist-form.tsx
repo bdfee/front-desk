@@ -1,10 +1,7 @@
 import { TextField, Grid, Button } from '@mui/material'
 import { SyntheticEvent, useState } from 'react'
 import { SpecialistFormProps } from '../../types'
-import {
-  validateTextInput,
-  sanitizeTextInput,
-} from '../../validations/specialist'
+import { validateTextInput, sanitizeTextInput } from '../../validations/inputs'
 
 const SpecialistForm = (props: SpecialistFormProps) => {
   const [firstName, setFirstName] = useState('')
