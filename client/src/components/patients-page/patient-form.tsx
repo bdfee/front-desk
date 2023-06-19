@@ -15,6 +15,8 @@ import { SyntheticEvent, useEffect, useState } from 'react'
 import { Gender, PatientFormProps, Specialist } from '../../types'
 import { validateTextInput, sanitizeTextInput } from '../../validations/inputs'
 
+import { formatPhone, validateEmail } from '../../validations/inputs'
+
 const PatientForm = (props: PatientFormProps) => {
   const [firstName, setFirstName] = useState('')
   const [lastName, setLastName] = useState('')
@@ -34,20 +36,6 @@ const PatientForm = (props: PatientFormProps) => {
     fetchSpecialists()
   }, [])
 
-  const formatPhone = (input: string) => {
-    const digitsOnly = input.replace(/\D/g, '')
-
-    let formattedPhone = ''
-    for (let i = 0; i < digitsOnly.length && i < 10; i++) {
-      if (i === 3 || i === 6) {
-        formattedPhone += '-'
-      }
-      formattedPhone += digitsOnly[i]
-    }
-
-    return formattedPhone
-  }
-
   const addPatient = (event: SyntheticEvent) => {
     event.preventDefault()
 
@@ -63,34 +51,26 @@ const PatientForm = (props: PatientFormProps) => {
       return
     }
 
-    if (!specialists) {
-      props.setError('error fetching specialists')
-      return
-    }
-
-    if (!specialistId) {
-      props.setError('invalid selection')
-      setSpecialistId('')
+    if (!validateEmail(email)) {
+      props.setError('invalid email')
       return
     }
 
     if (!dateOfBirth) {
-      props.setError('dob needed')
+      props.setError('please add date of birth')
       return
     }
 
     if (!gender) {
-      props.setError('gender needed')
+      props.setError('please specify gender')
       return
     }
-
-    console.log(dateOfBirth.toDate())
 
     props.onSubmit({
       name: sanitizeTextInput(firstName) + ' ' + sanitizeTextInput(lastName),
       email,
       phone: phone.replace(/-/g, ''),
-      dateOfBirth: '2020-02-02',
+      dateOfBirth: dateOfBirth.format('YYYY-MM-DD'),
       gender,
       address: sanitizeTextInput(address),
       specialistId: +specialistId,
@@ -105,15 +85,15 @@ const PatientForm = (props: PatientFormProps) => {
     setSpecialistId('')
   }
 
-  // const fieldsFilled =
-  //   !firstName.trim() ||
-  //   !lastName.trim() ||
-  //   !email.trim() ||
-  //   !phone.trim() ||
-  //   !dateOfBirth.trim() ||
-  //   !gender.trim() ||
-  //   !address.trim() ||
-  //   !specialistId
+  const fieldsFilled =
+    !firstName.trim() ||
+    !lastName.trim() ||
+    !email.trim() ||
+    !phone.trim() ||
+    !dateOfBirth ||
+    !gender ||
+    !address.trim() ||
+    !specialistId
 
   return (
     <form onSubmit={addPatient}>
@@ -171,24 +151,29 @@ const PatientForm = (props: PatientFormProps) => {
           )
         })}
       </Select>
-
-      <InputLabel id="specialist">Assign Specialist</InputLabel>
-      <Select
-        labelId="specialist"
-        value={specialistId}
-        onChange={({ target }) => setSpecialistId(target.value)}
-      >
-        {specialists?.map((specialist) => {
-          return (
-            <MenuItem
-              key={specialist.specialistId}
-              value={specialist.specialistId}
-            >
-              {specialist.name}
-            </MenuItem>
-          )
-        })}
-      </Select>
+      {!specialists ? (
+        <div>fetching specialists</div>
+      ) : (
+        <>
+          <InputLabel id="specialist">Assign Specialist</InputLabel>
+          <Select
+            labelId="specialist"
+            value={specialistId}
+            onChange={({ target }) => setSpecialistId(target.value)}
+          >
+            {specialists?.map((specialist) => {
+              return (
+                <MenuItem
+                  key={specialist.specialistId}
+                  value={specialist.specialistId}
+                >
+                  {specialist.name}
+                </MenuItem>
+              )
+            })}
+          </Select>
+        </>
+      )}
       <Grid>
         <Grid item>
           <Button
@@ -210,6 +195,7 @@ const PatientForm = (props: PatientFormProps) => {
             type="submit"
             variant="contained"
             aria-label="Add button"
+            disabled={fieldsFilled}
           >
             Add
           </Button>

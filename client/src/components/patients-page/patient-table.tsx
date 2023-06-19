@@ -10,6 +10,7 @@ import {
 } from '@mui/material'
 import { Link } from 'react-router-dom'
 import { Patient, PatientInput } from '../../types'
+import { formatPhone } from '../../validations/inputs'
 
 interface PatientListProps {
   patientList: Patient[]
@@ -40,8 +41,8 @@ const PatientTable = (props: PatientListProps) => {
                     {patient.name}
                   </Link>
                 </TableCell>
-                <TableCell>{patient.phone}</TableCell>
                 <TableCell>{patient.email}</TableCell>
+                <TableCell>{formatPhone(patient.phone)}</TableCell>
                 <TableCell>{patient.specialistId}</TableCell>
                 <TableCell>todo</TableCell>
               </TableRow>
