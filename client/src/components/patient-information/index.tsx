@@ -1,5 +1,5 @@
 import PatientInformation from './patient-information'
-import AddPatientModal from './add-patient-modal'
+import AddPatientModal from '../patient-modal/add-patient-modal'
 import { createContext, useState, useEffect } from 'react'
 import { PatientDetail } from '../../types'
 import { useParams } from 'react-router-dom'

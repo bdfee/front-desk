@@ -21,8 +21,8 @@ import {
 
 import { formatPhone, validateEmail } from '../../validations/inputs'
 import { PatientCtx } from '../../App'
-import { FormActionCtx } from '.'
-import { PatientFormActionCtx } from './info-index'
+import { FormActionCtx } from '../patient-table'
+import { PatientFormActionCtx } from '../patient-information/index'
 
 const PatientForm = (props: PatientFormProps) => {
   const [firstName, setFirstName] = useState('')

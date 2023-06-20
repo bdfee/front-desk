@@ -7,7 +7,7 @@ import {
   ListItemText,
   Button,
 } from '@mui/material'
-import { PatientFormActionCtx } from './info-index'
+import { PatientFormActionCtx } from './index'
 
 const PatientInformation = () => {
   const context = useContext(PatientFormActionCtx)

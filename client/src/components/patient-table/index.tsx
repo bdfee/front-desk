@@ -1,5 +1,5 @@
 import PatientTable from './patient-table'
-import AddPatientModal from './add-patient-modal'
+import AddPatientModal from '../patient-modal/add-patient-modal'
 import { createContext } from 'react'
 import { PatientDetail } from '../../types'
 
