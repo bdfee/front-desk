@@ -1,10 +1,21 @@
-import { useEffect, useState } from 'react'
+/* eslint-disable @typescript-eslint/no-empty-function */
+import {
+  useEffect,
+  useState,
+  createContext,
+  Dispatch,
+  SetStateAction,
+} from 'react'
 import axios from 'axios'
 import { Button } from '@mui/material'
 import { PatientDetail, PatientInput } from '../../types'
 import patientService from '../../services/patients'
 import PatientTable from './patient-table'
 import AddPatientModal from './add-patient-modal'
+
+type PatientContextType = Dispatch<SetStateAction<PatientDetail[]>>
+
+export const PatientCtx = createContext<PatientContextType | null>(null)
 
 const PatientPage = () => {
   const [patientList, setPatientList] = useState<PatientDetail[]>([])
@@ -93,7 +104,7 @@ const PatientPage = () => {
   const openModal = (): void => setModalOpen(true)
 
   return (
-    <>
+    <PatientCtx.Provider value={setPatientList}>
       <PatientTable
         patientList={patientList}
         updatePatient={updatePatient}
@@ -107,7 +118,7 @@ const PatientPage = () => {
         error={error}
         setError={setErrorWithTimeout}
       />
-    </>
+    </PatientCtx.Provider>
   )
 }
 
