@@ -50,7 +50,6 @@ const PatientForm = (props: PatientFormProps) => {
   useEffect(() => {
     if (patientFormContext) {
       const dob = dayjs(patientFormContext.patient.dateOfBirth)
-
       setFirstName(patientFormContext.patient.name)
       setLastName(patientFormContext.patient.name)
       setEmail(patientFormContext.patient.email)
