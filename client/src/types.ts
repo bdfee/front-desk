@@ -25,14 +25,14 @@ export interface Patient {
 }
 
 export interface PatientFormProps {
-  onSubmit: (values: PatientInput) => void
   onCancel: () => void
-  setError?: (errorMessage: string) => void
+  onUpdate: (id: number, patient: PatientInput) => Promise<void>
+  onSubmit: (values: PatientInput) => Promise<void>
 }
 
 export type PatientInput = Omit<Patient, 'patientId'>
 
-export type PatientDetail = Omit<Patient, 'specialistId'> & {
+export type PatientDetail = Patient & {
   specialist: Omit<Specialist, 'specialistId | speciality'>
 }
 

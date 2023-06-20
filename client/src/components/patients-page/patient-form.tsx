@@ -8,10 +8,10 @@ import {
 } from '@mui/material'
 import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
-import { Dayjs } from 'dayjs'
+import dayjs, { Dayjs } from 'dayjs'
 import specialistService from '../../services/specialist'
 
-import { SyntheticEvent, useEffect, useState } from 'react'
+import { SyntheticEvent, useEffect, useState, useContext } from 'react'
 import { Gender, PatientFormProps, Specialist } from '../../types'
 import {
   validateTextInput,
@@ -20,6 +20,9 @@ import {
 } from '../../validations/inputs'
 
 import { formatPhone, validateEmail } from '../../validations/inputs'
+import { PatientCtx } from '../../App'
+import { FormActionCtx } from '.'
+import { PatientFormActionCtx } from './info-index'
 
 const PatientForm = (props: PatientFormProps) => {
   const [firstName, setFirstName] = useState('')
@@ -32,6 +35,10 @@ const PatientForm = (props: PatientFormProps) => {
   const [specialists, setSpecialists] = useState<Specialist[]>()
   const [specialistId, setSpecialistId] = useState<string>('')
 
+  const patientContext = useContext(PatientCtx)
+  const patientFormContext = useContext(PatientFormActionCtx)
+  const formContext = useContext(FormActionCtx)
+
   useEffect(() => {
     const fetchSpecialists = async () => {
       const specialists = await specialistService.getAll()
@@ -40,37 +47,63 @@ const PatientForm = (props: PatientFormProps) => {
     fetchSpecialists()
   }, [])
 
+  useEffect(() => {
+    if (patientFormContext) {
+      const dob = dayjs(patientFormContext.patient.dateOfBirth)
+
+      setFirstName(patientFormContext.patient.name)
+      setLastName(patientFormContext.patient.name)
+      setEmail(patientFormContext.patient.email)
+      setPhone(patientFormContext.patient.phone)
+      setDateOfBirth(dob)
+      setGender(patientFormContext.patient.gender)
+      setAddress(patientFormContext.patient.address)
+      setSpecialistId(patientFormContext.patient.specialistId.toString())
+    }
+  }, [])
+
+  const fieldsFilled =
+    formContext?.type === 'add'
+      ? !firstName.trim() ||
+        !lastName.trim() ||
+        !email.trim() ||
+        !phone.trim() ||
+        !dateOfBirth ||
+        !gender ||
+        !address.trim() ||
+        !specialistId
+      : true
+
   const addPatient = (event: SyntheticEvent) => {
     event.preventDefault()
-
     if (!validateTextInput(firstName)) {
-      props.setError('invalid first name')
+      patientContext?.setError('invalid first name')
       setFirstName('')
       return
     }
 
     if (!validateTextInput(lastName)) {
-      props.setError('invalid last name')
+      patientContext?.setError('invalid last name')
       setLastName('')
       return
     }
 
     if (!validateEmail(email)) {
-      props.setError('invalid email')
+      patientContext?.setError('invalid email')
       return
     }
 
     if (!dateOfBirth) {
-      props.setError('please add date of birth')
+      patientContext?.setError('please add date of birth')
       return
     }
 
     if (!gender) {
-      props.setError('please specify gender')
+      patientContext?.setError('please specify gender')
       return
     }
 
-    props.onSubmit({
+    const patientValues = {
       name: sanitizeTextInput(firstName) + ' ' + sanitizeTextInput(lastName),
       email: sanitizeEmail(email),
       phone: phone.replace(/-/g, ''),
@@ -78,7 +111,14 @@ const PatientForm = (props: PatientFormProps) => {
       gender: sanitizeTextInput(gender),
       address: sanitizeTextInput(address),
       specialistId: +specialistId,
-    })
+    }
+
+    if (patientFormContext) {
+      props.onUpdate(patientFormContext?.patient.patientId, patientValues)
+    } else {
+      props.onSubmit(patientValues)
+    }
+
     setFirstName('')
     setLastName('')
     setEmail('')
@@ -88,17 +128,6 @@ const PatientForm = (props: PatientFormProps) => {
     setAddress('')
     setSpecialistId('')
   }
-
-  const fieldsFilled =
-    !firstName.trim() ||
-    !lastName.trim() ||
-    !email.trim() ||
-    !phone.trim() ||
-    !dateOfBirth ||
-    !gender ||
-    !address.trim() ||
-    !specialistId
-
   return (
     <form onSubmit={addPatient}>
       <TextField
