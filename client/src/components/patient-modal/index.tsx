@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import {
   Dialog,
   DialogContent,
@@ -7,35 +8,78 @@ import {
   Button,
 } from '@mui/material'
 import PatientForm from './patient-form'
-import { PatientInput } from '../../types'
-import { useContext, useState } from 'react'
-import { PatientsCtx, ErrorCtx } from '../../App'
+import { PatientDetail, PatientInput } from '../../types'
+import { Dispatch, useContext, useState, SetStateAction } from 'react'
+import { ErrorCtx } from '../../App'
 import patientService from '../../services/patients'
 import axios from 'axios'
 
-const AddPatientModal = () => {
+interface UpdatePatientModalProps {
+  type: string
+  state: PatientDetail | undefined
+  stateSetter: Dispatch<SetStateAction<PatientDetail | undefined>>
+}
+
+interface AddPatientModalProps {
+  type: string
+  state: PatientDetail[] | undefined
+  stateSetter: Dispatch<SetStateAction<PatientDetail | undefined>>
+}
+
+type ModalProps = UpdatePatientModalProps | AddPatientModalProps
+
+const PatientModal = (props: ModalProps) => {
   const [modalOpen, setModalOpen] = useState(false)
-  const patientsCtx = useContext(PatientsCtx)
   const errorCtx = useContext(ErrorCtx)
 
-  if (!patientsCtx || !errorCtx) {
+  if (!errorCtx) {
     return <div>no context here</div>
   }
 
-  const submitNewPatient = async (values: PatientInput) => {
+  const updatePatient = async (id: number, newValues: PatientInput) => {
     try {
-      const { patientId } = await patientService.create(values)
-      const patient = await patientService.getOneById(patientId)
-      patientsCtx.setPatients(patientsCtx.patients.concat(patient))
-      closeModal()
+      const { patientId } = await patientService.updateById(id, newValues)
+      const updatedPatient = await patientService.getOneById(patientId)
+      props.stateSetter(updatedPatient)
     } catch (error) {
       if (axios.isAxiosError(error)) {
         errorCtx.setError('axios error' + error.message)
       } else {
-        errorCtx.setError('unknown error submitting patient')
+        errorCtx.setError('unknown error updating specialist')
       }
     }
   }
+
+  // const addPatient = async (values: PatientInput) => {
+  //   try {
+  //     const { patientId } = await patientService.create(values)
+  //     const patient = await patientService.getOneById(patientId)
+  //     const patientState = props.state as PatientDetail[]
+  //     props.stateSetter(patientState.concat(patient))
+  //     closeModal()
+  //   } catch (error) {
+  //     if (axios.isAxiosError(error)) {
+  //       errorCtx.setError('axios error' + error.message)
+  //     } else {
+  //       errorCtx.setError('unknown error submitting patient')
+  //     }
+  //   }
+  // }
+
+  // const submitNewPatient = async (values: PatientInput) => {
+  //   try {
+  //     const { patientId } = await patientService.create(values)
+  //     const patient = await patientService.getOneById(patientId)
+  //     patientsCtx.setPatients(patientsCtx.patients.concat(patient))
+  //     closeModal()
+  //   } catch (error) {
+  //     if (axios.isAxiosError(error)) {
+  //       errorCtx.setError('axios error' + error.message)
+  //     } else {
+  //       errorCtx.setError('unknown error submitting patient')
+  //     }
+  //   }
+  // }
 
   // const deletePatient = async (id: number) => {
   //   try {
@@ -52,32 +96,39 @@ const AddPatientModal = () => {
   //   }
   // }
 
-  const updatePatient = async (id: number, patient: PatientInput) => {
-    try {
-      const { patientId } = await patientService.updateById(id, patient)
-      const updatedPatient = await patientService.getOneById(patientId)
-      patientsCtx.setPatients(
-        patientsCtx.patients.map((patient) =>
-          patient.patientId === updatedPatient.patientId
-            ? updatedPatient
-            : patient,
-        ),
-      )
-    } catch (error) {
-      if (axios.isAxiosError(error)) {
-        errorCtx.setError('axios error' + error.message)
-      } else {
-        errorCtx.setError('unknown error updating specialist')
-      }
-    }
-  }
-
   const closeModal = (): void => {
     setModalOpen(false)
     errorCtx.setError(undefined)
   }
 
   const openModal = (): void => setModalOpen(true)
+
+  const Form = () => {
+    switch (props.type) {
+      case 'edit': {
+        if (props.state) {
+          return (
+            <PatientForm
+              type={props.type}
+              state={props.state}
+              service={updatePatient}
+              onCancel={closeModal}
+            ></PatientForm>
+          )
+        }
+      }
+      // case 'add': {
+      //   return (
+      //     <PatientForm
+      //       type={props.type}
+      //       state={props.state}
+      //       service={addPatient}
+      //       onCancel={closeModal}
+      //     ></PatientForm>
+      //   )
+      // }
+    }
+  }
 
   return (
     <>
@@ -91,15 +142,11 @@ const AddPatientModal = () => {
               {errorCtx.error}
             </Alert>
           )}
-          <PatientForm
-            onSubmit={submitNewPatient}
-            onUpdate={updatePatient}
-            onCancel={closeModal}
-          />
+          {Form()}
         </DialogContent>
       </Dialog>
     </>
   )
 }
 
-export default AddPatientModal
+export default PatientModal

@@ -12,7 +12,7 @@ import dayjs, { Dayjs } from 'dayjs'
 import specialistService from '../../services/specialist'
 
 import { SyntheticEvent, useEffect, useState, useContext } from 'react'
-import { Gender, PatientFormProps, Specialist } from '../../types'
+import { Gender, PatientDetail, PatientInput, Specialist } from '../../types'
 import {
   validateTextInput,
   sanitizeTextInput,
@@ -21,10 +21,16 @@ import {
 
 import { formatPhone, validateEmail } from '../../validations/inputs'
 import { ErrorCtx } from '../../App'
-import { FormActionCtx } from '../patient-table'
-import { PatientFormActionCtx } from '../patient-information/index'
+
+interface PatientFormProps {
+  type: string
+  onCancel: () => void
+  state: PatientDetail | PatientDetail[] | undefined
+  service: (id: number, values: PatientInput) => Promise<void>
+}
 
 const PatientForm = (props: PatientFormProps) => {
+  const [patientId, setPatientId] = useState<number | undefined>()
   const [firstName, setFirstName] = useState('')
   const [lastName, setLastName] = useState('')
   const [email, setEmail] = useState('')
@@ -36,8 +42,6 @@ const PatientForm = (props: PatientFormProps) => {
   const [specialistId, setSpecialistId] = useState<string>('')
 
   const errorCtx = useContext(ErrorCtx)
-  const patientFormContext = useContext(PatientFormActionCtx)
-  const formContext = useContext(FormActionCtx)
 
   useEffect(() => {
     const fetchSpecialists = async () => {
@@ -48,32 +52,43 @@ const PatientForm = (props: PatientFormProps) => {
   }, [])
 
   useEffect(() => {
-    if (patientFormContext) {
-      const dob = dayjs(patientFormContext.patient.dateOfBirth)
-      setFirstName(patientFormContext.patient.name)
-      setLastName(patientFormContext.patient.name)
-      setEmail(patientFormContext.patient.email)
-      setPhone(patientFormContext.patient.phone)
+    if (props.type === 'edit') {
+      const {
+        dateOfBirth,
+        name,
+        email,
+        phone,
+        gender,
+        address,
+        specialistId,
+        patientId,
+      } = props.state as PatientDetail
+      const dob = dayjs(dateOfBirth)
+      setPatientId(patientId)
+      setFirstName(name)
+      setLastName(name)
+      setEmail(email)
+      setPhone(phone)
       setDateOfBirth(dob)
-      setGender(patientFormContext.patient.gender)
-      setAddress(patientFormContext.patient.address)
-      setSpecialistId(patientFormContext.patient.specialistId.toString())
+      setGender(gender)
+      setAddress(address)
+      setSpecialistId(specialistId.toString())
     }
   }, [])
 
-  const fieldsFilled =
-    formContext?.type === 'add'
-      ? !firstName.trim() ||
-        !lastName.trim() ||
-        !email.trim() ||
-        !phone.trim() ||
-        !dateOfBirth ||
-        !gender ||
-        !address.trim() ||
-        !specialistId
-      : true
+  // const fieldsFilled =
+  //   formContext?.type === 'add'
+  //     ? !firstName.trim() ||
+  //       !lastName.trim() ||
+  //       !email.trim() ||
+  //       !phone.trim() ||
+  //       !dateOfBirth ||
+  //       !gender ||
+  //       !address.trim() ||
+  //       !specialistId
+  //     : true
 
-  const addPatient = (event: SyntheticEvent) => {
+  const submitForm = (event: SyntheticEvent) => {
     event.preventDefault()
     if (!validateTextInput(firstName)) {
       errorCtx?.setError('invalid first name')
@@ -111,11 +126,8 @@ const PatientForm = (props: PatientFormProps) => {
       address: sanitizeTextInput(address),
       specialistId: +specialistId,
     }
-
-    if (patientFormContext) {
-      props.onUpdate(patientFormContext?.patient.patientId, patientValues)
-    } else {
-      props.onSubmit(patientValues)
+    if (patientId) {
+      props.service(patientId, patientValues)
     }
 
     setFirstName('')
@@ -128,7 +140,7 @@ const PatientForm = (props: PatientFormProps) => {
     setSpecialistId('')
   }
   return (
-    <form onSubmit={addPatient}>
+    <form onSubmit={submitForm}>
       <TextField
         label="First name"
         value={firstName}
@@ -227,7 +239,7 @@ const PatientForm = (props: PatientFormProps) => {
             type="submit"
             variant="contained"
             aria-label="Add button"
-            disabled={fieldsFilled}
+            // disabled={fieldsFilled}
           >
             Add
           </Button>

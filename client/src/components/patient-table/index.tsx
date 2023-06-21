@@ -1,23 +1,33 @@
 import PatientTable from './patient-table'
 import PatientModal from '../patient-modal'
-import { createContext } from 'react'
+import { useEffect, useState } from 'react'
 import { PatientDetail } from '../../types'
-
-interface FormActionContextType {
-  type: string
-  patient?: PatientDetail
-}
-
-export const FormActionCtx = createContext<FormActionContextType | null>(null)
+import patientService from '../../services/patients'
+import { isAxiosError } from 'axios'
 
 const PatientPage = () => {
-  const formCtx = { type: 'add' }
+  const [patients, setPatients] = useState<PatientDetail[]>([])
+
+  useEffect(() => {
+    const fetchPatients = async () => {
+      try {
+        const patientList = await patientService.getAll()
+        setPatients(patientList)
+      } catch (error) {
+        if (isAxiosError(error)) {
+          console.log('axios error' + error.message)
+        } else {
+          console.log('unknown error fetching patients')
+        }
+      }
+    }
+    fetchPatients()
+  }, [])
+
   return (
     <>
-      <PatientTable />
-      <FormActionCtx.Provider value={formCtx}>
-        <PatientModal />
-      </FormActionCtx.Provider>
+      <PatientTable patients={patients} />
+      <PatientModal type="add" state={patients} stateSetter={setPatients} />
     </>
   )
 }
