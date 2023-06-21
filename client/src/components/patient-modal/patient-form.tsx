@@ -8,11 +8,11 @@ import {
 } from '@mui/material'
 import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
-import { Dayjs } from 'dayjs'
+import dayjs, { Dayjs } from 'dayjs'
 import specialistService from '../../services/specialist'
 
-import { SyntheticEvent, useEffect, useState } from 'react'
-import { Gender, PatientFormProps, Specialist } from '../../types'
+import { SyntheticEvent, useEffect, useState, useContext } from 'react'
+import { Gender, PatientDetail, PatientInput, Specialist } from '../../types'
 import {
   validateTextInput,
   sanitizeTextInput,
@@ -20,8 +20,21 @@ import {
 } from '../../validations/inputs'
 
 import { formatPhone, validateEmail } from '../../validations/inputs'
+import { ErrorCtx } from '../../App'
+
+type UpdatePatient = (id: number, values: PatientInput) => Promise<void>
+
+type AddPatient = (values: PatientInput) => Promise<void>
+
+interface PatientFormProps {
+  type: string
+  onCancel: () => void
+  state: PatientDetail | PatientDetail[] | undefined
+  service: UpdatePatient | AddPatient | undefined
+}
 
 const PatientForm = (props: PatientFormProps) => {
+  const [patientId, setPatientId] = useState<number | undefined>()
   const [firstName, setFirstName] = useState('')
   const [lastName, setLastName] = useState('')
   const [email, setEmail] = useState('')
@@ -32,6 +45,8 @@ const PatientForm = (props: PatientFormProps) => {
   const [specialists, setSpecialists] = useState<Specialist[]>()
   const [specialistId, setSpecialistId] = useState<string>('')
 
+  const errorCtx = useContext(ErrorCtx)
+
   useEffect(() => {
     const fetchSpecialists = async () => {
       const specialists = await specialistService.getAll()
@@ -40,54 +55,30 @@ const PatientForm = (props: PatientFormProps) => {
     fetchSpecialists()
   }, [])
 
-  const addPatient = (event: SyntheticEvent) => {
-    event.preventDefault()
-
-    if (!validateTextInput(firstName)) {
-      props.setError('invalid first name')
-      setFirstName('')
-      return
+  useEffect(() => {
+    if (props.type === 'edit') {
+      const {
+        dateOfBirth,
+        name,
+        email,
+        phone,
+        gender,
+        address,
+        specialistId,
+        patientId,
+      } = props.state as PatientDetail
+      const dob = dayjs(dateOfBirth)
+      setPatientId(patientId)
+      setFirstName(name)
+      setLastName(name)
+      setEmail(email)
+      setPhone(phone)
+      setDateOfBirth(dob)
+      setGender(gender)
+      setAddress(address)
+      setSpecialistId(specialistId.toString())
     }
-
-    if (!validateTextInput(lastName)) {
-      props.setError('invalid last name')
-      setLastName('')
-      return
-    }
-
-    if (!validateEmail(email)) {
-      props.setError('invalid email')
-      return
-    }
-
-    if (!dateOfBirth) {
-      props.setError('please add date of birth')
-      return
-    }
-
-    if (!gender) {
-      props.setError('please specify gender')
-      return
-    }
-
-    props.onSubmit({
-      name: sanitizeTextInput(firstName) + ' ' + sanitizeTextInput(lastName),
-      email: sanitizeEmail(email),
-      phone: phone.replace(/-/g, ''),
-      dateOfBirth: dateOfBirth.format('YYYY-MM-DD'),
-      gender: sanitizeTextInput(gender),
-      address: sanitizeTextInput(address),
-      specialistId: +specialistId,
-    })
-    setFirstName('')
-    setLastName('')
-    setEmail('')
-    setPhone('')
-    setDateOfBirth(null)
-    setGender('')
-    setAddress('')
-    setSpecialistId('')
-  }
+  }, [])
 
   const fieldsFilled =
     !firstName.trim() ||
@@ -99,8 +90,77 @@ const PatientForm = (props: PatientFormProps) => {
     !address.trim() ||
     !specialistId
 
+  const submitForm = (event: SyntheticEvent) => {
+    event.preventDefault()
+    if (!validateTextInput(firstName)) {
+      errorCtx?.setError('invalid first name')
+      setFirstName('')
+      return
+    }
+
+    if (!validateTextInput(lastName)) {
+      errorCtx?.setError('invalid last name')
+      setLastName('')
+      return
+    }
+
+    if (!validateEmail(email)) {
+      errorCtx?.setError('invalid email')
+      return
+    }
+
+    if (!dateOfBirth) {
+      errorCtx?.setError('please add date of birth')
+      return
+    }
+
+    if (!gender) {
+      errorCtx?.setError('please specify gender')
+      return
+    }
+
+    const patientValues = {
+      name: sanitizeTextInput(firstName) + ' ' + sanitizeTextInput(lastName),
+      email: sanitizeEmail(email),
+      phone: phone.replace(/-/g, ''),
+      dateOfBirth: dateOfBirth.format('YYYY-MM-DD'),
+      gender: sanitizeTextInput(gender),
+      address: sanitizeTextInput(address),
+      specialistId: +specialistId,
+    }
+
+    switch (props.type) {
+      case 'edit': {
+        if (props.service && patientId) {
+          const updatePatient = props.service as UpdatePatient
+          updatePatient(patientId, patientValues)
+        }
+        break
+      }
+      case 'add': {
+        if (props.service) {
+          const addPatient = props.service as AddPatient
+          addPatient(patientValues)
+        }
+        break
+      }
+      default: {
+        console.log('error with service switch in patient form')
+        return
+      }
+    }
+
+    setFirstName('')
+    setLastName('')
+    setEmail('')
+    setPhone('')
+    setDateOfBirth(null)
+    setGender('')
+    setAddress('')
+    setSpecialistId('')
+  }
   return (
-    <form onSubmit={addPatient}>
+    <form onSubmit={submitForm}>
       <TextField
         label="First name"
         value={firstName}
