@@ -68,9 +68,10 @@ const PatientForm = (props: PatientFormProps) => {
         patientId,
       } = props.state as PatientDetail
       const dob = dayjs(dateOfBirth)
+      const [first, last] = name.split(' ')
       setPatientId(patientId)
-      setFirstName(name)
-      setLastName(name)
+      setFirstName(first)
+      setLastName(last)
       setEmail(email)
       setPhone(phone)
       setDateOfBirth(dob)
