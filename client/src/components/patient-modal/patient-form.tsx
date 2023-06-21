@@ -144,6 +144,10 @@ const PatientForm = (props: PatientFormProps) => {
         }
         break
       }
+      default: {
+        console.log('error with service switch in patient form')
+        return
+      }
     }
 
     setFirstName('')

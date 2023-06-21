@@ -1,11 +1,4 @@
-import {
-  Container,
-  Typography,
-  Box,
-  List,
-  ListItemText,
-  Button,
-} from '@mui/material'
+import { Container, Typography, Box, List, ListItemText } from '@mui/material'
 import { PatientDetail } from '../../types'
 
 interface InformationListProps {
@@ -16,8 +9,6 @@ const InformationList = ({ patient }: InformationListProps) => {
   return (
     <Container>
       <Typography>{patient.name}</Typography>
-      <Button>Edit</Button>
-      <Button>Delete</Button>
       <Box>
         <List>
           <ListItemText primary="gender" secondary={patient.gender} />
@@ -28,7 +19,10 @@ const InformationList = ({ patient }: InformationListProps) => {
           <ListItemText primary="email" secondary={patient?.email} />
           <ListItemText primary="dateOfBirth" secondary={patient.dateOfBirth} />
           <ListItemText primary="address" secondary={patient.address} />
-          <ListItemText primary="specialist" secondary={patient.specialistId} />
+          <ListItemText
+            primary="specialist"
+            secondary={patient.specialist.name}
+          />
         </List>
       </Box>
     </Container>

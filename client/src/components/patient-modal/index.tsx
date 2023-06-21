@@ -119,7 +119,7 @@ const PatientModal = (props: ModalProps) => {
 
   return (
     <>
-      <Button onClick={() => openModal()}>Add patient</Button>
+      <Button onClick={() => openModal()}>{props.type} patient</Button>
       <Dialog fullWidth={true} open={modalOpen} onClose={closeModal}>
         <DialogTitle>Add a new patient</DialogTitle>
         <Divider />
