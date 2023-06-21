@@ -20,7 +20,7 @@ import {
 } from '../../validations/inputs'
 
 import { formatPhone, validateEmail } from '../../validations/inputs'
-import { PatientCtx } from '../../App'
+import { ErrorCtx } from '../../App'
 import { FormActionCtx } from '../patient-table'
 import { PatientFormActionCtx } from '../patient-information/index'
 
@@ -35,7 +35,7 @@ const PatientForm = (props: PatientFormProps) => {
   const [specialists, setSpecialists] = useState<Specialist[]>()
   const [specialistId, setSpecialistId] = useState<string>('')
 
-  const patientContext = useContext(PatientCtx)
+  const errorCtx = useContext(ErrorCtx)
   const patientFormContext = useContext(PatientFormActionCtx)
   const formContext = useContext(FormActionCtx)
 
@@ -76,29 +76,29 @@ const PatientForm = (props: PatientFormProps) => {
   const addPatient = (event: SyntheticEvent) => {
     event.preventDefault()
     if (!validateTextInput(firstName)) {
-      patientContext?.setError('invalid first name')
+      errorCtx?.setError('invalid first name')
       setFirstName('')
       return
     }
 
     if (!validateTextInput(lastName)) {
-      patientContext?.setError('invalid last name')
+      errorCtx?.setError('invalid last name')
       setLastName('')
       return
     }
 
     if (!validateEmail(email)) {
-      patientContext?.setError('invalid email')
+      errorCtx?.setError('invalid email')
       return
     }
 
     if (!dateOfBirth) {
-      patientContext?.setError('please add date of birth')
+      errorCtx?.setError('please add date of birth')
       return
     }
 
     if (!gender) {
-      patientContext?.setError('please specify gender')
+      errorCtx?.setError('please specify gender')
       return
     }
 

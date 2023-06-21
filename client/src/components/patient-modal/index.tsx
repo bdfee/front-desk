@@ -9,15 +9,16 @@ import {
 import PatientForm from './patient-form'
 import { PatientInput } from '../../types'
 import { useContext, useState } from 'react'
-import { PatientCtx } from '../../App'
+import { PatientsCtx, ErrorCtx } from '../../App'
 import patientService from '../../services/patients'
 import axios from 'axios'
 
 const AddPatientModal = () => {
   const [modalOpen, setModalOpen] = useState(false)
-  const patientContext = useContext(PatientCtx)
+  const patientsCtx = useContext(PatientsCtx)
+  const errorCtx = useContext(ErrorCtx)
 
-  if (!patientContext) {
+  if (!patientsCtx || !errorCtx) {
     return <div>no context here</div>
   }
 
@@ -25,13 +26,13 @@ const AddPatientModal = () => {
     try {
       const { patientId } = await patientService.create(values)
       const patient = await patientService.getOneById(patientId)
-      patientContext.setPatientList(patientContext.patientList.concat(patient))
+      patientsCtx.setPatients(patientsCtx.patients.concat(patient))
       closeModal()
     } catch (error) {
       if (axios.isAxiosError(error)) {
-        console.log('axios error' + error.message)
+        errorCtx.setError('axios error' + error.message)
       } else {
-        console.log('unknown error submitting patient')
+        errorCtx.setError('unknown error submitting patient')
       }
     }
   }
@@ -55,8 +56,8 @@ const AddPatientModal = () => {
     try {
       const { patientId } = await patientService.updateById(id, patient)
       const updatedPatient = await patientService.getOneById(patientId)
-      patientContext.setPatientList(
-        patientContext.patientList.map((patient) =>
+      patientsCtx.setPatients(
+        patientsCtx.patients.map((patient) =>
           patient.patientId === updatedPatient.patientId
             ? updatedPatient
             : patient,
@@ -64,16 +65,16 @@ const AddPatientModal = () => {
       )
     } catch (error) {
       if (axios.isAxiosError(error)) {
-        console.log('axios error' + error.message)
+        errorCtx.setError('axios error' + error.message)
       } else {
-        console.log('unknown error updating specialist')
+        errorCtx.setError('unknown error updating specialist')
       }
     }
   }
 
   const closeModal = (): void => {
     setModalOpen(false)
-    patientContext.setError(undefined)
+    errorCtx.setError(undefined)
   }
 
   const openModal = (): void => setModalOpen(true)
@@ -85,9 +86,9 @@ const AddPatientModal = () => {
         <DialogTitle>Add a new patient</DialogTitle>
         <Divider />
         <DialogContent>
-          {patientContext.error && (
+          {errorCtx.error && (
             <Alert severity="error" role="alert">
-              {patientContext.error}
+              {errorCtx.error}
             </Alert>
           )}
           <PatientForm

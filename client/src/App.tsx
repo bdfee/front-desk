@@ -1,42 +1,46 @@
 import SpecialistPage from './components/specialist-page'
-import PatientPage from './components/patients-page'
-import InfoIndex from './components/patients-page/info-index'
+import PatientTable from './components/patient-table'
+import PatientInformation from './components/patient-information'
 import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom'
 import { Typography, Container, Divider, Button } from '@mui/material'
 import {
   createContext,
-  Dispatch,
-  SetStateAction,
   useState,
   useEffect,
+  Dispatch,
+  SetStateAction,
 } from 'react'
 import { PatientDetail } from './types'
-import axios from 'axios'
+import { isAxiosError } from 'axios'
 import patientService from './services/patients'
 
-interface PatientContextType {
-  setPatientList: Dispatch<SetStateAction<PatientDetail[]>>
-  patientList: PatientDetail[]
+interface ErrorCtxType {
   setError: (errorMessage: string | undefined) => () => void
   error: string | undefined
 }
 
-export const PatientCtx = createContext<PatientContextType | null>(null)
+interface PatientsCtxType {
+  patients: PatientDetail[]
+  setPatients: Dispatch<SetStateAction<PatientDetail[]>>
+}
+
+export const ErrorCtx = createContext<ErrorCtxType | null>(null)
+export const PatientsCtx = createContext<PatientsCtxType | null>(null)
 
 const App = () => {
   const [error, setError] = useState<string | undefined>()
-  const [patientList, setPatientList] = useState<PatientDetail[]>([])
+  const [patients, setPatients] = useState<PatientDetail[]>([])
 
   useEffect(() => {
     const fetchPatients = async () => {
       try {
-        const patients = await patientService.getAll()
-        setPatientList(patients)
+        const patientList = await patientService.getAll()
+        setPatients(patientList)
       } catch (error) {
-        if (axios.isAxiosError(error)) {
-          console.log('axios error' + error.message)
+        if (isAxiosError(error)) {
+          setError('axios error' + error.message)
         } else {
-          console.log('unknown error fetching patients')
+          setError('unknown error fetching patients')
         }
       }
     }
@@ -53,51 +57,56 @@ const App = () => {
     return () => clearTimeout(id)
   }
 
-  const CtxValues: PatientContextType = {
-    setPatientList,
-    patientList,
+  const ErrorCtxValue: ErrorCtxType = {
     setError: setErrorWithTimeout,
     error,
+  }
+
+  const PatientCtxValue: PatientsCtxType = {
+    setPatients,
+    patients,
   }
 
   return (
     <div className="App">
       <Router>
-        <Container>
-          <Typography variant="h2" style={{ marginBottom: '.05em' }}>
-            frontdesk
-          </Typography>
-          <Button component={Link} to="/" style={{ margin: '0px 5px' }}>
-            front
-          </Button>
-          <Button component={Link} to="/specialists">
-            specialists
-          </Button>
-          <Button component={Link} to="/patients">
-            patients
-          </Button>
-          <Divider style={{ marginBottom: '1em' }} />
-          <Routes>
-            <Route
-              path="/patients"
-              element={
-                <PatientCtx.Provider value={CtxValues}>
-                  <PatientPage />
-                </PatientCtx.Provider>
-              }
-            />
-            <Route
-              path="/patients/:id"
-              element={
-                <PatientCtx.Provider value={CtxValues}>
-                  <InfoIndex />
-                </PatientCtx.Provider>
-              }
-            />
-            <Route path="/specialists" element={<SpecialistPage />} />
-            <Route path="/" element={<div>home</div>} />
-          </Routes>
-        </Container>
+        <ErrorCtx.Provider value={ErrorCtxValue}>
+          <Container>
+            <Typography variant="h2" style={{ marginBottom: '.05em' }}>
+              frontdesk
+            </Typography>
+            <Button component={Link} to="/" style={{ margin: '0px 5px' }}>
+              front
+            </Button>
+            <Button component={Link} to="/specialists">
+              specialists
+            </Button>
+            <Button component={Link} to="/patients">
+              patients
+            </Button>
+            <Divider style={{ marginBottom: '1em' }} />
+            <Routes>
+              <Route
+                path="/patients"
+                element={
+                  <PatientsCtx.Provider value={PatientCtxValue}>
+                    <PatientTable />
+                  </PatientsCtx.Provider>
+                }
+              />
+              <Route
+                path="/patients/:id"
+                element={
+                  <PatientsCtx.Provider value={PatientCtxValue}>
+                    <PatientInformation />
+                  </PatientsCtx.Provider>
+                }
+              />
+              <Route path="/specialists" element={<SpecialistPage />} />
+              <Route path="/" element={<div>home</div>} />
+            </Routes>
+          </Container>
+        </ErrorCtx.Provider>
       </Router>
     </div>
   )

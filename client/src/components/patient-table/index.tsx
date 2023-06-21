@@ -1,5 +1,5 @@
 import PatientTable from './patient-table'
-import AddPatientModal from '../patient-modal'
+import PatientModal from '../patient-modal'
 import { createContext } from 'react'
 import { PatientDetail } from '../../types'
 
@@ -16,7 +16,7 @@ const PatientPage = () => {
     <>
       <PatientTable />
       <FormActionCtx.Provider value={formCtx}>
-        <AddPatientModal />
+        <PatientModal />
       </FormActionCtx.Provider>
     </>
   )
