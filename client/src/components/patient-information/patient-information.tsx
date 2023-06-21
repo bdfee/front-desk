@@ -14,9 +14,9 @@ const InformationList = ({ patient }: InformationListProps) => {
           <ListItemText primary="gender" secondary={patient.gender} />
           <ListItemText
             primary="date of birth"
-            secondary={patient?.dateOfBirth}
+            secondary={patient.dateOfBirth}
           />
-          <ListItemText primary="email" secondary={patient?.email} />
+          <ListItemText primary="email" secondary={patient.email} />
           <ListItemText primary="dateOfBirth" secondary={patient.dateOfBirth} />
           <ListItemText primary="address" secondary={patient.address} />
           <ListItemText

@@ -1,4 +1,3 @@
-/* eslint-disable react/prop-types */
 import {
   Dialog,
   DialogContent,
@@ -57,6 +56,7 @@ const PatientModal = (props: ModalProps) => {
         const { patientId } = await patientService.updateById(id, values)
         const updatedPatient = await patientService.getOneById(patientId)
         stateSetter(updatedPatient)
+        closeModal()
       } catch (error) {
         if (axios.isAxiosError(error)) {
           errorCtx.setError('axios error' + error.message)
