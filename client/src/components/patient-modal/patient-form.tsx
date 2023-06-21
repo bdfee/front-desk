@@ -22,11 +22,15 @@ import {
 import { formatPhone, validateEmail } from '../../validations/inputs'
 import { ErrorCtx } from '../../App'
 
+type UpdatePatient = (id: number, values: PatientInput) => Promise<void>
+
+type AddPatient = (values: PatientInput) => Promise<void>
+
 interface PatientFormProps {
   type: string
   onCancel: () => void
   state: PatientDetail | PatientDetail[] | undefined
-  service: (id: number, values: PatientInput) => Promise<void>
+  service: UpdatePatient | AddPatient | undefined
 }
 
 const PatientForm = (props: PatientFormProps) => {
@@ -76,17 +80,15 @@ const PatientForm = (props: PatientFormProps) => {
     }
   }, [])
 
-  // const fieldsFilled =
-  //   formContext?.type === 'add'
-  //     ? !firstName.trim() ||
-  //       !lastName.trim() ||
-  //       !email.trim() ||
-  //       !phone.trim() ||
-  //       !dateOfBirth ||
-  //       !gender ||
-  //       !address.trim() ||
-  //       !specialistId
-  //     : true
+  const fieldsFilled =
+    !firstName.trim() ||
+    !lastName.trim() ||
+    !email.trim() ||
+    !phone.trim() ||
+    !dateOfBirth ||
+    !gender ||
+    !address.trim() ||
+    !specialistId
 
   const submitForm = (event: SyntheticEvent) => {
     event.preventDefault()
@@ -126,8 +128,22 @@ const PatientForm = (props: PatientFormProps) => {
       address: sanitizeTextInput(address),
       specialistId: +specialistId,
     }
-    if (patientId) {
-      props.service(patientId, patientValues)
+
+    switch (props.type) {
+      case 'edit': {
+        if (props.service && patientId) {
+          const updatePatient = props.service as UpdatePatient
+          updatePatient(patientId, patientValues)
+        }
+        break
+      }
+      case 'add': {
+        if (props.service) {
+          const addPatient = props.service as AddPatient
+          addPatient(patientValues)
+        }
+        break
+      }
     }
 
     setFirstName('')
@@ -239,7 +255,7 @@ const PatientForm = (props: PatientFormProps) => {
             type="submit"
             variant="contained"
             aria-label="Add button"
-            // disabled={fieldsFilled}
+            disabled={fieldsFilled}
           >
             Add
           </Button>
