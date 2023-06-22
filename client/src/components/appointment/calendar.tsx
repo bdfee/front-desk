@@ -2,6 +2,8 @@ import dayjs from 'dayjs'
 import { useEffect, useState } from 'react'
 import { Calendar, dayjsLocalizer } from 'react-big-calendar'
 import 'react-big-calendar/lib/css/react-big-calendar.css'
+import appointmentService from '../../services/appointment'
+import { isAxiosError } from 'axios'
 
 interface EventProps {
   title: string
@@ -9,77 +11,22 @@ interface EventProps {
   end: Date
 }
 
-// type NewEvent = Omit<EventProps, 'title'>
-
 type NewEvent = Omit<EventProps, 'title'>
 
-//add cal buttons to toggle between specialists and appointment type
-// add appointment setting by drag
-
-const events = [
-  {
-    appointmentId: 5,
-    date: '2020-02-02',
-    start: '10:00:00',
-    end: '13:00:00',
-    type: 'intake',
-    description: 'test',
-    patientId: 12,
-    specialistId: 7,
-    specialist: {
-      name: 'test specialist corrections',
-    },
-    patient: {
-      name: 'test test jr',
-    },
-  },
-  {
-    appointmentId: 6,
-    date: '2020-04-02',
-    start: '10:00:00',
-    end: '13:00:00',
-    type: 'intake',
-    description: 'test',
-    patientId: 12,
-    specialistId: 7,
-    specialist: {
-      name: 'test specialist corrections',
-    },
-    patient: {
-      name: 'test test jr',
-    },
-  },
-  {
-    appointmentId: 7,
-    date: '2020-04-04',
-    start: '10:00:00',
-    end: '13:00:00',
-    type: 'intake',
-    description: 'test',
-    patientId: 12,
-    specialistId: 7,
-    specialist: {
-      name: 'test specialist corrections',
-    },
-    patient: {
-      name: 'test test jr',
-    },
-  },
-]
-
-const formatEvents = () => {
-  return events.map((event) => {
-    const f = {
-      title: event.specialist.name,
-      start: new Date(event.date + 'T' + event.start),
-      end: new Date(event.date + 'T' + event.end),
+const formatEvents = (appointments: AppointmentDetail[]) => {
+  return appointments.map((appointment) => {
+    const event: EventProps = {
+      title: appointment.specialist.name.toString(),
+      start: new Date(appointment.date + 'T' + appointment.start),
+      end: new Date(appointment.date + 'T' + appointment.end),
     }
-    return f
+    return event
   })
 }
 
 import timezone from 'dayjs/plugin/timezone'
 import utc from 'dayjs/plugin/utc'
+import { AppointmentDetail } from '../../types'
 
 dayjs.extend(timezone)
 dayjs.extend(utc)
@@ -102,11 +49,22 @@ const getEventProps = (event: EventProps) => {
 }
 
 const RBC = () => {
-  const [myEvents, setMyEvents] = useState<EventProps[]>()
+  const [myEvents, setMyEvents] = useState<EventProps[]>([])
 
   useEffect(() => {
-    const eventsList = formatEvents()
-    setMyEvents(eventsList)
+    const fetchAppointments = async () => {
+      try {
+        const appointments = formatEvents(await appointmentService.getAll())
+        setMyEvents(myEvents.concat(appointments))
+      } catch (error) {
+        if (isAxiosError(error)) {
+          console.log('axios error' + error.message)
+        } else {
+          console.log('unknown error fetching patient')
+        }
+      }
+    }
+    void fetchAppointments()
   }, [])
 
   const handleCreateEvent = (event: NewEvent) => {
