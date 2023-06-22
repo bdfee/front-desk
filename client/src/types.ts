@@ -36,3 +36,32 @@ export enum Gender {
   NonBinary = 'non-binary',
   Transgender = 'transgender',
 }
+
+export interface Appointment {
+  patientId: number
+  specialistId: number
+  date: string
+  start: string
+  end: string
+  type: string
+  description: string
+}
+
+export type AppointmentDetail = Omit<
+  Appointment,
+  'specialistId' | 'patientId'
+> & {
+  specialist: Omit<Specialist, 'specialistId' | 'speciality'>
+  patient: Omit<
+    Patient,
+    | 'patientId'
+    | 'email'
+    | 'phone'
+    | 'dateOfBirth'
+    | 'gender'
+    | 'address'
+    | 'specialistId'
+  >
+}
+
+export type AppointmentInput = Omit<Appointment, 'appointmentId'>
