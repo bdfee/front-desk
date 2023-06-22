@@ -1,6 +1,7 @@
 import SpecialistPage from './components/specialist-page'
 import PatientTable from './components/patient-table'
 import PatientInformation from './components/patient-information'
+import RBC from './components/appointment/calendar'
 import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom'
 import { Typography, Container, Divider, Button } from '@mui/material'
 import { createContext, useState } from 'react'
@@ -47,11 +48,15 @@ const App = () => {
             <Button component={Link} to="/patients">
               patients
             </Button>
+            <Button component={Link} to="/calendar">
+              calendar
+            </Button>
             <Divider style={{ marginBottom: '1em' }} />
             <Routes>
               <Route path="/patients" element={<PatientTable />} />
               <Route path="/patients/:id" element={<PatientInformation />} />
               <Route path="/specialists" element={<SpecialistPage />} />
+              <Route path="/calendar" element={<RBC />} />
               <Route path="/" element={<div>home</div>} />
             </Routes>
           </Container>
