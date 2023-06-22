@@ -1,12 +1,20 @@
-import dayjs, { Dayjs } from 'dayjs'
+import dayjs from 'dayjs'
+import { useEffect, useState } from 'react'
 import { Calendar, dayjsLocalizer } from 'react-big-calendar'
 import 'react-big-calendar/lib/css/react-big-calendar.css'
 
 interface EventProps {
   title: string
-  start: Dayjs
-  end: Dayjs
+  start: Date
+  end: Date
 }
+
+// type NewEvent = Omit<EventProps, 'title'>
+
+type NewEvent = Omit<EventProps, 'title'>
+
+//add cal buttons to toggle between specialists and appointment type
+// add appointment setting by drag
 
 const events = [
   {
@@ -63,8 +71,8 @@ const formatEvents = () => {
   return events.map((event) => {
     const f = {
       title: event.specialist.name,
-      start: dayjs(new Date(event.date + 'T' + event.start)),
-      end: dayjs(new Date(event.date + 'T' + event.end)),
+      start: new Date(event.date + 'T' + event.start),
+      end: new Date(event.date + 'T' + event.end),
     }
     return f
   })
@@ -94,19 +102,39 @@ const getEventProps = (event: EventProps) => {
 }
 
 const RBC = () => {
+  const [myEvents, setMyEvents] = useState<EventProps[]>()
+
+  useEffect(() => {
+    const eventsList = formatEvents()
+    setMyEvents(eventsList)
+  }, [])
+
+  const handleCreateEvent = (event: NewEvent) => {
+    const title = window.prompt('new event name')
+    if (title) {
+      const newEvent: EventProps = {
+        title,
+        start: new Date(event.start),
+        end: new Date(event.end),
+      }
+      setMyEvents(myEvents?.concat(newEvent))
+    }
+  }
+
   const defaultDate = new Date(2020, 2, 2)
-  const eventsList = formatEvents()
   return (
     <div style={{ height: '500px' }}>
       <Calendar
         defaultDate={defaultDate}
-        events={eventsList}
+        events={myEvents}
         localizer={localizer}
         startAccessor="start"
+        selectable
         endAccessor="end"
         step={60}
         views={{ month: true, week: true, day: true }}
         eventPropGetter={(event) => getEventProps(event)}
+        onSelectSlot={(object: NewEvent) => handleCreateEvent(object)}
       />
     </div>
   )
