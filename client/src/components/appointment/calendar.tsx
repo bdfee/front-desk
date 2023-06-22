@@ -1,7 +1,12 @@
-import { useMemo } from 'react'
-import dayjs from 'dayjs'
+import dayjs, { Dayjs } from 'dayjs'
 import { Calendar, dayjsLocalizer } from 'react-big-calendar'
 import 'react-big-calendar/lib/css/react-big-calendar.css'
+
+interface EventProps {
+  title: string
+  start: Dayjs
+  end: Dayjs
+}
 
 const events = [
   {
@@ -73,24 +78,35 @@ dayjs.extend(utc)
 
 const localizer = dayjsLocalizer(dayjs)
 
+const getEventProps = (event: EventProps) => {
+  const style = {
+    backgroundColor: 'lightgrey',
+  }
+
+  if (event.title === 'test specialist corrections') {
+    style.backgroundColor = 'lightgreen'
+  }
+
+  return {
+    className: '',
+    style: style,
+  }
+}
+
 const RBC = () => {
-  const { defaultDate, events } = useMemo(() => {
-    const defaultDate = new Date(2020, 2, 2)
-    const events = formatEvents()
-
-    return { defaultDate, events }
-  }, [])
-
+  const defaultDate = new Date(2020, 2, 2)
+  const eventsList = formatEvents()
   return (
     <div style={{ height: '500px' }}>
       <Calendar
         defaultDate={defaultDate}
-        events={events}
+        events={eventsList}
         localizer={localizer}
         startAccessor="start"
         endAccessor="end"
         step={60}
         views={{ month: true, week: true, day: true }}
+        eventPropGetter={(event) => getEventProps(event)}
       />
     </div>
   )
