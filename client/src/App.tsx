@@ -1,10 +1,11 @@
 import SpecialistPage from './components/specialist-page'
 import PatientTable from './components/patient-table'
 import PatientInformation from './components/patient-information'
-import RBC from './components/appointment/calendar'
+import RBC from './components/calendar'
 import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom'
 import { Typography, Container, Divider, Button } from '@mui/material'
 import { createContext, useState } from 'react'
+import AppointmentInformation from './components/appointment-information'
 
 interface ErrorCtxType {
   setError: (errorMessage: string | undefined) => () => void
@@ -56,6 +57,10 @@ const App = () => {
               <Route path="/patients" element={<PatientTable />} />
               <Route path="/patients/:id" element={<PatientInformation />} />
               <Route path="/specialists" element={<SpecialistPage />} />
+              <Route
+                path="/appointments/:id"
+                element={<AppointmentInformation />}
+              />
               <Route path="/calendar" element={<RBC />} />
               <Route path="/" element={<div>home</div>} />
             </Routes>
