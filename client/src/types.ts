@@ -48,10 +48,7 @@ export interface Appointment {
   description: string
 }
 
-export type AppointmentDetail = Omit<
-  Appointment,
-  'specialistId' | 'patientId'
-> & {
+export type AppointmentDetail = Appointment & {
   specialist: Omit<Specialist, 'speciality'>
   patient: Omit<
     Patient,

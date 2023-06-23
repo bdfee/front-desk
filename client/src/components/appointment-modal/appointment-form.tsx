@@ -25,13 +25,9 @@ import {
 } from '../../types'
 
 import { ErrorCtx } from '../../App'
-import {
-  isStartTimeBeforeEndTime,
-  validateTextInput,
-  validateTimeString,
-} from '../../validations/inputs'
+import { validateTextInput } from '../../validations/inputs'
 
-type UpdateAppointment = (id: string, values: AppointmentInput) => Promise<void>
+type UpdateAppointment = (id: number, values: AppointmentInput) => Promise<void>
 type AddAppointment = (values: AppointmentInput) => Promise<void>
 
 interface AppointmentFormProps {
@@ -44,14 +40,16 @@ interface AppointmentFormProps {
 const AppointmentForm = (props: AppointmentFormProps) => {
   const [specialists, setSpecialists] = useState<Specialist[]>([])
   const [patients, setPatients] = useState<Patient[]>([])
-  const [appointmentId, setAppointmentId] = useState<string>('')
+
+  const [specialistId, setSpecialistId] = useState<string>('')
+  const [patientId, setPatientId] = useState<string>('')
+  const [appointmentId, setAppointmentId] = useState<number | undefined>()
+
   const [type, setType] = useState<string>('')
   const [start, setStart] = useState<Dayjs | null>(null)
   const [end, setEnd] = useState<Dayjs | null>(null)
   const [date, setDate] = useState<Dayjs | null>(null)
   const [description, setDescription] = useState<string>('')
-  const [specialistId, setSpecialistId] = useState<string>('')
-  const [patientId, setPatientId] = useState<string>('')
 
   const errorCtx = useContext(ErrorCtx)
 
@@ -78,22 +76,21 @@ const AppointmentForm = (props: AppointmentFormProps) => {
         end,
         date,
         description,
-        patient,
+        patientId,
         type,
-        specialist,
+        specialistId,
       } = props.state as AppointmentDetail
       const d = dayjs(date)
-      const s = dayjs(start)
-      const e = dayjs(end)
-      console.log(d)
-      setAppointmentId(appointmentId.toString())
+      const s = dayjs(start, 'HH:mm:ss')
+      const e = dayjs(end, 'HH:mm:ss')
+      setAppointmentId(appointmentId)
       setStart(s)
       setEnd(e)
       setDate(d)
       setType(type)
       setDescription(description)
-      setSpecialistId(specialist.specialistId.toString())
-      setPatientId(patient.patientId.toString())
+      setSpecialistId(specialistId.toString())
+      setPatientId(patientId.toString())
     }
   }, [])
 
@@ -103,8 +100,8 @@ const AppointmentForm = (props: AppointmentFormProps) => {
     !date ||
     !type.trim() ||
     !description.trim() ||
-    !specialistId.trim() ||
-    !patientId.trim()
+    !specialistId ||
+    !patientId
 
   const submitForm = (event: SyntheticEvent) => {
     event.preventDefault()
@@ -114,20 +111,14 @@ const AppointmentForm = (props: AppointmentFormProps) => {
       return
     }
 
-    // if (!isStartTimeBeforeEndTime(start, end)) {
-    //   errorCtx?.setError('start time must come before end time')
-    //   return
-    // }
-
     if (!validateTextInput(description)) {
       errorCtx?.setError('please enter a text description')
       setDescription('')
       return
     }
-
     const appointmentValues = {
-      start: start.format('HHH:MM:SS'),
-      end: end.format('HH:MM:SS'),
+      start: start.format('HH:mm:ss'),
+      end: end.format('HH:mm:ss'),
       date: date.format('YYYY-MM-DD'),
       type,
       description,
@@ -154,7 +145,7 @@ const AppointmentForm = (props: AppointmentFormProps) => {
         return
       }
     }
-    setAppointmentId('')
+    setAppointmentId(undefined)
     setStart(null)
     setEnd(null)
     setDate(null)
@@ -188,7 +179,7 @@ const AppointmentForm = (props: AppointmentFormProps) => {
         value={description}
         onChange={({ target }) => setDescription(target.value)}
       />
-      {!specialists ? (
+      {!specialists.length ? (
         <div>fetching specialists</div>
       ) : (
         <>
@@ -202,7 +193,7 @@ const AppointmentForm = (props: AppointmentFormProps) => {
               return (
                 <MenuItem
                   key={specialist.specialistId}
-                  value={specialist.specialistId}
+                  value={specialist.specialistId.toString()}
                 >
                   {specialist.name}
                 </MenuItem>
@@ -211,7 +202,7 @@ const AppointmentForm = (props: AppointmentFormProps) => {
           </Select>
         </>
       )}
-      {!patients ? (
+      {!patients.length ? (
         <div>fetching patients</div>
       ) : (
         <>
@@ -223,7 +214,10 @@ const AppointmentForm = (props: AppointmentFormProps) => {
           >
             {patients?.map((patient) => {
               return (
-                <MenuItem key={patient.patientId} value={patient.patientId}>
+                <MenuItem
+                  key={patient.patientId}
+                  value={patient.patientId.toString()}
+                >
                   {patient.name}
                 </MenuItem>
               )
@@ -254,7 +248,7 @@ const AppointmentForm = (props: AppointmentFormProps) => {
             aria-label="Add button"
             disabled={fieldsFilled}
           >
-            Add
+            {props.type}
           </Button>
         </Grid>
       </Grid>

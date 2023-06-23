@@ -34,7 +34,11 @@ interface PatientFormProps {
 }
 
 const PatientForm = (props: PatientFormProps) => {
-  const [patientId, setPatientId] = useState<number | undefined>() // this should be string
+  const [specialists, setSpecialists] = useState<Specialist[]>()
+
+  const [patientId, setPatientId] = useState<number | undefined>()
+  const [specialistId, setSpecialistId] = useState<string>('')
+
   const [firstName, setFirstName] = useState('')
   const [lastName, setLastName] = useState('')
   const [email, setEmail] = useState('')
@@ -42,8 +46,6 @@ const PatientForm = (props: PatientFormProps) => {
   const [dateOfBirth, setDateOfBirth] = useState<Dayjs | null>(null)
   const [gender, setGender] = useState<string>('')
   const [address, setAddress] = useState('')
-  const [specialists, setSpecialists] = useState<Specialist[]>()
-  const [specialistId, setSpecialistId] = useState<string>('')
 
   const errorCtx = useContext(ErrorCtx)
 
@@ -68,7 +70,6 @@ const PatientForm = (props: PatientFormProps) => {
         patientId,
       } = props.state as PatientDetail
       const dob = dayjs(dateOfBirth)
-      console.log(dob)
       const [first, last] = name.split(' ')
       setPatientId(patientId)
       setFirstName(first)
@@ -151,7 +152,7 @@ const PatientForm = (props: PatientFormProps) => {
         return
       }
     }
-
+    setPatientId(undefined)
     setFirstName('')
     setLastName('')
     setEmail('')
@@ -263,7 +264,7 @@ const PatientForm = (props: PatientFormProps) => {
             aria-label="Add button"
             disabled={fieldsFilled}
           >
-            Add
+            {props.type}
           </Button>
         </Grid>
       </Grid>

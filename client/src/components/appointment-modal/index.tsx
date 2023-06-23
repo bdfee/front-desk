@@ -50,7 +50,7 @@ const AppointmentModal = (props: AppointmentModalProps) => {
     return <div>no context here</div>
   }
 
-  const updateAppointment = async (id: string, values: AppointmentInput) => {
+  const updateAppointment = async (id: number, values: AppointmentInput) => {
     if (props.type === 'edit') {
       const { stateSetter } = props as UpdateAppointmentModalProps
       try {
