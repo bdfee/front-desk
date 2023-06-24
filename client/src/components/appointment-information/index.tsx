@@ -35,7 +35,7 @@ const AppointmentInformation = () => {
 
   return (
     <>
-      <InformationList appointment={appointment} />
+      {/* <InformationList appointment={appointment} /> */}
       <AppointmentModal
         type="edit"
         state={appointment}

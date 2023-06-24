@@ -179,6 +179,16 @@ const AppointmentForm = (props: AppointmentFormProps) => {
         value={description}
         onChange={({ target }) => setDescription(target.value)}
       />
+      <InputLabel id="type">Appointment type</InputLabel>
+      <Select
+        labelId="type"
+        value={type}
+        onChange={({ target }) => setType(target.value)}
+      >
+        <MenuItem value="intake">Intake</MenuItem>
+        <MenuItem value="physicalTherapy">Physical Therapy</MenuItem>
+        <MenuItem value="nutrition">Nutrition</MenuItem>
+      </Select>
       {!specialists.length ? (
         <div>fetching specialists</div>
       ) : (
