@@ -35,12 +35,13 @@ const AppointmentInformation = () => {
 
   return (
     <>
-      {/* <InformationList appointment={appointment} /> */}
-      <AppointmentModal
+      <InformationList appointment={appointment} />
+      {/* <AppointmentModal
+
         type="edit"
         state={appointment}
         stateSetter={setAppointment}
-      />
+      /> */}
     </>
   )
 }

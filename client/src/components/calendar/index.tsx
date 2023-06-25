@@ -52,13 +52,21 @@ const getEventProps = (event: EventProps) => {
   }
 }
 
+export interface PreFormData {
+  start: string
+  end: string
+  date: string
+}
+
 const RBC = () => {
   const nav = useNavigate()
   const [appointments, setAppointments] = useState<AppointmentDetail[]>()
+  const [preFormData, setPreformData] = useState<PreFormData | undefined>()
+  const [modalOpen, setModalOpen] = useState(false)
 
   const navigateToAppointmentEditor = (appointmentId: number) => {
     nav(`/calendar/${appointmentId}`, {
-      state: { openModalOnLoad: true },
+      state: { openModalOnLoad: false },
     })
   }
 
@@ -79,20 +87,22 @@ const RBC = () => {
   }, [])
 
   const handleCreateEvent = (event: NewEvent) => {
-    const title = window.prompt('new event name')
-    if (title) {
-      const newEvent: EventProps = {
-        title,
-        appointmentId: 10,
-        start: new Date(event.start),
-        end: new Date(event.end),
-      }
-      console.log(newEvent)
-      // setAppointments(appointments.concat(newEvent))
+    const startData = dayjs(event.start)
+    const endData = dayjs(event.end)
+
+    const start = startData.format('HH:mm:ss')
+    const end = endData.format('HH:mm:ss')
+    const date = startData.format('YYYY-MM-DD')
+    const preFormData = {
+      start,
+      end,
+      date,
     }
+    setPreformData(preFormData)
+    setModalOpen(true)
   }
 
-  const defaultDate = new Date(2020, 2, 2)
+  const defaultDate = new Date()
 
   if (!appointments) {
     return <div>fetching appointments</div>
@@ -118,7 +128,10 @@ const RBC = () => {
         />
       </div>
       <AppointmentModal
-        type="add"
+        modalOpen={modalOpen}
+        setModalOpen={setModalOpen}
+        type={preFormData ? 'addFromCalendar' : 'add'}
+        preFormData={preFormData}
         state={appointments}
         stateSetter={setAppointments}
       />

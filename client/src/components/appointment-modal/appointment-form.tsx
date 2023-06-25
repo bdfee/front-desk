@@ -26,12 +26,20 @@ import {
 
 import { ErrorCtx } from '../../App'
 import { validateTextInput } from '../../validations/inputs'
+import { PreFormData } from '../calendar'
+
+// interface CalendarInput {
+//   date: Dayjs
+//   start: Dayjs
+//   end: Dayjs
+// }
 
 type UpdateAppointment = (id: number, values: AppointmentInput) => Promise<void>
 type AddAppointment = (values: AppointmentInput) => Promise<void>
 
 interface AppointmentFormProps {
   type: string
+  preFormData: PreFormData | undefined
   onCancel: () => void
   state: AppointmentDetail | AppointmentDetail[] | undefined
   service: UpdateAppointment | AddAppointment | undefined
@@ -92,6 +100,15 @@ const AppointmentForm = (props: AppointmentFormProps) => {
       setSpecialistId(specialistId.toString())
       setPatientId(patientId.toString())
     }
+
+    if (props.type === 'addFromCalendar' && props.preFormData) {
+      const d = dayjs(props.preFormData.date)
+      const s = dayjs(props.preFormData.start, 'HH:mm:ss')
+      const e = dayjs(props.preFormData.end, 'HH:mm:ss')
+      setDate(d)
+      setStart(s)
+      setEnd(e)
+    }
   }, [])
 
   const fieldsFilled =
@@ -133,7 +150,7 @@ const AppointmentForm = (props: AppointmentFormProps) => {
         }
         break
       }
-      case 'add': {
+      case 'add' || 'addFromCalendar': {
         if (props.service && date) {
           const addAppointment = props.service as AddAppointment
           addAppointment(appointmentValues)
