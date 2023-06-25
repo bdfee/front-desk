@@ -4,11 +4,10 @@ import {
   DialogTitle,
   Divider,
   Alert,
-  Button,
 } from '@mui/material'
 import AppointmentForm from './appointment-form'
 import { AppointmentDetail, AppointmentInput } from '../../types'
-import { PreFormData } from '../calendar'
+import { AppointmentFormValues } from '../calendar'
 import { Dispatch, useContext, SetStateAction, useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
 import { ErrorCtx } from '../../App'
@@ -19,8 +18,8 @@ interface UpdateAppointmentModalProps {
   type: string
   modalOpen: boolean
   setModalOpen: Dispatch<SetStateAction<boolean>>
-  preFormData: PreFormData | undefined
-
+  formValues: AppointmentFormValues | undefined
+  clearFormValues: () => void
   state: AppointmentDetail | undefined
   stateSetter: Dispatch<SetStateAction<AppointmentDetail | undefined>>
 }
@@ -28,7 +27,8 @@ interface UpdateAppointmentModalProps {
 interface AddAppointmentModalProps {
   type: string
   modalOpen: boolean
-  preFormData: PreFormData | undefined
+  formValues: AppointmentFormValues | undefined
+  clearFormValues: () => void | undefined
   setModalOpen: Dispatch<SetStateAction<boolean>>
   state: AppointmentDetail[] | undefined
   stateSetter: Dispatch<SetStateAction<AppointmentDetail[] | undefined>>
@@ -75,12 +75,14 @@ const AppointmentModal = (props: AppointmentModalProps) => {
   }
 
   const addAppointment = async (values: AppointmentInput) => {
-    if (props.type === 'add') {
+    if (props.type !== 'edit') {
       const { stateSetter, state } = props as AddAppointmentModalProps
       try {
         const { appointmentId } = await appointmentService.create(values)
         const appointment = await appointmentService.getOneById(appointmentId)
+        console.log(appointment)
         stateSetter(state?.concat(appointment))
+        props.clearFormValues()
         closeModal()
       } catch (error) {
         if (axios.isAxiosError(error)) {
@@ -101,7 +103,6 @@ const AppointmentModal = (props: AppointmentModalProps) => {
 
   return (
     <>
-      <Button onClick={() => openModal()}>{props.type} appointment</Button>
       <Dialog fullWidth={true} open={props.modalOpen} onClose={closeModal}>
         <DialogTitle>{props.type} an appointment</DialogTitle>
         <Divider />
@@ -114,7 +115,7 @@ const AppointmentModal = (props: AppointmentModalProps) => {
           <AppointmentForm
             type={props.type}
             state={props.state}
-            preFormData={props.preFormData}
+            formValues={props.formValues}
             service={props.type === 'edit' ? updateAppointment : addAppointment}
             onCancel={closeModal}
           ></AppointmentForm>

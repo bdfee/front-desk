@@ -4,12 +4,19 @@ import { Calendar, dayjsLocalizer } from 'react-big-calendar'
 import 'react-big-calendar/lib/css/react-big-calendar.css'
 import appointmentService from '../../services/appointment'
 import { isAxiosError } from 'axios'
+import { Button } from '@mui/material'
 
 interface EventProps {
   title: string
   appointmentId: number
   start: Date
   end: Date
+}
+
+export interface AppointmentFormValues {
+  start: string
+  end: string
+  date: string
 }
 
 type NewEvent = Omit<EventProps, 'title' | 'appointmentId'>
@@ -52,16 +59,12 @@ const getEventProps = (event: EventProps) => {
   }
 }
 
-export interface PreFormData {
-  start: string
-  end: string
-  date: string
-}
-
 const RBC = () => {
   const nav = useNavigate()
   const [appointments, setAppointments] = useState<AppointmentDetail[]>()
-  const [preFormData, setPreformData] = useState<PreFormData | undefined>()
+  const [formValues, setFormValues] = useState<
+    AppointmentFormValues | undefined
+  >()
   const [modalOpen, setModalOpen] = useState(false)
 
   const navigateToAppointmentEditor = (appointmentId: number) => {
@@ -93,19 +96,23 @@ const RBC = () => {
     const start = startData.format('HH:mm:ss')
     const end = endData.format('HH:mm:ss')
     const date = startData.format('YYYY-MM-DD')
-    const preFormData = {
+    const values = {
       start,
       end,
       date,
     }
-    setPreformData(preFormData)
     setModalOpen(true)
+    setFormValues(values)
   }
 
   const defaultDate = new Date()
 
   if (!appointments) {
     return <div>fetching appointments</div>
+  }
+
+  const clearForm = () => {
+    setFormValues(undefined)
   }
 
   return (
@@ -127,11 +134,13 @@ const RBC = () => {
           }
         />
       </div>
+      <Button onClick={() => setModalOpen(true)}>add appointment</Button>
       <AppointmentModal
         modalOpen={modalOpen}
         setModalOpen={setModalOpen}
-        type={preFormData ? 'addFromCalendar' : 'add'}
-        preFormData={preFormData}
+        type={formValues ? 'addWithValues' : 'add'}
+        clearFormValues={clearForm}
+        formValues={formValues}
         state={appointments}
         stateSetter={setAppointments}
       />

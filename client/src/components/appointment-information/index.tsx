@@ -3,12 +3,13 @@ import AppointmentModal from '../appointment-modal'
 import { useState, useEffect } from 'react'
 import { AppointmentDetail } from '../../types'
 import { useParams } from 'react-router-dom'
+import { Button } from '@mui/material'
 import axios from 'axios'
 import appointmentService from '../../services/appointment'
 
 const AppointmentInformation = () => {
   const [appointment, setAppointment] = useState<AppointmentDetail>()
-
+  const [modalOpen, setModalOpen] = useState<boolean>(false)
   const { id } = useParams<{ id: string }>()
 
   useEffect(() => {
@@ -36,12 +37,16 @@ const AppointmentInformation = () => {
   return (
     <>
       <InformationList appointment={appointment} />
-      {/* <AppointmentModal
-
+      <Button onClick={() => setModalOpen(true)}>edit appointment</Button>
+      <AppointmentModal
+        modalOpen={modalOpen}
+        setModalOpen={setModalOpen}
+        formValues={undefined}
+        clearFormValues={undefined}
         type="edit"
         state={appointment}
         stateSetter={setAppointment}
-      /> */}
+      />
     </>
   )
 }

@@ -68,7 +68,7 @@ const PatientModal = (props: PatientModalProps) => {
   }
 
   const addPatient = async (values: PatientInput) => {
-    if (props.type === 'add') {
+    if (props.type !== 'edit') {
       const { stateSetter, state } = props as AddPatientModalProps
       try {
         const { patientId } = await patientService.create(values)

@@ -26,21 +26,16 @@ import {
 
 import { ErrorCtx } from '../../App'
 import { validateTextInput } from '../../validations/inputs'
-import { PreFormData } from '../calendar'
-
-// interface CalendarInput {
-//   date: Dayjs
-//   start: Dayjs
-//   end: Dayjs
-// }
+import { AppointmentFormValues } from '../calendar'
 
 type UpdateAppointment = (id: number, values: AppointmentInput) => Promise<void>
 type AddAppointment = (values: AppointmentInput) => Promise<void>
 
 interface AppointmentFormProps {
   type: string
-  preFormData: PreFormData | undefined
   onCancel: () => void
+  formValues: AppointmentFormValues | undefined
+  clearFormValues: () => void | undefined
   state: AppointmentDetail | AppointmentDetail[] | undefined
   service: UpdateAppointment | AddAppointment | undefined
 }
@@ -101,10 +96,10 @@ const AppointmentForm = (props: AppointmentFormProps) => {
       setPatientId(patientId.toString())
     }
 
-    if (props.type === 'addFromCalendar' && props.preFormData) {
-      const d = dayjs(props.preFormData.date)
-      const s = dayjs(props.preFormData.start, 'HH:mm:ss')
-      const e = dayjs(props.preFormData.end, 'HH:mm:ss')
+    if (props.type === 'addWithValues' && props.formValues) {
+      const d = dayjs(props.formValues.date)
+      const s = dayjs(props.formValues.start, 'HH:mm:ss')
+      const e = dayjs(props.formValues.end, 'HH:mm:ss')
       setDate(d)
       setStart(s)
       setEnd(e)
@@ -142,6 +137,7 @@ const AppointmentForm = (props: AppointmentFormProps) => {
       specialistId: +specialistId,
       patientId: +patientId,
     }
+
     switch (props.type) {
       case 'edit': {
         if (props.service && appointmentId) {
@@ -150,15 +146,22 @@ const AppointmentForm = (props: AppointmentFormProps) => {
         }
         break
       }
-      case 'add' || 'addFromCalendar': {
-        if (props.service && date) {
+      case 'add': {
+        if (props.service) {
+          const addAppointment = props.service as AddAppointment
+          addAppointment(appointmentValues)
+        }
+        break
+      }
+      case 'addWithValues': {
+        if (props.service) {
           const addAppointment = props.service as AddAppointment
           addAppointment(appointmentValues)
         }
         break
       }
       default: {
-        console.log('error with service switch in patient form')
+        console.log('error with service switch in appointment form')
         return
       }
     }
