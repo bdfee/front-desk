@@ -38,6 +38,7 @@ export enum Gender {
 }
 
 export interface Appointment {
+  appointmentId: number
   patientId: number
   specialistId: number
   date: string
@@ -47,20 +48,11 @@ export interface Appointment {
   description: string
 }
 
-export type AppointmentDetail = Omit<
-  Appointment,
-  'specialistId' | 'patientId'
-> & {
-  specialist: Omit<Specialist, 'specialistId' | 'speciality'>
+export type AppointmentDetail = Appointment & {
+  specialist: Omit<Specialist, 'speciality'>
   patient: Omit<
     Patient,
-    | 'patientId'
-    | 'email'
-    | 'phone'
-    | 'dateOfBirth'
-    | 'gender'
-    | 'address'
-    | 'specialistId'
+    'email' | 'phone' | 'dateOfBirth' | 'gender' | 'address' | 'specialistId'
   >
 }
 

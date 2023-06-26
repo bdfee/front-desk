@@ -32,9 +32,9 @@ interface AddPatientModalProps {
   stateSetter: Dispatch<SetStateAction<PatientDetail[] | undefined>>
 }
 
-type ModalProps = UpdatePatientModalProps | AddPatientModalProps
+type PatientModalProps = UpdatePatientModalProps | AddPatientModalProps
 
-const PatientModal = (props: ModalProps) => {
+const PatientModal = (props: PatientModalProps) => {
   const [modalOpen, setModalOpen] = useState(false)
   const errorCtx = useContext(ErrorCtx)
   const location = useLocation()
@@ -68,7 +68,7 @@ const PatientModal = (props: ModalProps) => {
   }
 
   const addPatient = async (values: PatientInput) => {
-    if (props.type === 'add') {
+    if (props.type !== 'edit') {
       const { stateSetter, state } = props as AddPatientModalProps
       try {
         const { patientId } = await patientService.create(values)
@@ -92,31 +92,6 @@ const PatientModal = (props: ModalProps) => {
 
   const openModal = (): void => setModalOpen(true)
 
-  const Form = () => {
-    switch (props.type) {
-      case 'edit': {
-        return (
-          <PatientForm
-            type={props.type}
-            state={props.state}
-            service={updatePatient}
-            onCancel={closeModal}
-          ></PatientForm>
-        )
-      }
-      case 'add': {
-        return (
-          <PatientForm
-            type={props.type}
-            state={props.state}
-            service={addPatient}
-            onCancel={closeModal}
-          ></PatientForm>
-        )
-      }
-    }
-  }
-
   return (
     <>
       <Button onClick={() => openModal()}>{props.type} patient</Button>
@@ -129,7 +104,12 @@ const PatientModal = (props: ModalProps) => {
               {errorCtx.error}
             </Alert>
           )}
-          {Form()}
+          <PatientForm
+            type={props.type}
+            state={props.state}
+            service={props.type === 'edit' ? updatePatient : addPatient}
+            onCancel={closeModal}
+          ></PatientForm>
         </DialogContent>
       </Dialog>
     </>
