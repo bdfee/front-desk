@@ -34,8 +34,8 @@ type AddAppointment = (values: AppointmentInput) => Promise<void>
 interface AppointmentFormProps {
   type: string
   onCancel: () => void
-  formValues: AppointmentFormValues | undefined
-  clearFormValues: () => void | undefined
+  formValues?: AppointmentFormValues
+  clearFormValues?: () => void
   state: AppointmentDetail | AppointmentDetail[] | undefined
   service: UpdateAppointment | AddAppointment | undefined
 }

@@ -18,8 +18,8 @@ interface UpdateAppointmentModalProps {
   type: string
   modalOpen: boolean
   setModalOpen: Dispatch<SetStateAction<boolean>>
-  formValues: AppointmentFormValues | undefined
-  clearFormValues: () => void
+  formValues?: AppointmentFormValues
+  clearFormValues?: () => void
   state: AppointmentDetail | undefined
   stateSetter: Dispatch<SetStateAction<AppointmentDetail | undefined>>
 }
@@ -27,8 +27,8 @@ interface UpdateAppointmentModalProps {
 interface AddAppointmentModalProps {
   type: string
   modalOpen: boolean
-  formValues: AppointmentFormValues | undefined
-  clearFormValues: () => void | undefined
+  formValues?: AppointmentFormValues
+  clearFormValues?: () => void
   setModalOpen: Dispatch<SetStateAction<boolean>>
   state: AppointmentDetail[] | undefined
   stateSetter: Dispatch<SetStateAction<AppointmentDetail[] | undefined>>
@@ -75,7 +75,7 @@ const AppointmentModal = (props: AppointmentModalProps) => {
   }
 
   const addAppointment = async (values: AppointmentInput) => {
-    if (props.type !== 'edit') {
+    if (props.type !== 'edit' && props.clearFormValues) {
       const { stateSetter, state } = props as AddAppointmentModalProps
       try {
         const { appointmentId } = await appointmentService.create(values)
@@ -116,6 +116,7 @@ const AppointmentModal = (props: AppointmentModalProps) => {
             type={props.type}
             state={props.state}
             formValues={props.formValues}
+            clearFormValues={props?.clearFormValues}
             service={props.type === 'edit' ? updateAppointment : addAppointment}
             onCancel={closeModal}
           ></AppointmentForm>
