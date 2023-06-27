@@ -1,11 +1,4 @@
-import {
-  TextField,
-  Grid,
-  Button,
-  Select,
-  MenuItem,
-  InputLabel,
-} from '@mui/material'
+import { TextField, Grid, Button, InputLabel } from '@mui/material'
 import {
   DatePicker,
   LocalizationProvider,
@@ -13,16 +6,11 @@ import {
 } from '@mui/x-date-pickers'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import dayjs, { Dayjs } from 'dayjs'
-import specialistService from '../../services/specialist'
-import patientService from '../../services/patients'
+
+import FetchedFormComponents from './fetched-form-components'
 
 import { SyntheticEvent, useEffect, useState, useContext } from 'react'
-import {
-  AppointmentDetail,
-  AppointmentInput,
-  Patient,
-  Specialist,
-} from '../../types'
+import { AppointmentDetail, AppointmentInput } from '../../types'
 
 import { ErrorCtx } from '../../App'
 import { validateTextInput } from '../../validations/inputs'
@@ -41,9 +29,6 @@ interface AppointmentFormProps {
 }
 
 const AppointmentForm = (props: AppointmentFormProps) => {
-  const [specialists, setSpecialists] = useState<Specialist[]>([])
-  const [patients, setPatients] = useState<Patient[]>([])
-
   const [specialistId, setSpecialistId] = useState<string>('')
   const [patientId, setPatientId] = useState<string>('')
   const [appointmentId, setAppointmentId] = useState<number | undefined>()
@@ -55,21 +40,6 @@ const AppointmentForm = (props: AppointmentFormProps) => {
   const [description, setDescription] = useState<string>('')
 
   const errorCtx = useContext(ErrorCtx)
-
-  // improve this fetch
-  useEffect(() => {
-    const fetchSpecialists = async () => {
-      const specialists = await specialistService.getAll()
-      setSpecialists(specialists)
-    }
-    fetchSpecialists()
-
-    const fetchPatients = async () => {
-      const patients = await patientService.getAll()
-      setPatients(patients)
-    }
-    fetchPatients()
-  }, [])
 
   useEffect(() => {
     if (props.type === 'edit') {
@@ -200,61 +170,15 @@ const AppointmentForm = (props: AppointmentFormProps) => {
         onChange={({ target }) => setDescription(target.value)}
       />
       <InputLabel id="type">Appointment type</InputLabel>
-      <Select
-        labelId="type"
-        value={type}
-        onChange={({ target }) => setType(target.value)}
-      >
-        <MenuItem value="intake">Intake</MenuItem>
-        <MenuItem value="physicalTherapy">Physical Therapy</MenuItem>
-        <MenuItem value="nutrition">Nutrition</MenuItem>
-      </Select>
-      {!specialists.length ? (
-        <div>fetching specialists</div>
-      ) : (
-        <>
-          <InputLabel id="specialist">Assign Specialist</InputLabel>
-          <Select
-            labelId="specialist"
-            value={specialistId}
-            onChange={({ target }) => setSpecialistId(target.value)}
-          >
-            {specialists?.map((specialist) => {
-              return (
-                <MenuItem
-                  key={specialist.specialistId}
-                  value={specialist.specialistId.toString()}
-                >
-                  {specialist.name}
-                </MenuItem>
-              )
-            })}
-          </Select>
-        </>
-      )}
-      {!patients.length ? (
-        <div>fetching patients</div>
-      ) : (
-        <>
-          <InputLabel id="patients">Assign Patient</InputLabel>
-          <Select
-            labelId="patient"
-            value={patientId}
-            onChange={({ target }) => setPatientId(target.value)}
-          >
-            {patients?.map((patient) => {
-              return (
-                <MenuItem
-                  key={patient.patientId}
-                  value={patient.patientId.toString()}
-                >
-                  {patient.name}
-                </MenuItem>
-              )
-            })}
-          </Select>
-        </>
-      )}
+
+      <FetchedFormComponents
+        patientId={patientId}
+        setPatientId={setPatientId}
+        specialistId={specialistId}
+        setSpecialistId={setSpecialistId}
+        type={type}
+        setType={setType}
+      />
       <Grid>
         <Grid item>
           <Button
