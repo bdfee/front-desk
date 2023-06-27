@@ -102,27 +102,25 @@ const AppointmentModal = (props: AppointmentModalProps) => {
   const openModal = (): void => props.setModalOpen(true)
 
   return (
-    <>
-      <Dialog fullWidth={true} open={props.modalOpen} onClose={closeModal}>
-        <DialogTitle>{props.type} an appointment</DialogTitle>
-        <Divider />
-        <DialogContent>
-          {errorCtx.error && (
-            <Alert severity="error" role="alert">
-              {errorCtx.error}
-            </Alert>
-          )}
-          <AppointmentForm
-            type={props.type}
-            state={props.state}
-            formValues={props.formValues}
-            clearFormValues={props?.clearFormValues}
-            service={props.type === 'edit' ? updateAppointment : addAppointment}
-            onCancel={closeModal}
-          ></AppointmentForm>
-        </DialogContent>
-      </Dialog>
-    </>
+    <Dialog fullWidth={true} open={props.modalOpen} onClose={closeModal}>
+      <DialogTitle>{props.type} an appointment</DialogTitle>
+      <Divider />
+      <DialogContent>
+        {errorCtx.error && (
+          <Alert severity="error" role="alert">
+            {errorCtx.error}
+          </Alert>
+        )}
+        <AppointmentForm
+          type={props.type}
+          state={props.state}
+          formValues={props.formValues}
+          clearFormValues={props?.clearFormValues}
+          service={props.type === 'edit' ? updateAppointment : addAppointment}
+          onCancel={closeModal}
+        ></AppointmentForm>
+      </DialogContent>
+    </Dialog>
   )
 }
 

@@ -7,6 +7,7 @@ import {
   OutlinedInput,
 } from '@mui/material'
 import { Dispatch, SetStateAction } from 'react'
+import Swatch from '../swatch'
 
 export interface SelectTypeProps {
   type: string
@@ -24,9 +25,18 @@ const SelectType = ({ type, setType }: SelectTypeProps) => {
         onChange={({ target }) => setType(target.value)}
         input={<OutlinedInput label="Appointment type" />}
       >
-        <MenuItem value="intake">Intake</MenuItem>
-        <MenuItem value="physicalTherapy">Physical Therapy</MenuItem>
-        <MenuItem value="nutrition">Nutrition</MenuItem>
+        <MenuItem value="intake">
+          Intake
+          {!type && <Swatch color="gray" />}
+        </MenuItem>
+        <MenuItem value="physicalTherapy">
+          Physical Therapy
+          {!type && <Swatch color="red" />}
+        </MenuItem>
+        <MenuItem value="nutrition">
+          Nutrition
+          {!type && <Swatch color="green" />}
+        </MenuItem>
       </Select>
       {type && (
         <Button

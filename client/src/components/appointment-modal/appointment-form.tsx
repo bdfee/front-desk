@@ -1,4 +1,4 @@
-import { TextField, Grid, Button, InputLabel } from '@mui/material'
+import { TextField, Grid, Button, Divider } from '@mui/material'
 import {
   DatePicker,
   LocalizationProvider,
@@ -169,8 +169,7 @@ const AppointmentForm = (props: AppointmentFormProps) => {
         value={description}
         onChange={({ target }) => setDescription(target.value)}
       />
-      <InputLabel id="type">Appointment type</InputLabel>
-
+      <Divider />
       <FetchedFormComponents
         patientId={patientId}
         setPatientId={setPatientId}
@@ -202,7 +201,7 @@ const AppointmentForm = (props: AppointmentFormProps) => {
             aria-label="Add button"
             disabled={fieldsFilled}
           >
-            {props.type}
+            Save
           </Button>
         </Grid>
       </Grid>
