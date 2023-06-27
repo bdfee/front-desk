@@ -20,19 +20,23 @@ type UpdateAppointment = (id: number, values: AppointmentInput) => Promise<void>
 type AddAppointment = (values: AppointmentInput) => Promise<void>
 
 interface AppointmentFormProps {
-  type: string
+  serviceType: string
   onCancel: () => void
   formValues?: AppointmentFormValues
-  clearFormValues?: () => void
   state: AppointmentDetail | AppointmentDetail[] | undefined
   service: UpdateAppointment | AddAppointment | undefined
 }
 
-const AppointmentForm = (props: AppointmentFormProps) => {
+const AppointmentForm = ({
+  serviceType,
+  onCancel,
+  formValues,
+  state,
+  service,
+}: AppointmentFormProps) => {
   const [specialistId, setSpecialistId] = useState<string>('')
   const [patientId, setPatientId] = useState<string>('')
   const [appointmentId, setAppointmentId] = useState<number | undefined>()
-
   const [type, setType] = useState<string>('')
   const [start, setStart] = useState<Dayjs | null>(null)
   const [end, setEnd] = useState<Dayjs | null>(null)
@@ -42,7 +46,7 @@ const AppointmentForm = (props: AppointmentFormProps) => {
   const errorCtx = useContext(ErrorCtx)
 
   useEffect(() => {
-    if (props.type === 'edit') {
+    if (serviceType === 'edit') {
       const {
         appointmentId,
         start,
@@ -52,27 +56,21 @@ const AppointmentForm = (props: AppointmentFormProps) => {
         patientId,
         type,
         specialistId,
-      } = props.state as AppointmentDetail
-      const d = dayjs(date)
-      const s = dayjs(start, 'HH:mm:ss')
-      const e = dayjs(end, 'HH:mm:ss')
+      } = state as AppointmentDetail
       setAppointmentId(appointmentId)
-      setStart(s)
-      setEnd(e)
-      setDate(d)
+      setStart(() => dayjs(start, 'HH:mm:ss'))
+      setEnd(() => dayjs(end, 'HH:mm:ss'))
+      setDate(() => dayjs(date))
       setType(type)
       setDescription(description)
       setSpecialistId(specialistId.toString())
       setPatientId(patientId.toString())
     }
 
-    if (props.type === 'addWithValues' && props.formValues) {
-      const d = dayjs(props.formValues.date)
-      const s = dayjs(props.formValues.start, 'HH:mm:ss')
-      const e = dayjs(props.formValues.end, 'HH:mm:ss')
-      setDate(d)
-      setStart(s)
-      setEnd(e)
+    if (serviceType === 'addWithValues' && formValues) {
+      setDate(() => dayjs(formValues.date))
+      setStart(() => dayjs(formValues.start, 'HH:mm:ss'))
+      setEnd(() => dayjs(formValues.end, 'HH:mm:ss'))
     }
   }, [])
 
@@ -108,24 +106,24 @@ const AppointmentForm = (props: AppointmentFormProps) => {
       patientId: +patientId,
     }
 
-    switch (props.type) {
+    switch (serviceType) {
       case 'edit': {
-        if (props.service && appointmentId) {
-          const updateAppointment = props.service as UpdateAppointment
+        if (service && appointmentId) {
+          const updateAppointment = service as UpdateAppointment
           updateAppointment(appointmentId, appointmentValues)
         }
         break
       }
       case 'add': {
-        if (props.service) {
-          const addAppointment = props.service as AddAppointment
+        if (service) {
+          const addAppointment = service as AddAppointment
           addAppointment(appointmentValues)
         }
         break
       }
       case 'addWithValues': {
-        if (props.service) {
-          const addAppointment = props.service as AddAppointment
+        if (service) {
+          const addAppointment = service as AddAppointment
           addAppointment(appointmentValues)
         }
         break
@@ -185,7 +183,7 @@ const AppointmentForm = (props: AppointmentFormProps) => {
             variant="contained"
             style={{ float: 'right' }}
             type="button"
-            onClick={props.onCancel}
+            onClick={onCancel}
             aria-label="Cancel button"
           >
             Cancel

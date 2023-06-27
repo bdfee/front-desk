@@ -15,7 +15,7 @@ import { AppointmentDetail, AppointmentInput } from '../../types'
 import { AppointmentFormValues } from '../calendar'
 
 interface BaseAppointmentModalProps {
-  type: string
+  serviceType: string
   modalOpen: boolean
   setModalOpen: Dispatch<SetStateAction<boolean>>
   formValues?: AppointmentFormValues
@@ -51,7 +51,7 @@ const AppointmentModal = (props: AppointmentModalProps) => {
   }
 
   const updateAppointment = async (id: number, values: AppointmentInput) => {
-    if (props.type === 'edit') {
+    if (props.serviceType === 'edit') {
       const { stateSetter } = props as UpdateAppointmentModalProps
       try {
         const { appointmentId } = await appointmentService.updateById(
@@ -74,7 +74,7 @@ const AppointmentModal = (props: AppointmentModalProps) => {
   }
 
   const addAppointment = async (values: AppointmentInput) => {
-    if (props.type !== 'edit' && props.clearFormValues) {
+    if (props.serviceType !== 'edit' && props.clearFormValues) {
       const { stateSetter, state } = props as AddAppointmentModalProps
       try {
         const { appointmentId } = await appointmentService.create(values)
@@ -92,16 +92,16 @@ const AppointmentModal = (props: AppointmentModalProps) => {
     }
   }
 
-  const closeModal = (): void => {
+  const closeModal = () => {
     props.setModalOpen(false)
     errorCtx.setError(undefined)
   }
 
-  const openModal = (): void => props.setModalOpen(true)
+  const openModal = () => props.setModalOpen(true)
 
   return (
     <Dialog fullWidth={true} open={props.modalOpen} onClose={closeModal}>
-      <DialogTitle>{props.type} an appointment</DialogTitle>
+      <DialogTitle>{props.serviceType} an appointment</DialogTitle>
       <Divider />
       <DialogContent>
         {errorCtx.error && (
@@ -110,11 +110,12 @@ const AppointmentModal = (props: AppointmentModalProps) => {
           </Alert>
         )}
         <AppointmentForm
-          type={props.type}
+          serviceType={props.serviceType}
           state={props.state}
           formValues={props.formValues}
-          clearFormValues={props?.clearFormValues}
-          service={props.type === 'edit' ? updateAppointment : addAppointment}
+          service={
+            props.serviceType === 'edit' ? updateAppointment : addAppointment
+          }
           onCancel={closeModal}
         ></AppointmentForm>
       </DialogContent>

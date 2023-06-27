@@ -67,7 +67,7 @@ const Calendar = () => {
       <AppointmentModal
         modalOpen={modalOpen}
         setModalOpen={setModalOpen}
-        type={formValues ? 'addWithValues' : 'add'}
+        serviceType={formValues ? 'addWithValues' : 'add'}
         clearFormValues={clearForm}
         formValues={formValues}
         state={appointments}
