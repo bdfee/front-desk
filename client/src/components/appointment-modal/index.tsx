@@ -5,31 +5,29 @@ import {
   Divider,
   Alert,
 } from '@mui/material'
-import AppointmentForm from './appointment-form'
-import { AppointmentDetail, AppointmentInput } from '../../types'
-import { AppointmentFormValues } from '../calendar'
-import { Dispatch, useContext, SetStateAction, useEffect } from 'react'
+import { Dispatch, SetStateAction, useContext, useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
 import { ErrorCtx } from '../../App'
 import appointmentService from '../../services/appointment'
 import axios from 'axios'
+import AppointmentForm from './appointment-form'
+import { AppointmentDetail, AppointmentInput } from '../../types'
+import { AppointmentFormValues } from '../calendar'
 
-interface UpdateAppointmentModalProps {
+interface BaseAppointmentModalProps {
   type: string
   modalOpen: boolean
   setModalOpen: Dispatch<SetStateAction<boolean>>
   formValues?: AppointmentFormValues
   clearFormValues?: () => void
+}
+
+interface UpdateAppointmentModalProps extends BaseAppointmentModalProps {
   state: AppointmentDetail | undefined
   stateSetter: Dispatch<SetStateAction<AppointmentDetail | undefined>>
 }
 
-interface AddAppointmentModalProps {
-  type: string
-  modalOpen: boolean
-  formValues?: AppointmentFormValues
-  clearFormValues?: () => void
-  setModalOpen: Dispatch<SetStateAction<boolean>>
+interface AddAppointmentModalProps extends BaseAppointmentModalProps {
   state: AppointmentDetail[] | undefined
   stateSetter: Dispatch<SetStateAction<AppointmentDetail[] | undefined>>
 }
@@ -47,6 +45,7 @@ const AppointmentModal = (props: AppointmentModalProps) => {
       openModal()
     }
   })
+
   if (!errorCtx) {
     return <div>no context here</div>
   }
@@ -80,7 +79,6 @@ const AppointmentModal = (props: AppointmentModalProps) => {
       try {
         const { appointmentId } = await appointmentService.create(values)
         const appointment = await appointmentService.getOneById(appointmentId)
-        console.log(appointment)
         stateSetter(state?.concat(appointment))
         props.clearFormValues()
         closeModal()
