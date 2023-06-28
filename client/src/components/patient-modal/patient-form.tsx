@@ -10,7 +10,7 @@ import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import dayjs, { Dayjs } from 'dayjs'
 import specialistService from '../../services/specialist'
-
+import { useQuery } from 'react-query'
 import { SyntheticEvent, useEffect, useState, useContext } from 'react'
 import { Gender, PatientDetail, PatientInput, Specialist } from '../../types'
 import {
@@ -48,14 +48,22 @@ const PatientForm = (props: PatientFormProps) => {
   const [address, setAddress] = useState('')
 
   const errorCtx = useContext(ErrorCtx)
+  const { error, data } = useQuery('GET_SPECIALISTS', specialistService.getAll)
 
   useEffect(() => {
-    const fetchSpecialists = async () => {
-      const specialists = await specialistService.getAll()
-      setSpecialists(specialists)
+    if (data) {
+      setSpecialists(data)
     }
-    fetchSpecialists()
-  }, [])
+  }, [data])
+
+  // useEffect(() => {
+
+  //   const fetchSpecialists = async () => {
+  //     const specialists = await specialistService.getAll()
+  //     setSpecialists(specialists)
+  //   }
+  //   fetchSpecialists()
+  // }, [])
 
   useEffect(() => {
     if (props.type === 'update') {
@@ -162,6 +170,15 @@ const PatientForm = (props: PatientFormProps) => {
     setAddress('')
     setSpecialistId('')
   }
+
+  if (!data) {
+    return <div>fetching patients</div>
+  }
+
+  if (error) {
+    return <div>error fetching patients</div>
+  }
+
   return (
     <form onSubmit={submitForm}>
       <TextField

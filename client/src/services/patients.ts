@@ -2,6 +2,7 @@ import axios, { isAxiosError } from 'axios'
 import { PatientDetail, PatientInput } from '../types'
 import { apiBaseUrl } from '../constants'
 import { isPatient } from '../typeUtils'
+import { AppointmentDetail } from '../types'
 
 const url = `${apiBaseUrl}/patients/`
 
@@ -12,6 +13,13 @@ const getAll = async () => {
 
 const getOneById = async (id: number) => {
   const { data } = await axios.get<PatientDetail>(url + id)
+  return data
+}
+
+const getAppointmentsByPatient = async (id: number) => {
+  const { data } = await axios.get<AppointmentDetail[]>(
+    url + id + '/appointments',
+  )
   return data
 }
 
@@ -65,4 +73,5 @@ export default {
   create,
   deleteById,
   updateById,
+  getAppointmentsByPatient,
 }

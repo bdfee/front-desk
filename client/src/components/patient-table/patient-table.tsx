@@ -20,14 +20,14 @@ interface PatientTableProps {
 }
 
 const PatientTable = ({ patients, deletePatient }: PatientTableProps) => {
-  const nav = useNavigate()
+  const navigate = useNavigate()
 
   const navigateToPatient = (patientId: number) => {
-    nav(`/patients/${patientId}`)
+    navigate(`/patients/${patientId}`)
   }
 
   const navigateToPatientEditor = (patientId: number) => {
-    nav(`/patients/${patientId}`, {
+    navigate(`/patients/${patientId}`, {
       state: { openModalOnLoad: true },
     })
   }
@@ -42,8 +42,7 @@ const PatientTable = ({ patients, deletePatient }: PatientTableProps) => {
             <TableCell>Email</TableCell>
             <TableCell>Phone</TableCell>
             <TableCell>Specialist</TableCell>
-            <TableCell>Last Seen</TableCell>
-            <TableCell>Next Appointment</TableCell>
+
             <TableCell>Actions</TableCell>
           </TableRow>
         </TableHead>
@@ -62,8 +61,7 @@ const PatientTable = ({ patients, deletePatient }: PatientTableProps) => {
                 <TableCell>{patient.email}</TableCell>
                 <TableCell>{formatPhone(patient.phone)}</TableCell>
                 <TableCell>{patient.specialist.name}</TableCell>
-                <TableCell>last seen</TableCell>
-                <TableCell>next appt</TableCell>
+
                 <TableCell>
                   <Button
                     onClick={() => navigateToPatientEditor(patient.patientId)}
