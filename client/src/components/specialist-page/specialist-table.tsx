@@ -84,6 +84,8 @@ const SpecialistTable = (props: SpecialistListProps) => {
           <TableRow>
             <TableCell>Name</TableCell>
             <TableCell>Specialty</TableCell>
+            <TableCell>Number of Clients</TableCell>
+            <TableCell>Appointments DATERANGE</TableCell>
             <TableCell>Actions</TableCell>
           </TableRow>
         </TableHead>
@@ -115,6 +117,8 @@ const SpecialistTable = (props: SpecialistListProps) => {
                     specialist.speciality
                   )}
                 </TableCell>
+                <TableCell># patients</TableCell>
+                <TableCell>Appts this week</TableCell>
                 <TableCell>
                   <Button
                     onClick={() =>
