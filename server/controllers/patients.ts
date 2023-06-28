@@ -54,8 +54,9 @@ router.get("/:id/appointments", async (req, res, next) => {
 
 router.put("/:id", async (req, res, next) => {
   try {
-    const updatedPatient = await patientService.updateOneById(+req.params.id, req.body);
-    res.json(updatedPatient);
+    const { patientId } = await patientService.updateOneById(+req.params.id, req.body);
+    const patient = await patientService.getOneById(patientId);
+    res.json(patient);
   } catch (error) {
     if (error instanceof Error) {
       error.message = "Error updating patient: " + error;

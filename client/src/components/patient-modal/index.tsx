@@ -56,8 +56,7 @@ const PatientModal = (props: PatientModalProps) => {
     if (props.type === 'update') {
       const { stateSetter } = props as UpdatePatientModalProps
       try {
-        const { patientId } = await patientService.updateById(id, values)
-        const updatedPatient = await patientService.getOneById(patientId)
+        const updatedPatient = await patientService.updateById(id, values)
         stateSetter(updatedPatient)
         closeModal()
       } catch (error) {
