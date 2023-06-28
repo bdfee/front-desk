@@ -53,9 +53,23 @@ const updateById = async (id: number, object: unknown) => {
   }
 }
 
+const getTableData = async () => {
+  try {
+    const { data } = await axios.get(url + 'table-data')
+    return data
+  } catch (error) {
+    if (isAxiosError(error)) {
+      throw new Error(error.response?.data.error)
+    } else {
+      throw new Error('Unknown error updating specialists')
+    }
+  }
+}
+
 export default {
   getAll,
   create,
   deleteById,
   updateById,
+  getTableData,
 }

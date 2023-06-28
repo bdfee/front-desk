@@ -6,31 +6,42 @@ import { Specialist, SpecialistInput } from '../../types'
 import specialistService from '../../services/specialist'
 import { Button, Alert } from '@mui/material'
 
+export interface TableData {
+  specialist: Specialist
+  appointmentCount: number
+  patientCount: number
+}
+
 const SpecialistPage = () => {
-  const [specialistList, setSpecialistList] = useState<Specialist[]>([])
+  const [tableData, setTableData] = useState<TableData[]>([])
   const [modalOpen, setModalOpen] = useState(false)
   const [error, setError] = useState<string | undefined>()
 
   useEffect(() => {
-    const fetchSpecialists = async () => {
+    const fetchTableData = async () => {
       try {
-        const specialists = await specialistService.getAll()
-        setSpecialistList(specialists)
+        const tableData = await specialistService.getTableData()
+        setTableData(tableData)
+        console.log(tableData)
       } catch (error) {
-        if (axios.isAxiosError(error)) {
-          console.log('axios error' + error.message)
-        } else {
-          console.log('unknown error fetching specialists')
-        }
+        console.log(error)
       }
     }
-    fetchSpecialists()
+
+    fetchTableData()
   }, [])
 
   const submitNewSpecialist = async (values: SpecialistInput) => {
     try {
       const specialist = await specialistService.create(values)
-      setSpecialistList(specialistList.concat(specialist))
+
+      setTableData(
+        tableData.concat({
+          specialist,
+          appointmentCount: 0,
+          patientCount: 0,
+        }),
+      )
       setModalOpen(false)
     } catch (error: unknown) {
       if (axios.isAxiosError(error)) {
@@ -44,8 +55,8 @@ const SpecialistPage = () => {
   const deleteSpecialist = async (id: number) => {
     try {
       await specialistService.deleteById(id)
-      setSpecialistList(
-        specialistList.filter(({ specialistId }) => specialistId !== id),
+      setTableData(
+        tableData.filter(({ specialist }) => specialist.specialistId !== id),
       )
     } catch (error) {
       if (axios.isAxiosError(error)) {
@@ -58,16 +69,24 @@ const SpecialistPage = () => {
 
   const updateSpecialist = async (id: number, specialist: SpecialistInput) => {
     const { name, speciality } = specialist
+    const existingTableData = tableData.filter(
+      (obj) => obj.specialist.specialistId === id,
+    )
+
     try {
       const updatedSpecialist = await specialistService.updateById(id, {
         name,
         speciality,
       })
-      setSpecialistList(
-        specialistList.map((s) =>
-          s.specialistId === updatedSpecialist.specialistId
-            ? updatedSpecialist
-            : s,
+      setTableData(
+        tableData.map((obj) =>
+          obj.specialist.specialistId === updatedSpecialist.specialistId
+            ? {
+                specialist: updatedSpecialist,
+                appointmentCount: existingTableData[0].appointmentCount,
+                patientCount: existingTableData[0].patientCount,
+              }
+            : obj,
         ),
       )
     } catch (error) {
@@ -104,7 +123,7 @@ const SpecialistPage = () => {
         </Alert>
       )}
       <SpecialistTable
-        specialistList={specialistList}
+        tableData={tableData}
         deleteSpecialist={deleteSpecialist}
         updateSpecialist={updateSpecialist}
         setError={setErrorWithTimeout}
