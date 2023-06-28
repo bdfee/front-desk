@@ -56,15 +56,6 @@ const PatientForm = (props: PatientFormProps) => {
     }
   }, [data])
 
-  // useEffect(() => {
-
-  //   const fetchSpecialists = async () => {
-  //     const specialists = await specialistService.getAll()
-  //     setSpecialists(specialists)
-  //   }
-  //   fetchSpecialists()
-  // }, [])
-
   useEffect(() => {
     if (props.type === 'update') {
       const {

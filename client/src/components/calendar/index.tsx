@@ -32,7 +32,6 @@ const Calendar = () => {
 
   useEffect(() => {
     const fetchAppointments = async () => {
-      console.log('calendar/index/fetchAppointments')
       try {
         const fetchedAppointments = await appointmentService.getAll()
         setAppointments(fetchedAppointments)
