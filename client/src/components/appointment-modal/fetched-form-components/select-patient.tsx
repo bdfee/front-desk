@@ -28,7 +28,13 @@ const SelectPatient = ({ patientId, setPatientId }: SelectPatientProps) => {
   }, [data])
 
   if (!data) {
-    return <div>fetching patients</div>
+    return (
+      <>
+        <InputLabel id="loading-patients" size="small">
+          Loading Patients
+        </InputLabel>
+      </>
+    )
   }
 
   if (error) {

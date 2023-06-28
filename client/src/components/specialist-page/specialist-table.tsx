@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, ChangeEvent } from 'react'
 import {
   Table,
   TableBody,
@@ -14,15 +14,23 @@ import {
 import { Specialist, SpecialistInput } from '../../types'
 import { sanitizeTextInput, validateTextInput } from '../../validations/inputs'
 import { isSpecialist } from '../../typeUtils'
+import { TableData } from './index'
+import 'dayjs/plugin/utc'
+import 'dayjs/plugin/timezone'
 
 interface SpecialistListProps {
-  specialistList: Specialist[]
+  tableData: TableData[]
   deleteSpecialist: (id: number) => void
   updateSpecialist: (id: number, object: SpecialistInput) => void
   setError: (errorMessage: string) => void
 }
 
-const SpecialistTable = (props: SpecialistListProps) => {
+const SpecialistTable = ({
+  tableData,
+  updateSpecialist,
+  setError,
+  deleteSpecialist,
+}: SpecialistListProps) => {
   const [editMode, setEditMode] = useState(false)
   const [editRowIdx, setEditRowIdx] = useState(-1)
   const [editRowData, setEditRowData] = useState<Specialist | undefined>()
@@ -30,11 +38,11 @@ const SpecialistTable = (props: SpecialistListProps) => {
   const handleRowEdit = (rowIdx: number) => {
     setEditMode(!editMode)
     setEditRowIdx(editRowIdx === -1 ? rowIdx : -1)
-    setEditRowData(props.specialistList[rowIdx])
+    setEditRowData(tableData[rowIdx].specialist)
   }
 
   const handleCellEdit = (
-    event: React.ChangeEvent<HTMLTextAreaElement | HTMLInputElement>,
+    event: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>,
     colName: string,
   ) => {
     if (editRowData) {
@@ -53,10 +61,10 @@ const SpecialistTable = (props: SpecialistListProps) => {
     let speciality
 
     if (!validateTextInput(editRowData.name)) {
-      props.setError('invalid update to name')
+      setError('invalid update to name')
       return
     } else if (!validateTextInput(editRowData.speciality)) {
-      props.setError('invalid update to speciality')
+      setError('invalid update to speciality')
       return
     } else {
       name = sanitizeTextInput(editRowData.name)
@@ -65,7 +73,7 @@ const SpecialistTable = (props: SpecialistListProps) => {
 
     try {
       if (isSpecialist(editRowData)) {
-        props.updateSpecialist(editRowData.specialistId, {
+        updateSpecialist(editRowData.specialistId, {
           name,
           speciality,
         })
@@ -73,9 +81,10 @@ const SpecialistTable = (props: SpecialistListProps) => {
         setEditRowIdx(-1)
       }
     } catch (error) {
-      props.setError('Error saving changes:' + error)
+      setError('Error saving changes:' + error)
     }
   }
+
   return (
     <TableContainer component={Paper} data-testid="specialist-table">
       <Typography variant="h3">Specialists</Typography>
@@ -84,13 +93,15 @@ const SpecialistTable = (props: SpecialistListProps) => {
           <TableRow>
             <TableCell>Name</TableCell>
             <TableCell>Specialty</TableCell>
+            <TableCell>Number of Clients</TableCell>
+            <TableCell>Upcoming Appointments</TableCell>
             <TableCell>Actions</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
-          {props.specialistList.map((specialist, idx) => {
+          {tableData.map((row, idx) => {
             return (
-              <TableRow key={specialist.specialistId}>
+              <TableRow key={row.specialist.specialistId}>
                 <TableCell>
                   {editMode && editRowIdx === idx && editRowData ? (
                     <TextField
@@ -100,7 +111,7 @@ const SpecialistTable = (props: SpecialistListProps) => {
                       aria-label="Edit name"
                     />
                   ) : (
-                    specialist.name
+                    row.specialist.name
                   )}
                 </TableCell>
                 <TableCell>
@@ -112,13 +123,15 @@ const SpecialistTable = (props: SpecialistListProps) => {
                       aria-label="Edit specialty"
                     />
                   ) : (
-                    specialist.speciality
+                    row.specialist.speciality
                   )}
                 </TableCell>
+                <TableCell>{row.patientCount}</TableCell>
+                <TableCell>{row.appointmentCount}</TableCell>
                 <TableCell>
                   <Button
                     onClick={() =>
-                      props.deleteSpecialist(specialist.specialistId)
+                      deleteSpecialist(row.specialist.specialistId)
                     }
                     aria-label="Delete specialist"
                   >

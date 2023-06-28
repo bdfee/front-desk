@@ -31,7 +31,11 @@ const SelectSpecialist = ({
   }, [data])
 
   if (!data) {
-    return <div>fetching specialists</div>
+    return (
+      <InputLabel id="loading-patients" size="small">
+        Loading Specialists
+      </InputLabel>
+    )
   }
 
   if (error) {

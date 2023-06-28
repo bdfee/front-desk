@@ -42,6 +42,7 @@ const PatientTable = ({ patients, deletePatient }: PatientTableProps) => {
             <TableCell>Email</TableCell>
             <TableCell>Phone</TableCell>
             <TableCell>Specialist</TableCell>
+            <TableCell>Last Seen</TableCell>
             <TableCell>Next Appointment</TableCell>
             <TableCell>Actions</TableCell>
           </TableRow>
@@ -61,7 +62,8 @@ const PatientTable = ({ patients, deletePatient }: PatientTableProps) => {
                 <TableCell>{patient.email}</TableCell>
                 <TableCell>{formatPhone(patient.phone)}</TableCell>
                 <TableCell>{patient.specialist.name}</TableCell>
-                <TableCell>todo</TableCell>
+                <TableCell>last seen</TableCell>
+                <TableCell>next appt</TableCell>
                 <TableCell>
                   <Button
                     onClick={() => navigateToPatientEditor(patient.patientId)}

@@ -1,6 +1,8 @@
 import { Specialist } from "../models";
 import { validateProperties, validateInput, validateSpecialist } from "./validation/specialist";
 import { findOneByPk, findAll } from "./utils/specialist";
+import { countAllBySpecialist } from "./utils/patient";
+import { countUpcomingBySpecialist } from "../queries/appointment";
 
 export const getAll = async (): Promise<Specialist[]> => findAll();
 
@@ -27,4 +29,22 @@ export const create = async (object: unknown): Promise<Specialist> => {
   if (validateProperties(object) && validateInput(object)) {
     return Specialist.create(object);
   } else throw new Error("unknown error creating specialist");
+};
+
+export const getTableData = async () => {
+  const specialists = await findAll();
+  const dataPromises = specialists.map(async (specialist) => {
+    if (Number(specialist.specialistId)) {
+      const appointmentCount = await countUpcomingBySpecialist(specialist.specialistId);
+      const patientCount = await countAllBySpecialist(specialist.specialistId);
+
+      return {
+        specialist,
+        appointmentCount,
+        patientCount,
+      };
+    } else throw new Error("error");
+  });
+
+  return Promise.all(dataPromises);
 };

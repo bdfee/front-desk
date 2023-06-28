@@ -64,6 +64,27 @@ export const findAllBySpecialist = async (specialistId: number) => {
   });
 };
 
+export const countUpcomingBySpecialist = async (specialistId: number) => {
+  const currentDate = new Date();
+  const nextWeekDate = new Date();
+  nextWeekDate.setDate(currentDate.getDate() + 7);
+
+  return Appointment.count({
+    where: {
+      specialistId,
+      date: {
+        [Op.between]: [currentDate, nextWeekDate],
+      },
+    },
+    include: [
+      {
+        model: Specialist,
+        attributes: ["name"],
+      },
+    ],
+  });
+};
+
 export const findAllByDateframe = async (startDate: string, endDate: string) => {
   return Appointment.findAll({
     where: {

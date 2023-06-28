@@ -2,6 +2,7 @@ import { Router } from "express";
 import * as specialistService from "../services/specialist";
 import * as patientService from "../services/patient";
 import * as appointmentService from "../services/appointment";
+import { Error } from "sequelize";
 
 const router = Router();
 
@@ -26,6 +27,16 @@ router.post("/", async (req, res, next) => {
       error.message = "Error posting specialist: " + error;
       next(error);
     }
+  }
+});
+
+router.get("/table-data", async (_req, res, next) => {
+  try {
+    const tableData = await specialistService.getTableData();
+    res.json(tableData);
+  } catch (error) {
+    console.log(error);
+    next(error);
   }
 });
 
