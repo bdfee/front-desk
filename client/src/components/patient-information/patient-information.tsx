@@ -1,11 +1,21 @@
 import { Container, Typography, Box, List, ListItemText } from '@mui/material'
-import { PatientDetail } from '../../types'
+import { AppointmentDetail, PatientDetail } from '../../types'
 
 interface InformationListProps {
   patient: PatientDetail
+  appointments: AppointmentDetail[]
 }
 
-const InformationList = ({ patient }: InformationListProps) => {
+const InformationList = ({ patient, appointments }: InformationListProps) => {
+  const history: AppointmentDetail[] = []
+  const upcoming: AppointmentDetail[] = []
+
+  appointments.forEach((appointment) => {
+    new Date() > new Date(appointment.date)
+      ? history.push(appointment)
+      : upcoming.push(appointment)
+  })
+
   return (
     <Container>
       <Typography>{patient.name}</Typography>
@@ -23,6 +33,28 @@ const InformationList = ({ patient }: InformationListProps) => {
             primary="specialist"
             secondary={patient.specialist.name}
           />
+        </List>
+        <Typography>Appointment History</Typography>
+        <List>
+          {history.map((appointment) => {
+            return (
+              <ListItemText
+                key={appointment.appointmentId}
+                primary={appointment.date + ' ' + appointment.specialist.name}
+              />
+            )
+          })}
+        </List>
+        <Typography>Upcoming Appointments</Typography>
+        <List>
+          {upcoming.map((appointment) => {
+            return (
+              <ListItemText
+                key={appointment.appointmentId}
+                primary={appointment.date + ' ' + appointment.specialist.name}
+              />
+            )
+          })}
         </List>
       </Box>
     </Container>

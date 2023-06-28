@@ -19,6 +19,7 @@ import { useLocation } from 'react-router-dom'
 import { ErrorCtx } from '../../App'
 import patientService from '../../services/patients'
 import axios from 'axios'
+import { QueryClientProvider, QueryClient } from 'react-query'
 
 interface UpdatePatientModalProps {
   type: string
@@ -33,6 +34,8 @@ interface AddPatientModalProps {
 }
 
 type PatientModalProps = UpdatePatientModalProps | AddPatientModalProps
+
+const queryClient = new QueryClient()
 
 const PatientModal = (props: PatientModalProps) => {
   const [modalOpen, setModalOpen] = useState(false)
@@ -53,8 +56,7 @@ const PatientModal = (props: PatientModalProps) => {
     if (props.type === 'update') {
       const { stateSetter } = props as UpdatePatientModalProps
       try {
-        const { patientId } = await patientService.updateById(id, values)
-        const updatedPatient = await patientService.getOneById(patientId)
+        const updatedPatient = await patientService.updateById(id, values)
         stateSetter(updatedPatient)
         closeModal()
       } catch (error) {
@@ -71,8 +73,7 @@ const PatientModal = (props: PatientModalProps) => {
     if (props.type !== 'update') {
       const { stateSetter, state } = props as AddPatientModalProps
       try {
-        const { patientId } = await patientService.create(values)
-        const patient = await patientService.getOneById(patientId)
+        const patient = await patientService.create(values)
         stateSetter(state?.concat(patient))
         closeModal()
       } catch (error) {
@@ -93,7 +94,7 @@ const PatientModal = (props: PatientModalProps) => {
   const openModal = (): void => setModalOpen(true)
 
   return (
-    <>
+    <QueryClientProvider client={queryClient}>
       <Button onClick={() => openModal()}>{props.type} patient</Button>
       <Dialog fullWidth={true} open={modalOpen} onClose={closeModal}>
         <DialogTitle>Add a new patient</DialogTitle>
@@ -112,7 +113,7 @@ const PatientModal = (props: PatientModalProps) => {
           ></PatientForm>
         </DialogContent>
       </Dialog>
-    </>
+    </QueryClientProvider>
   )
 }
 

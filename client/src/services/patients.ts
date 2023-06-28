@@ -2,6 +2,7 @@ import axios, { isAxiosError } from 'axios'
 import { PatientDetail, PatientInput } from '../types'
 import { apiBaseUrl } from '../constants'
 import { isPatient } from '../typeUtils'
+import { AppointmentDetail } from '../types'
 
 const url = `${apiBaseUrl}/patients/`
 
@@ -15,9 +16,16 @@ const getOneById = async (id: number) => {
   return data
 }
 
+const getAppointmentsByPatient = async (id: number) => {
+  const { data } = await axios.get<AppointmentDetail[]>(
+    url + id + '/appointments',
+  )
+  return data
+}
+
 const create = async (object: PatientInput) => {
   try {
-    const { data } = await axios.post<PatientInput>(url, object)
+    const { data } = await axios.post<PatientDetail>(url, object)
     if (!isPatient(data)) {
       throw new Error('invalid patient data')
     }
@@ -45,7 +53,7 @@ const deleteById = async (id: number) => {
 
 const updateById = async (id: number, object: unknown) => {
   try {
-    const { data } = await axios.put(url + id, object)
+    const { data } = await axios.put<PatientDetail>(url + id, object)
     if (!isPatient(data)) {
       throw new Error('invalid patient data')
     }
@@ -65,4 +73,5 @@ export default {
   create,
   deleteById,
   updateById,
+  getAppointmentsByPatient,
 }
