@@ -5,24 +5,19 @@ import {
 } from 'react-big-calendar'
 import timezone from 'dayjs/plugin/timezone'
 import utc from 'dayjs/plugin/utc'
-import { RBCEventProps, NewEvent, AppointmentFormValues } from './index'
+import { RBCEventProps, NewEvent, RBCEventPropsForForm } from './index'
 import { useNavigate } from 'react-router-dom'
 import { useMemo, useCallback, useState } from 'react'
 import { AppointmentDetail } from '../../types'
 import 'react-big-calendar/lib/css/react-big-calendar.css'
 import FetchedFormComponents from '../appointment-modal/fetched-form-components'
 
-interface RBCProps {
-  appointments: AppointmentDetail[]
-  openModal: (values: AppointmentFormValues) => void
-}
-
 dayjs.extend(timezone)
 dayjs.extend(utc)
 
 interface RBCProps {
   appointments: AppointmentDetail[]
-  openModal: (values: AppointmentFormValues) => void
+  openModal: (values: RBCEventPropsForForm) => void
 }
 
 const RBC = ({ appointments, openModal }: RBCProps) => {

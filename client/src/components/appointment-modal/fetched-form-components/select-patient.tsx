@@ -41,10 +41,13 @@ const SelectPatient = ({ patientId, setPatientId }: SelectPatientProps) => {
         width: 175,
       }}
     >
-      <InputLabel id="select-patients">Patient</InputLabel>
+      <InputLabel id="select-patients" size="small">
+        Patient
+      </InputLabel>
       <Select
         labelId="select-patients"
         value={patientId}
+        size="small"
         onChange={({ target }) => setPatientId(target.value)}
         input={<OutlinedInput label="Patient" />}
       >

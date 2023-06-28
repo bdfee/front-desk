@@ -50,7 +50,7 @@ const PatientModal = (props: PatientModalProps) => {
   }
 
   const updatePatient = async (id: number, values: PatientInput) => {
-    if (props.type === 'edit') {
+    if (props.type === 'update') {
       const { stateSetter } = props as UpdatePatientModalProps
       try {
         const { patientId } = await patientService.updateById(id, values)
@@ -68,7 +68,7 @@ const PatientModal = (props: PatientModalProps) => {
   }
 
   const addPatient = async (values: PatientInput) => {
-    if (props.type !== 'edit') {
+    if (props.type !== 'update') {
       const { stateSetter, state } = props as AddPatientModalProps
       try {
         const { patientId } = await patientService.create(values)
@@ -107,7 +107,7 @@ const PatientModal = (props: PatientModalProps) => {
           <PatientForm
             type={props.type}
             state={props.state}
-            service={props.type === 'edit' ? updatePatient : addPatient}
+            service={props.type === 'update' ? updatePatient : addPatient}
             onCancel={closeModal}
           ></PatientForm>
         </DialogContent>

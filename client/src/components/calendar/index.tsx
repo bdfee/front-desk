@@ -12,7 +12,7 @@ export interface RBCEventProps {
   end: Date
 }
 
-export interface AppointmentFormValues {
+export interface RBCEventPropsForForm {
   start: string
   end: string
   date: string
@@ -26,7 +26,7 @@ import AppointmentModal from '../appointment-modal'
 const Calendar = () => {
   const [appointments, setAppointments] = useState<AppointmentDetail[]>()
   const [formValues, setFormValues] = useState<
-    AppointmentFormValues | undefined
+    RBCEventPropsForForm | undefined
   >()
   const [modalOpen, setModalOpen] = useState(false)
 
@@ -51,7 +51,7 @@ const Calendar = () => {
     return <div>fetching appointments</div>
   }
 
-  const openModal = (values: AppointmentFormValues) => {
+  const openModal = (values: RBCEventPropsForForm) => {
     setModalOpen(true)
     setFormValues(values)
   }
@@ -67,7 +67,7 @@ const Calendar = () => {
       <AppointmentModal
         modalOpen={modalOpen}
         setModalOpen={setModalOpen}
-        serviceType={formValues ? 'addWithValues' : 'add'}
+        serviceType={formValues ? 'addFromCalendar' : 'add'}
         clearFormValues={clearForm}
         formValues={formValues}
         state={appointments}

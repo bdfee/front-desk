@@ -26,12 +26,14 @@ const FetchedFormComponents = ({
 }: FetchedFormComponentsProps) => {
   return (
     <QueryClientProvider client={queryClient}>
-      <SelectPatient patientId={patientId} setPatientId={setPatientId} />
-      <SelectSpecialist
-        specialistId={specialistId}
-        setSpecialistId={setSpecialistId}
-      />
-      <SelectType type={type} setType={setType} />
+      <div style={{ minHeight: '71px' }}>
+        <SelectPatient patientId={patientId} setPatientId={setPatientId} />
+        <SelectSpecialist
+          specialistId={specialistId}
+          setSpecialistId={setSpecialistId}
+        />
+        <SelectType type={type} setType={setType} />
+      </div>
     </QueryClientProvider>
   )
 }

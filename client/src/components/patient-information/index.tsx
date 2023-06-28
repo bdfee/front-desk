@@ -34,7 +34,7 @@ const PatientInformation = () => {
   return (
     <>
       <InformationList patient={patient} />
-      <PatientModal type="edit" state={patient} stateSetter={setPatient} />
+      <PatientModal type="update" state={patient} stateSetter={setPatient} />
     </>
   )
 }

@@ -58,7 +58,7 @@ const PatientForm = (props: PatientFormProps) => {
   }, [])
 
   useEffect(() => {
-    if (props.type === 'edit') {
+    if (props.type === 'update') {
       const {
         dateOfBirth,
         name,
@@ -133,7 +133,7 @@ const PatientForm = (props: PatientFormProps) => {
     }
 
     switch (props.type) {
-      case 'edit': {
+      case 'update': {
         if (props.service && patientId) {
           const updatePatient = props.service as UpdatePatient
           updatePatient(patientId, patientValues)

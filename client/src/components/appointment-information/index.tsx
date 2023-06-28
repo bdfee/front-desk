@@ -41,7 +41,7 @@ const AppointmentInformation = () => {
       <AppointmentModal
         modalOpen={modalOpen}
         setModalOpen={setModalOpen}
-        serviceType="edit"
+        serviceType="update"
         state={appointment}
         stateSetter={setAppointment}
       />

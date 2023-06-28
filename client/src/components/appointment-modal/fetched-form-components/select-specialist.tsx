@@ -40,10 +40,13 @@ const SelectSpecialist = ({
 
   return (
     <FormControl sx={{ width: 175 }}>
-      <InputLabel id="specialist">Specialist</InputLabel>
+      <InputLabel id="specialist" size="small">
+        Specialist
+      </InputLabel>
       <Select
         labelId="specialist"
         value={specialistId}
+        size="small"
         onChange={({ target }) => setSpecialistId(target.value)}
         input={<OutlinedInput label="Specialist" />}
       >

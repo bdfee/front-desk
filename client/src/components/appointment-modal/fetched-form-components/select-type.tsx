@@ -17,11 +17,14 @@ export interface SelectTypeProps {
 const SelectType = ({ type, setType }: SelectTypeProps) => {
   return (
     <FormControl sx={{ width: 200 }}>
-      <InputLabel id="select-type">Appointment type</InputLabel>
+      <InputLabel id="select-type" size="small">
+        Appointment type
+      </InputLabel>
 
       <Select
         labelId="select-type"
         value={type}
+        size="small"
         onChange={({ target }) => setType(target.value)}
         input={<OutlinedInput label="Appointment type" />}
       >

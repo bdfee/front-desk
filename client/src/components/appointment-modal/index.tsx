@@ -12,13 +12,13 @@ import appointmentService from '../../services/appointment'
 import axios from 'axios'
 import AppointmentForm from './appointment-form'
 import { AppointmentDetail, AppointmentInput } from '../../types'
-import { AppointmentFormValues } from '../calendar'
+import { RBCEventPropsForForm } from '../calendar'
 
 interface BaseAppointmentModalProps {
   serviceType: string
   modalOpen: boolean
   setModalOpen: Dispatch<SetStateAction<boolean>>
-  formValues?: AppointmentFormValues
+  formValues?: RBCEventPropsForForm
   clearFormValues?: () => void
 }
 
@@ -37,6 +37,9 @@ type AppointmentModalProps =
   | AddAppointmentModalProps
 
 const AppointmentModal = (props: AppointmentModalProps) => {
+  const { modalOpen, setModalOpen, serviceType, clearFormValues, formValues } =
+    props
+
   const errorCtx = useContext(ErrorCtx)
   const location = useLocation()
 
@@ -51,57 +54,55 @@ const AppointmentModal = (props: AppointmentModalProps) => {
   }
 
   const updateAppointment = async (id: number, values: AppointmentInput) => {
-    if (props.serviceType === 'edit') {
-      const { stateSetter } = props as UpdateAppointmentModalProps
-      try {
-        const { appointmentId } = await appointmentService.updateById(
-          +id,
-          values,
-        )
-        const updatedAppointment = await appointmentService.getOneById(
-          appointmentId,
-        )
-        stateSetter(updatedAppointment)
-        closeModal()
-      } catch (error) {
-        if (axios.isAxiosError(error)) {
-          errorCtx.setError('axios error' + error.message)
-        } else {
-          errorCtx.setError('unknown error updating appointment')
-        }
+    const { stateSetter } = props as UpdateAppointmentModalProps
+    try {
+      // improve this fetch
+      const { appointmentId } = await appointmentService.updateById(+id, values)
+      const updatedAppointment = await appointmentService.getOneById(
+        appointmentId,
+      )
+      stateSetter(updatedAppointment)
+      closeModal()
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        errorCtx.setError('axios error' + error.message)
+      } else {
+        errorCtx.setError('unknown error updating appointment')
       }
     }
   }
 
   const addAppointment = async (values: AppointmentInput) => {
-    if (props.serviceType !== 'edit' && props.clearFormValues) {
-      const { stateSetter, state } = props as AddAppointmentModalProps
-      try {
-        const { appointmentId } = await appointmentService.create(values)
-        const appointment = await appointmentService.getOneById(appointmentId)
-        stateSetter(state?.concat(appointment))
-        props.clearFormValues()
-        closeModal()
-      } catch (error) {
-        if (axios.isAxiosError(error)) {
-          errorCtx.setError('axios error' + error.message)
-        } else {
-          errorCtx.setError('unknown error submitting appointment')
-        }
+    const { stateSetter, state } = props as AddAppointmentModalProps
+    try {
+      // improve this fetch
+      const { appointmentId } = await appointmentService.create(values)
+      const appointment = await appointmentService.getOneById(appointmentId)
+      stateSetter(state?.concat(appointment))
+      if (clearFormValues) {
+        clearFormValues()
+      }
+
+      closeModal()
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        errorCtx.setError('axios error' + error.message)
+      } else {
+        errorCtx.setError('unknown error submitting appointment')
       }
     }
   }
 
   const closeModal = () => {
-    props.setModalOpen(false)
+    setModalOpen(false)
     errorCtx.setError(undefined)
   }
 
-  const openModal = () => props.setModalOpen(true)
+  const openModal = () => setModalOpen(true)
 
   return (
-    <Dialog fullWidth={true} open={props.modalOpen} onClose={closeModal}>
-      <DialogTitle>{props.serviceType} an appointment</DialogTitle>
+    <Dialog fullWidth={true} open={modalOpen} onClose={closeModal}>
+      <DialogTitle>{serviceType} an appointment</DialogTitle>
       <Divider />
       <DialogContent>
         {errorCtx.error && (
@@ -110,11 +111,11 @@ const AppointmentModal = (props: AppointmentModalProps) => {
           </Alert>
         )}
         <AppointmentForm
-          serviceType={props.serviceType}
+          serviceType={serviceType}
           state={props.state}
-          formValues={props.formValues}
+          formValues={formValues}
           service={
-            props.serviceType === 'edit' ? updateAppointment : addAppointment
+            serviceType === 'update' ? updateAppointment : addAppointment
           }
           onCancel={closeModal}
         ></AppointmentForm>

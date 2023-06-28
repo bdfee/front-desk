@@ -14,7 +14,7 @@ import { AppointmentDetail, AppointmentInput } from '../../types'
 
 import { ErrorCtx } from '../../App'
 import { validateTextInput } from '../../validations/inputs'
-import { AppointmentFormValues } from '../calendar'
+import { RBCEventPropsForForm } from '../calendar'
 
 type UpdateAppointment = (id: number, values: AppointmentInput) => Promise<void>
 type AddAppointment = (values: AppointmentInput) => Promise<void>
@@ -22,7 +22,7 @@ type AddAppointment = (values: AppointmentInput) => Promise<void>
 interface AppointmentFormProps {
   serviceType: string
   onCancel: () => void
-  formValues?: AppointmentFormValues
+  formValues?: RBCEventPropsForForm
   state: AppointmentDetail | AppointmentDetail[] | undefined
   service: UpdateAppointment | AddAppointment | undefined
 }
@@ -46,7 +46,7 @@ const AppointmentForm = ({
   const errorCtx = useContext(ErrorCtx)
 
   useEffect(() => {
-    if (serviceType === 'edit') {
+    if (serviceType === 'update') {
       const {
         appointmentId,
         start,
@@ -67,7 +67,7 @@ const AppointmentForm = ({
       setPatientId(patientId.toString())
     }
 
-    if (serviceType === 'addWithValues' && formValues) {
+    if (serviceType === 'addFromCalendar' && formValues) {
       setDate(() => dayjs(formValues.date))
       setStart(() => dayjs(formValues.start, 'HH:mm:ss'))
       setEnd(() => dayjs(formValues.end, 'HH:mm:ss'))
@@ -96,6 +96,9 @@ const AppointmentForm = ({
       setDescription('')
       return
     }
+
+    // validate start comes before end
+
     const appointmentValues = {
       start: start.format('HH:mm:ss'),
       end: end.format('HH:mm:ss'),
@@ -107,7 +110,7 @@ const AppointmentForm = ({
     }
 
     switch (serviceType) {
-      case 'edit': {
+      case 'update': {
         if (service && appointmentId) {
           const updateAppointment = service as UpdateAppointment
           updateAppointment(appointmentId, appointmentValues)
@@ -121,7 +124,7 @@ const AppointmentForm = ({
         }
         break
       }
-      case 'addWithValues': {
+      case 'addFromCalendar': {
         if (service) {
           const addAppointment = service as AddAppointment
           addAppointment(appointmentValues)
