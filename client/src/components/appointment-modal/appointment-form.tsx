@@ -1,11 +1,4 @@
-import {
-  TextField,
-  Grid,
-  Button,
-  Select,
-  MenuItem,
-  InputLabel,
-} from '@mui/material'
+import { TextField, Grid, Button, Divider } from '@mui/material'
 import {
   DatePicker,
   LocalizationProvider,
@@ -13,41 +6,37 @@ import {
 } from '@mui/x-date-pickers'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import dayjs, { Dayjs } from 'dayjs'
-import specialistService from '../../services/specialist'
-import patientService from '../../services/patients'
+
+import FetchedFormComponents from './fetched-form-components'
 
 import { SyntheticEvent, useEffect, useState, useContext } from 'react'
-import {
-  AppointmentDetail,
-  AppointmentInput,
-  Patient,
-  Specialist,
-} from '../../types'
+import { AppointmentDetail, AppointmentInput } from '../../types'
 
 import { ErrorCtx } from '../../App'
 import { validateTextInput } from '../../validations/inputs'
-import { AppointmentFormValues } from '../calendar'
+import { RBCEventPropsForForm } from '../calendar'
 
 type UpdateAppointment = (id: number, values: AppointmentInput) => Promise<void>
 type AddAppointment = (values: AppointmentInput) => Promise<void>
 
 interface AppointmentFormProps {
-  type: string
+  serviceType: string
   onCancel: () => void
-  formValues?: AppointmentFormValues
-  clearFormValues?: () => void
+  formValues?: RBCEventPropsForForm
   state: AppointmentDetail | AppointmentDetail[] | undefined
   service: UpdateAppointment | AddAppointment | undefined
 }
 
-const AppointmentForm = (props: AppointmentFormProps) => {
-  const [specialists, setSpecialists] = useState<Specialist[]>([])
-  const [patients, setPatients] = useState<Patient[]>([])
-
+const AppointmentForm = ({
+  serviceType,
+  onCancel,
+  formValues,
+  state,
+  service,
+}: AppointmentFormProps) => {
   const [specialistId, setSpecialistId] = useState<string>('')
   const [patientId, setPatientId] = useState<string>('')
   const [appointmentId, setAppointmentId] = useState<number | undefined>()
-
   const [type, setType] = useState<string>('')
   const [start, setStart] = useState<Dayjs | null>(null)
   const [end, setEnd] = useState<Dayjs | null>(null)
@@ -56,23 +45,8 @@ const AppointmentForm = (props: AppointmentFormProps) => {
 
   const errorCtx = useContext(ErrorCtx)
 
-  // improve this fetch
   useEffect(() => {
-    const fetchSpecialists = async () => {
-      const specialists = await specialistService.getAll()
-      setSpecialists(specialists)
-    }
-    fetchSpecialists()
-
-    const fetchPatients = async () => {
-      const patients = await patientService.getAll()
-      setPatients(patients)
-    }
-    fetchPatients()
-  }, [])
-
-  useEffect(() => {
-    if (props.type === 'edit') {
+    if (serviceType === 'update') {
       const {
         appointmentId,
         start,
@@ -82,27 +56,21 @@ const AppointmentForm = (props: AppointmentFormProps) => {
         patientId,
         type,
         specialistId,
-      } = props.state as AppointmentDetail
-      const d = dayjs(date)
-      const s = dayjs(start, 'HH:mm:ss')
-      const e = dayjs(end, 'HH:mm:ss')
+      } = state as AppointmentDetail
       setAppointmentId(appointmentId)
-      setStart(s)
-      setEnd(e)
-      setDate(d)
+      setStart(() => dayjs(start, 'HH:mm:ss'))
+      setEnd(() => dayjs(end, 'HH:mm:ss'))
+      setDate(() => dayjs(date))
       setType(type)
       setDescription(description)
       setSpecialistId(specialistId.toString())
       setPatientId(patientId.toString())
     }
 
-    if (props.type === 'addWithValues' && props.formValues) {
-      const d = dayjs(props.formValues.date)
-      const s = dayjs(props.formValues.start, 'HH:mm:ss')
-      const e = dayjs(props.formValues.end, 'HH:mm:ss')
-      setDate(d)
-      setStart(s)
-      setEnd(e)
+    if (serviceType === 'addFromCalendar' && formValues) {
+      setDate(() => dayjs(formValues.date))
+      setStart(() => dayjs(formValues.start, 'HH:mm:ss'))
+      setEnd(() => dayjs(formValues.end, 'HH:mm:ss'))
     }
   }, [])
 
@@ -128,6 +96,9 @@ const AppointmentForm = (props: AppointmentFormProps) => {
       setDescription('')
       return
     }
+
+    // validate start comes before end
+
     const appointmentValues = {
       start: start.format('HH:mm:ss'),
       end: end.format('HH:mm:ss'),
@@ -138,24 +109,24 @@ const AppointmentForm = (props: AppointmentFormProps) => {
       patientId: +patientId,
     }
 
-    switch (props.type) {
-      case 'edit': {
-        if (props.service && appointmentId) {
-          const updateAppointment = props.service as UpdateAppointment
+    switch (serviceType) {
+      case 'update': {
+        if (service && appointmentId) {
+          const updateAppointment = service as UpdateAppointment
           updateAppointment(appointmentId, appointmentValues)
         }
         break
       }
       case 'add': {
-        if (props.service) {
-          const addAppointment = props.service as AddAppointment
+        if (service) {
+          const addAppointment = service as AddAppointment
           addAppointment(appointmentValues)
         }
         break
       }
-      case 'addWithValues': {
-        if (props.service) {
-          const addAppointment = props.service as AddAppointment
+      case 'addFromCalendar': {
+        if (service) {
+          const addAppointment = service as AddAppointment
           addAppointment(appointmentValues)
         }
         break
@@ -199,62 +170,15 @@ const AppointmentForm = (props: AppointmentFormProps) => {
         value={description}
         onChange={({ target }) => setDescription(target.value)}
       />
-      <InputLabel id="type">Appointment type</InputLabel>
-      <Select
-        labelId="type"
-        value={type}
-        onChange={({ target }) => setType(target.value)}
-      >
-        <MenuItem value="intake">Intake</MenuItem>
-        <MenuItem value="physicalTherapy">Physical Therapy</MenuItem>
-        <MenuItem value="nutrition">Nutrition</MenuItem>
-      </Select>
-      {!specialists.length ? (
-        <div>fetching specialists</div>
-      ) : (
-        <>
-          <InputLabel id="specialist">Assign Specialist</InputLabel>
-          <Select
-            labelId="specialist"
-            value={specialistId}
-            onChange={({ target }) => setSpecialistId(target.value)}
-          >
-            {specialists?.map((specialist) => {
-              return (
-                <MenuItem
-                  key={specialist.specialistId}
-                  value={specialist.specialistId.toString()}
-                >
-                  {specialist.name}
-                </MenuItem>
-              )
-            })}
-          </Select>
-        </>
-      )}
-      {!patients.length ? (
-        <div>fetching patients</div>
-      ) : (
-        <>
-          <InputLabel id="patients">Assign Patient</InputLabel>
-          <Select
-            labelId="patient"
-            value={patientId}
-            onChange={({ target }) => setPatientId(target.value)}
-          >
-            {patients?.map((patient) => {
-              return (
-                <MenuItem
-                  key={patient.patientId}
-                  value={patient.patientId.toString()}
-                >
-                  {patient.name}
-                </MenuItem>
-              )
-            })}
-          </Select>
-        </>
-      )}
+      <Divider />
+      <FetchedFormComponents
+        patientId={patientId}
+        setPatientId={setPatientId}
+        specialistId={specialistId}
+        setSpecialistId={setSpecialistId}
+        type={type}
+        setType={setType}
+      />
       <Grid>
         <Grid item>
           <Button
@@ -262,7 +186,7 @@ const AppointmentForm = (props: AppointmentFormProps) => {
             variant="contained"
             style={{ float: 'right' }}
             type="button"
-            onClick={props.onCancel}
+            onClick={onCancel}
             aria-label="Cancel button"
           >
             Cancel
@@ -278,7 +202,7 @@ const AppointmentForm = (props: AppointmentFormProps) => {
             aria-label="Add button"
             disabled={fieldsFilled}
           >
-            {props.type}
+            Save
           </Button>
         </Grid>
       </Grid>

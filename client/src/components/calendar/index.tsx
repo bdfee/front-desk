@@ -7,57 +7,51 @@ import RBC from './rbc'
 export interface RBCEventProps {
   title: string
   appointmentId: number
+  type: string
   start: Date
   end: Date
 }
 
-export interface AppointmentFormValues {
+export interface RBCEventPropsForForm {
   start: string
   end: string
   date: string
 }
 
-export type NewEvent = Omit<RBCEventProps, 'title' | 'appointmentId'>
+export type NewEvent = Omit<RBCEventProps, 'title' | 'appointmentId' | 'type'>
 
 import { AppointmentDetail } from '../../types'
 import AppointmentModal from '../appointment-modal'
 
-const CACHE_KEY = 'cachedAppointments'
-
 const Calendar = () => {
   const [appointments, setAppointments] = useState<AppointmentDetail[]>()
   const [formValues, setFormValues] = useState<
-    AppointmentFormValues | undefined
+    RBCEventPropsForForm | undefined
   >()
   const [modalOpen, setModalOpen] = useState(false)
 
   useEffect(() => {
-    const cachedAppointments = localStorage.getItem(CACHE_KEY)
-    if (cachedAppointments) {
-      setAppointments(JSON.parse(cachedAppointments))
-    } else {
-      const fetchAppointments = async () => {
-        try {
-          const fetchedAppointments = await appointmentService.getAll()
-          setAppointments(fetchedAppointments)
-          localStorage.setItem(CACHE_KEY, JSON.stringify(fetchedAppointments))
-        } catch (error) {
-          if (isAxiosError(error)) {
-            console.log('axios error' + error.message)
-          } else {
-            console.log('unknown error fetching patient')
-          }
+    const fetchAppointments = async () => {
+      console.log('calendar/index/fetchAppointments')
+      try {
+        const fetchedAppointments = await appointmentService.getAll()
+        setAppointments(fetchedAppointments)
+      } catch (error) {
+        if (isAxiosError(error)) {
+          console.log('axios error' + error.message)
+        } else {
+          console.log('unknown error fetching patient')
         }
       }
-      void fetchAppointments()
     }
+    void fetchAppointments()
   }, [])
 
   if (!appointments) {
     return <div>fetching appointments</div>
   }
 
-  const openModal = (values: AppointmentFormValues) => {
+  const openModal = (values: RBCEventPropsForForm) => {
     setModalOpen(true)
     setFormValues(values)
   }
@@ -73,7 +67,7 @@ const Calendar = () => {
       <AppointmentModal
         modalOpen={modalOpen}
         setModalOpen={setModalOpen}
-        type={formValues ? 'addWithValues' : 'add'}
+        serviceType={formValues ? 'addFromCalendar' : 'add'}
         clearFormValues={clearForm}
         formValues={formValues}
         state={appointments}

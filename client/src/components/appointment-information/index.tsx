@@ -41,9 +41,7 @@ const AppointmentInformation = () => {
       <AppointmentModal
         modalOpen={modalOpen}
         setModalOpen={setModalOpen}
-        clearFormValues={undefined}
-        formValues={undefined}
-        type="edit"
+        serviceType="update"
         state={appointment}
         stateSetter={setAppointment}
       />
