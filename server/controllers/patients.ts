@@ -18,7 +18,8 @@ router.get("/", async (_req, res, next) => {
 
 router.post("/", async (req, res, next) => {
   try {
-    const patient = await patientService.create(req.body);
+    const { patientId } = await patientService.create(req.body);
+    const patient = await patientService.getOneById(patientId);
     res.json(patient);
   } catch (error) {
     if (error instanceof Error) {

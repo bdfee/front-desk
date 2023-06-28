@@ -25,7 +25,7 @@ const getAppointmentsByPatient = async (id: number) => {
 
 const create = async (object: PatientInput) => {
   try {
-    const { data } = await axios.post<PatientInput>(url, object)
+    const { data } = await axios.post<PatientDetail>(url, object)
     if (!isPatient(data)) {
       throw new Error('invalid patient data')
     }
