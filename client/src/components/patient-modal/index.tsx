@@ -7,28 +7,16 @@ import {
   Button,
 } from '@mui/material'
 import PatientForm from './patient-form'
-// import { PatientDetail, PatientInput } from '../../types'
 import { useContext, useState, useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
 import { ErrorCtx } from '../../App'
-// import patientService from '../../services/patients'
-// import axios from 'axios'
+
 import { QueryClientProvider } from 'react-query'
 import { queryClient } from '../../App'
 
-interface UpdatePatientModalProps {
+interface PatientModalProps {
   type: string
-  // state: PatientDetail | undefined
-  // stateSetter: Dispatch<SetStateAction<PatientDetail | undefined>>
 }
-
-interface AddPatientModalProps {
-  type: string
-  // state: PatientDetail[] | undefined
-  // stateSetter: Dispatch<SetStateAction<PatientDetail[] | undefined>>
-}
-
-type PatientModalProps = UpdatePatientModalProps | AddPatientModalProps
 
 const PatientModal = (props: PatientModalProps) => {
   const [modalOpen, setModalOpen] = useState(false)
