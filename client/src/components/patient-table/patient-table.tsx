@@ -11,16 +11,41 @@ import {
   Link,
 } from '@mui/material'
 import { useNavigate } from 'react-router-dom'
+import { useState } from 'react'
 import { PatientDetail } from '../../types'
 import { formatPhone } from '../../validations/inputs'
+import {
+  useQuery,
+  UseQueryResult,
+  useMutation,
+  UseMutationResult,
+} from 'react-query'
+import { queryClient } from '../../App'
+import patientService from '../../services/patients'
 
-interface PatientTableProps {
-  patients: PatientDetail[]
-  deletePatient: (id: number) => void
-}
-
-const PatientTable = ({ patients, deletePatient }: PatientTableProps) => {
+const PatientTable = () => {
+  const [patients, setPatients] = useState<PatientDetail[]>([])
   const navigate = useNavigate()
+
+  const { data }: UseQueryResult<PatientDetail[]> = useQuery({
+    queryKey: 'GET_PATIENTS',
+    queryFn: patientService.getAll,
+    onSuccess: (data) => setPatients(data),
+  })
+
+  const deletePatient: UseMutationResult<void, unknown, number> = useMutation({
+    mutationFn: (id: number) => patientService.deleteById(id),
+    onSuccess: (_data, id: number) => {
+      queryClient.invalidateQueries('GET_PATIENTS')
+      setPatients(patients?.filter(({ patientId }) => patientId !== id))
+    },
+  })
+
+  const handleDelete = (id: number) => deletePatient.mutate(id)
+
+  if (!data) {
+    return <div>fetching patients list</div>
+  }
 
   const navigateToPatient = (patientId: number) => {
     navigate(`/patients/${patientId}`)
@@ -47,28 +72,26 @@ const PatientTable = ({ patients, deletePatient }: PatientTableProps) => {
           </TableRow>
         </TableHead>
         <TableBody>
-          {patients.map((patient) => {
+          {patients.map(({ patientId, name, email, phone, specialist }) => {
             return (
-              <TableRow key={patient.patientId}>
+              <TableRow key={patientId}>
                 <TableCell>
                   <Link
-                    onClick={() => navigateToPatient(patient.patientId)}
+                    onClick={() => navigateToPatient(patientId)}
                     component="button"
                   >
-                    <Typography>{patient.name}</Typography>
+                    <Typography>{name}</Typography>
                   </Link>
                 </TableCell>
-                <TableCell>{patient.email}</TableCell>
-                <TableCell>{formatPhone(patient.phone)}</TableCell>
-                <TableCell>{patient.specialist.name}</TableCell>
+                <TableCell>{email}</TableCell>
+                <TableCell>{formatPhone(phone)}</TableCell>
+                <TableCell>{specialist.name}</TableCell>
 
                 <TableCell>
-                  <Button
-                    onClick={() => navigateToPatientEditor(patient.patientId)}
-                  >
+                  <Button onClick={() => navigateToPatientEditor(patientId)}>
                     Edit
                   </Button>
-                  <Button onClick={() => deletePatient(+patient.patientId)}>
+                  <Button onClick={() => handleDelete(+patientId)}>
                     Delete
                   </Button>
                 </TableCell>
