@@ -10,31 +10,27 @@ import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import dayjs, { Dayjs } from 'dayjs'
 import specialistService from '../../services/specialist'
-import { useQuery, UseQueryResult } from 'react-query'
-import { SyntheticEvent, useEffect, useState, useContext } from 'react'
+import { useQuery, UseQueryResult, useMutation } from 'react-query'
+import { SyntheticEvent, useState, useContext } from 'react'
+import { useParams } from 'react-router-dom'
 import { Gender, PatientDetail, PatientInput, Specialist } from '../../types'
 import {
   validateTextInput,
   sanitizeTextInput,
   sanitizeEmail,
 } from '../../validations/inputs'
-
+import patientService from '../../services/patients'
 import { formatPhone, validateEmail } from '../../validations/inputs'
 import { ErrorCtx } from '../../App'
-
-type UpdatePatient = (id: number, values: PatientInput) => Promise<void>
-
-type AddPatient = (values: PatientInput) => Promise<void>
+import { queryClient } from '../../App'
 
 interface PatientFormProps {
   type: string
-  onCancel: () => void
-  state: PatientDetail | PatientDetail[] | undefined
-  service: UpdatePatient | AddPatient | undefined
+  closeModal: () => void
 }
 
-const PatientForm = (props: PatientFormProps) => {
-  const [specialists, setSpecialists] = useState<Specialist[]>()
+const PatientForm = ({ type, closeModal }: PatientFormProps) => {
+  const [specialists, setSpecialists] = useState<Specialist[]>([])
 
   const [patientId, setPatientId] = useState<number | undefined>()
   const [specialistId, setSpecialistId] = useState<string>('')
@@ -49,17 +45,64 @@ const PatientForm = (props: PatientFormProps) => {
 
   const errorCtx = useContext(ErrorCtx)
 
-  const { data }: UseQueryResult<Specialist[]> = useQuery({
-    queryKey: 'GET_SPECIALISTS',
+  const { id } = useParams<{ id: string }>()
+
+  const { data: specialistsData }: UseQueryResult<Specialist[]> = useQuery({
+    queryKey: ['GET_SPECIALISTS'],
     queryFn: specialistService.getAll,
     onSuccess: (data) => setSpecialists(data),
     onError: (error: Error) =>
       errorCtx?.setError('error fetching specialists ' + error.message),
   })
 
-  useEffect(() => {
-    if (props.type === 'update') {
-      const {
+  const updatePatient = useMutation<
+    PatientDetail,
+    unknown,
+    [number, PatientInput]
+  >(
+    (variables) => {
+      const [patientId, values] = variables
+      return patientService.updateById(patientId, values)
+    },
+    {
+      onSuccess: (_, variables: [number, PatientInput]) => {
+        const [patientId] = variables
+        queryClient.invalidateQueries({
+          queryKey: [`GET_PATIENT_${patientId}`],
+        })
+        queryClient.invalidateQueries({
+          queryKey: ['GET_PATIENTS'],
+        })
+        closeModal()
+      },
+    },
+  )
+
+  const addPatient = useMutation<PatientDetail, unknown, [PatientInput]>(
+    (variables) => {
+      const [values] = variables
+      return patientService.create(values)
+    },
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ['GET_PATIENTS'] })
+        closeModal()
+      },
+    },
+  )
+
+  if (type === 'update') {
+    if (id) {
+      useQuery({
+        enabled: true,
+        queryKey: [`GET_PATIENT_${+id}`] as [string],
+        queryFn: () => patientService.getOneById(+id),
+        onSuccess: (data) => handleSetFormState(data),
+        onError: (error: Error) =>
+          errorCtx?.setError('error fetching patient ' + error.message),
+      })
+
+      const handleSetFormState = ({
         dateOfBirth,
         name,
         email,
@@ -68,20 +111,21 @@ const PatientForm = (props: PatientFormProps) => {
         address,
         specialistId,
         patientId,
-      } = props.state as PatientDetail
-      const dob = dayjs(dateOfBirth)
-      const [first, last] = name.split(' ')
-      setPatientId(patientId)
-      setFirstName(first)
-      setLastName(last)
-      setEmail(email)
-      setPhone(phone)
-      setDateOfBirth(dob)
-      setGender(gender)
-      setAddress(address)
-      setSpecialistId(specialistId.toString())
+      }: PatientDetail) => {
+        const dob = dayjs(dateOfBirth)
+        const [first, last] = name.split(' ')
+        setPatientId(patientId)
+        setFirstName(first)
+        setLastName(last)
+        setEmail(email)
+        setPhone(phone)
+        setDateOfBirth(dob)
+        setGender(gender)
+        setAddress(address)
+        setSpecialistId(specialistId.toString())
+      }
     }
-  }, [])
+  }
 
   const fieldsFilled =
     !firstName.trim() ||
@@ -132,18 +176,16 @@ const PatientForm = (props: PatientFormProps) => {
       specialistId: +specialistId,
     }
 
-    switch (props.type) {
+    switch (type) {
       case 'update': {
-        if (props.service && patientId) {
-          const updatePatient = props.service as UpdatePatient
-          updatePatient(patientId, patientValues)
+        if (patientId) {
+          updatePatient.mutate([patientId, patientValues])
         }
         break
       }
       case 'add': {
-        if (props.service) {
-          const addPatient = props.service as AddPatient
-          addPatient(patientValues)
+        if (patientId) {
+          addPatient.mutate([patientValues])
         }
         break
       }
@@ -163,8 +205,8 @@ const PatientForm = (props: PatientFormProps) => {
     setSpecialistId('')
   }
 
-  if (!data) {
-    return <div>fetching patients</div>
+  if (!specialistsData) {
+    return <div>fetching specialists</div>
   }
 
   return (
@@ -253,7 +295,7 @@ const PatientForm = (props: PatientFormProps) => {
             variant="contained"
             style={{ float: 'right' }}
             type="button"
-            onClick={props.onCancel}
+            onClick={closeModal}
             aria-label="Cancel button"
           >
             Cancel
@@ -269,7 +311,7 @@ const PatientForm = (props: PatientFormProps) => {
             aria-label="Add button"
             disabled={fieldsFilled}
           >
-            {props.type}
+            {type}
           </Button>
         </Grid>
       </Grid>

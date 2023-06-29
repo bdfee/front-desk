@@ -6,6 +6,9 @@ import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom'
 import { Typography, Container, Divider, Button } from '@mui/material'
 import { createContext, useState } from 'react'
 import AppointmentInformation from './components/appointment-information'
+import { QueryClient } from 'react-query'
+
+export const queryClient = new QueryClient()
 
 interface ErrorCtxType {
   setError: (errorMessage: string | undefined) => () => void
