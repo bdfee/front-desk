@@ -10,7 +10,7 @@ import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import dayjs, { Dayjs } from 'dayjs'
 import specialistService from '../../services/specialist'
-import { useQuery } from 'react-query'
+import { useQuery, UseQueryResult } from 'react-query'
 import { SyntheticEvent, useEffect, useState, useContext } from 'react'
 import { Gender, PatientDetail, PatientInput, Specialist } from '../../types'
 import {
@@ -48,13 +48,14 @@ const PatientForm = (props: PatientFormProps) => {
   const [address, setAddress] = useState('')
 
   const errorCtx = useContext(ErrorCtx)
-  const { error, data } = useQuery('GET_SPECIALISTS', specialistService.getAll)
 
-  useEffect(() => {
-    if (data) {
-      setSpecialists(data)
-    }
-  }, [data])
+  const { data }: UseQueryResult<Specialist[]> = useQuery({
+    queryKey: 'GET_SPECIALISTS',
+    queryFn: specialistService.getAll,
+    onSuccess: (data) => setSpecialists(data),
+    onError: (error: Error) =>
+      errorCtx?.setError('error fetching specialists ' + error.message),
+  })
 
   useEffect(() => {
     if (props.type === 'update') {
@@ -164,10 +165,6 @@ const PatientForm = (props: PatientFormProps) => {
 
   if (!data) {
     return <div>fetching patients</div>
-  }
-
-  if (error) {
-    return <div>error fetching patients</div>
   }
 
   return (
