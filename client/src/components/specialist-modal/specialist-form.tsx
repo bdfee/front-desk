@@ -1,48 +1,75 @@
 import { TextField, Grid, Button } from '@mui/material'
 import { SyntheticEvent, useState } from 'react'
-import { SpecialistFormProps } from '../../types'
+import { Specialist, SpecialistInput } from '../../types'
 import { validateTextInput, sanitizeTextInput } from '../../validations/inputs'
+import { useMutation } from 'react-query'
+import specialistService from '../../services/specialist'
+import { queryClient } from '../../App'
 
-const SpecialistForm = (props: SpecialistFormProps) => {
+interface SpecialistFormProps {
+  onClose: () => void
+  setError: (errorMessage: string) => () => void
+}
+
+const SpecialistForm = ({ onClose, setError }: SpecialistFormProps) => {
   const [firstName, setFirstName] = useState('')
   const [lastName, setLastName] = useState('')
   const [speciality, setSpeciality] = useState('')
 
-  const addSpecialist = (event: SyntheticEvent) => {
+  const addSpecialist = useMutation<Specialist, Error, [SpecialistInput]>(
+    (variables) => {
+      const [values] = variables
+      return specialistService.create(values)
+    },
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries({ queryKey: ['GET_SPECIALISTS_TABLE'] })
+      },
+      onError: (error: Error) => console.log('Error: ', error.message),
+    },
+  )
+
+  const handleAddSpecialist = (event: SyntheticEvent) => {
     event.preventDefault()
 
     if (!validateTextInput(firstName)) {
-      props.setError('invalid first name')
+      setError('invalid first name')
       setFirstName('')
       return
     }
 
     if (!validateTextInput(lastName)) {
-      props.setError('invalid last name')
+      setError('invalid last name')
       setLastName('')
       return
     }
 
     if (!validateTextInput(speciality)) {
-      props.setError('invalid speciality')
+      setError('invalid speciality')
       setSpeciality('')
       return
     }
 
-    props.onSubmit({
-      name: sanitizeTextInput(firstName) + ' ' + sanitizeTextInput(lastName),
-      speciality: sanitizeTextInput(speciality),
-    })
+    addSpecialist.mutate([
+      {
+        name: sanitizeTextInput(firstName) + ' ' + sanitizeTextInput(lastName),
+        speciality: sanitizeTextInput(speciality),
+      },
+    ])
+
     setFirstName('')
     setLastName('')
     setSpeciality('')
   }
 
+  if (addSpecialist.isError) {
+    setError('Error ' + addSpecialist.error.message)
+  }
   const fieldsFilled =
     !firstName.trim() || !lastName.trim() || !speciality.trim()
 
   return (
-    <form onSubmit={addSpecialist} aria-label="Specialist form">
+    <form onSubmit={handleAddSpecialist} aria-label="Specialist form">
       <TextField
         id="first-name"
         label="First name"
@@ -78,7 +105,7 @@ const SpecialistForm = (props: SpecialistFormProps) => {
             variant="contained"
             style={{ float: 'right' }}
             type="button"
-            onClick={props.onCancel}
+            onClick={onClose}
             aria-label="Cancel button"
           >
             Cancel
