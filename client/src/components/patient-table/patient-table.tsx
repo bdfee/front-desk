@@ -14,9 +14,7 @@ import { useNavigate } from 'react-router-dom'
 import { useState } from 'react'
 import { PatientDetail } from '../../types'
 import { formatPhone } from '../../validations/inputs'
-// import { useMutation, UseMutationResult } from 'react-query'
-// import { queryClient } from '../../App'
-// import patientService from '../../services/patients'
+
 import { useDeletePatientById, useFetchPatients } from '../patientActions'
 
 const PatientTable = () => {
@@ -26,14 +24,6 @@ const PatientTable = () => {
   const { error: fetchPatientsError } = useFetchPatients(setPatients)
 
   const deletePatient = useDeletePatientById(setPatients, patients)
-
-  // const deletePatient: UseMutationResult<void, unknown, number> = useMutation({
-  //   mutationFn: (id: number) => patientService.deleteById(id),
-  //   onSuccess: (_data, id: number) => {
-  //     queryClient.invalidateQueries('GET_PATIENTS')
-  //     setPatients(patients?.filter(({ patientId }) => patientId !== id))
-  //   },
-  // })
 
   const navigateToPatient = (patientId: number) => {
     navigate(`/patients/${patientId}`)
