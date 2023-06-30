@@ -11,16 +11,18 @@ import {
   Button,
   Typography,
 } from '@mui/material'
-import { Specialist, SpecialistInput } from '../../types'
-import { useQuery, useMutation } from 'react-query'
+import { Specialist } from '../../types'
 import { sanitizeTextInput, validateTextInput } from '../../validations/inputs'
-import specialistService from '../../services/specialist'
 import { isSpecialist } from '../../typeUtils'
 import 'dayjs/plugin/utc'
 import 'dayjs/plugin/timezone'
-import { queryClient } from '../../App'
+import {
+  useDeleteSpecialistById,
+  useFetchSpecialistTable,
+  useUpdateTableRowBySpecialistId,
+} from '../specialistActions'
 
-interface TableData {
+export interface TableData {
   specialist: Specialist
   appointmentCount: number
   patientCount: number
@@ -36,25 +38,9 @@ const SpecialistTable = ({ setError }: TableProps) => {
   const [editRowIdx, setEditRowIdx] = useState(-1)
   const [editRowData, setEditRowData] = useState<Specialist | undefined>()
 
-  const { error: fetchTableDataError } = useQuery({
-    queryKey: ['GET_SPECIALISTS_TABLE'],
-    queryFn: specialistService.getTableData,
-    onSuccess: (data) => setTableData(data),
-    onError: (error: Error) => 'error ' + error.message,
-  })
+  const { error: fetchTableDataError } = useFetchSpecialistTable(setTableData)
 
-  const deleteSpecialistById = useMutation<void, Error, number>(
-    (id: number) => specialistService.deleteById(id),
-    {
-      onSuccess: (_data, id: number) => {
-        queryClient.invalidateQueries('GET_SPECIALISTS')
-        setTableData(
-          tableData.filter(({ specialist }) => specialist.specialistId !== id),
-        )
-      },
-      onError: (error: Error) => console.error('Error:', error),
-    },
-  )
+  const deleteSpecialistById = useDeleteSpecialistById(setTableData, tableData)
 
   const handleUpdateTableRowBySpecialistId = (
     specialistId: number,
@@ -77,28 +63,8 @@ const SpecialistTable = ({ setError }: TableProps) => {
     )
   }
 
-  const updateTableRowBySpecialistId = useMutation<
-    Specialist,
-    Error,
-    [number, SpecialistInput]
-  >(
-    (variables) => {
-      const [specialistId, values] = variables
-      return specialistService.updateById(specialistId, values)
-    },
-    {
-      onSuccess: (data: Specialist, variables: [number, SpecialistInput]) => {
-        const [specialistId] = variables
-        handleUpdateTableRowBySpecialistId(specialistId, data)
-        queryClient.invalidateQueries({
-          queryKey: [`UPDATE_SPECIALIST_${specialistId}`],
-        })
-        queryClient.invalidateQueries({
-          queryKey: ['GET_SPECIALISTS'],
-        })
-      },
-      onError: (error: Error) => console.error('Error:', error),
-    },
+  const updateTableRowBySpecialistId = useUpdateTableRowBySpecialistId(
+    handleUpdateTableRowBySpecialistId,
   )
 
   const handleRowEdit = (rowIdx: number) => {
@@ -129,10 +95,10 @@ const SpecialistTable = ({ setError }: TableProps) => {
     let speciality
 
     if (!validateTextInput(editRowData.name)) {
-      console.log('invalid update to name')
+      setError('invalid update to name')
       return
     } else if (!validateTextInput(editRowData.speciality)) {
-      console.log('invalid update to speciality')
+      setError('invalid update to speciality')
       return
     } else {
       name = sanitizeTextInput(editRowData.name)

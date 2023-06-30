@@ -1,33 +1,19 @@
 import { TextField, Grid, Button } from '@mui/material'
 import { SyntheticEvent, useState } from 'react'
-import { Specialist, SpecialistInput } from '../../types'
 import { validateTextInput, sanitizeTextInput } from '../../validations/inputs'
-import { useMutation } from 'react-query'
-import specialistService from '../../services/specialist'
-import { queryClient } from '../../App'
+import { useAddSpecialist } from '../specialistActions'
 
 interface SpecialistFormProps {
-  onClose: () => void
+  closeModal: () => void
   setError: (errorMessage: string) => () => void
 }
 
-const SpecialistForm = ({ onClose, setError }: SpecialistFormProps) => {
+const SpecialistForm = ({ closeModal, setError }: SpecialistFormProps) => {
   const [firstName, setFirstName] = useState('')
   const [lastName, setLastName] = useState('')
   const [speciality, setSpeciality] = useState('')
 
-  const addSpecialist = useMutation<Specialist, Error, [SpecialistInput]>(
-    (variables) => {
-      const [values] = variables
-      return specialistService.create(values)
-    },
-    {
-      onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ['GET_SPECIALISTS_TABLE'] })
-      },
-      onError: (error: Error) => console.log('Error: ', error.message),
-    },
-  )
+  const addSpecialist = useAddSpecialist()
 
   const handleAddSpecialist = (event: SyntheticEvent) => {
     event.preventDefault()
@@ -56,7 +42,7 @@ const SpecialistForm = ({ onClose, setError }: SpecialistFormProps) => {
         speciality: sanitizeTextInput(speciality),
       },
     ])
-
+    closeModal()
     setFirstName('')
     setLastName('')
     setSpeciality('')
@@ -105,7 +91,7 @@ const SpecialistForm = ({ onClose, setError }: SpecialistFormProps) => {
             variant="contained"
             style={{ float: 'right' }}
             type="button"
-            onClick={onClose}
+            onClick={closeModal}
             aria-label="Cancel button"
           >
             Cancel

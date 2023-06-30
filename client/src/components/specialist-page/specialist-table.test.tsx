@@ -1,6 +1,6 @@
 import { screen, render } from '@testing-library/react'
 import '@testing-library/jest-dom/extend-expect'
-import SpecialistTable from './table'
+// import SpecialistTable from './table'
 import { createLocalSpecialistList } from '../../testHelpers/specialists'
 import { Specialist } from '../../types'
 import userEvent from '@testing-library/user-event'

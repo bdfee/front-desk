@@ -39,7 +39,7 @@ const SpecialistModal = ({
               {error}
             </Alert>
           )}
-          <SpecialistForm onClose={closeModal} setError={setError} />
+          <SpecialistForm closeModal={closeModal} setError={setError} />
         </DialogContent>
       </Dialog>
     </QueryClientProvider>
