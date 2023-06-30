@@ -4,7 +4,8 @@ import { Container, Typography, Box, List, ListItemText } from '@mui/material'
 import { AppointmentDetail, PatientDetail } from '../../types'
 import patientService from '../../services/patients'
 import { ErrorCtx } from '../../App'
-
+// import {SetStateAction, Dispatch } from 'react'
+import { useFetchPatientByIdQuery } from '../patientActions'
 interface InformationListProps {
   patientId: number
 }
@@ -14,13 +15,8 @@ const InformationList = ({ patientId }: InformationListProps) => {
   const [appointments, setAppointments] = useState<AppointmentDetail[]>([])
   const errorCtx = useContext(ErrorCtx)
 
-  useQuery({
-    queryKey: [`GET_PATIENT_${patientId}`] as [string],
-    queryFn: () => patientService.getOneById(patientId),
-    onSuccess: (data) => setPatient(data),
-    onError: (error: Error) =>
-      errorCtx?.setError('error fetching patient ' + error.message),
-  })
+  // pass in state setter and patientId to call from onSuccess directly
+  const { error } = useFetchPatientByIdQuery(setPatient, patientId)
 
   const { data: appointmentData }: UseQueryResult<AppointmentDetail[]> =
     useQuery({
@@ -42,6 +38,10 @@ const InformationList = ({ patientId }: InformationListProps) => {
     })
 
     return { history, upcoming }
+  }
+
+  if (error) {
+    errorCtx?.setError(error.message)
   }
 
   if (!patient) {
