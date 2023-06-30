@@ -75,6 +75,8 @@ const PatientForm = ({ type, closeModal }: PatientFormProps) => {
         })
         closeModal()
       },
+      // onError: (error: Error) =>
+      //   errorCtx?.setError('error updating patients ' + error.message),
     },
   )
 

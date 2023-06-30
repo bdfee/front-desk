@@ -1,11 +1,11 @@
 import { useState, useContext } from 'react'
-import { useQuery, UseQueryResult } from 'react-query'
 import { Container, Typography, Box, List, ListItemText } from '@mui/material'
 import { AppointmentDetail, PatientDetail } from '../../types'
-import patientService from '../../services/patients'
 import { ErrorCtx } from '../../App'
-// import {SetStateAction, Dispatch } from 'react'
-import { useFetchPatientByIdQuery } from '../patientActions'
+import {
+  useFetchPatientByIdQuery,
+  useFetchAppointmentsByPatientId,
+} from '../patientActions'
 interface InformationListProps {
   patientId: number
 }
@@ -15,17 +15,16 @@ const InformationList = ({ patientId }: InformationListProps) => {
   const [appointments, setAppointments] = useState<AppointmentDetail[]>([])
   const errorCtx = useContext(ErrorCtx)
 
-  // pass in state setter and patientId to call from onSuccess directly
-  const { error } = useFetchPatientByIdQuery(setPatient, patientId)
+  // pass in state setters and patientId to call from onSuccess directly
+  const { error: fetchPatientError } = useFetchPatientByIdQuery(
+    setPatient,
+    patientId,
+  )
 
-  const { data: appointmentData }: UseQueryResult<AppointmentDetail[]> =
-    useQuery({
-      queryKey: [`GET_APPOINTMENTS_BY_PATIENTS_${patientId}`] as [string],
-      queryFn: () => patientService.getAppointmentsByPatient(patientId),
-      onSuccess: (data) => setAppointments(data),
-      onError: (error: Error) =>
-        errorCtx?.setError('error fetching appointments ' + error.message),
-    })
+  const { error: fetchAppointmentError } = useFetchAppointmentsByPatientId(
+    setAppointments,
+    patientId,
+  )
 
   const sortAppointments = (appointments: AppointmentDetail[]) => {
     const history: AppointmentDetail[] = []
@@ -40,8 +39,12 @@ const InformationList = ({ patientId }: InformationListProps) => {
     return { history, upcoming }
   }
 
-  if (error) {
-    errorCtx?.setError(error.message)
+  if (fetchPatientError) {
+    errorCtx?.setError(fetchPatientError.message)
+  }
+
+  if (fetchAppointmentError) {
+    errorCtx?.setError(fetchAppointmentError.message)
   }
 
   if (!patient) {
@@ -70,7 +73,7 @@ const InformationList = ({ patientId }: InformationListProps) => {
         </List>
         <Typography>Appointment History</Typography>
         <List>
-          {appointmentData &&
+          {appointments.length &&
             history.map((appointment) => {
               return (
                 <ListItemText

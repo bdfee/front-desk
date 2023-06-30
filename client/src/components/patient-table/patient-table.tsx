@@ -14,38 +14,26 @@ import { useNavigate } from 'react-router-dom'
 import { useState } from 'react'
 import { PatientDetail } from '../../types'
 import { formatPhone } from '../../validations/inputs'
-import {
-  useQuery,
-  UseQueryResult,
-  useMutation,
-  UseMutationResult,
-} from 'react-query'
-import { queryClient } from '../../App'
-import patientService from '../../services/patients'
+// import { useMutation, UseMutationResult } from 'react-query'
+// import { queryClient } from '../../App'
+// import patientService from '../../services/patients'
+import { useDeletePatientById, useFetchPatients } from '../patientActions'
 
 const PatientTable = () => {
   const [patients, setPatients] = useState<PatientDetail[]>([])
   const navigate = useNavigate()
 
-  const { data }: UseQueryResult<PatientDetail[]> = useQuery({
-    queryKey: 'GET_PATIENTS',
-    queryFn: patientService.getAll,
-    onSuccess: (data) => setPatients(data),
-  })
+  const { error: fetchPatientsError } = useFetchPatients(setPatients)
 
-  const deletePatient: UseMutationResult<void, unknown, number> = useMutation({
-    mutationFn: (id: number) => patientService.deleteById(id),
-    onSuccess: (_data, id: number) => {
-      queryClient.invalidateQueries('GET_PATIENTS')
-      setPatients(patients?.filter(({ patientId }) => patientId !== id))
-    },
-  })
+  const deletePatient = useDeletePatientById(setPatients, patients)
 
-  const handleDelete = (id: number) => deletePatient.mutate(id)
-
-  if (!data) {
-    return <div>fetching patients list</div>
-  }
+  // const deletePatient: UseMutationResult<void, unknown, number> = useMutation({
+  //   mutationFn: (id: number) => patientService.deleteById(id),
+  //   onSuccess: (_data, id: number) => {
+  //     queryClient.invalidateQueries('GET_PATIENTS')
+  //     setPatients(patients?.filter(({ patientId }) => patientId !== id))
+  //   },
+  // })
 
   const navigateToPatient = (patientId: number) => {
     navigate(`/patients/${patientId}`)
@@ -55,6 +43,14 @@ const PatientTable = () => {
     navigate(`/patients/${patientId}`, {
       state: { openModalOnLoad: true },
     })
+  }
+
+  if (fetchPatientsError) {
+    console.log(fetchPatientsError.message)
+  }
+
+  if (deletePatient.isError) {
+    console.log(deletePatient.error.message)
   }
 
   return (
@@ -91,7 +87,7 @@ const PatientTable = () => {
                   <Button onClick={() => navigateToPatientEditor(patientId)}>
                     Edit
                   </Button>
-                  <Button onClick={() => handleDelete(+patientId)}>
+                  <Button onClick={() => deletePatient.mutate(+patientId)}>
                     Delete
                   </Button>
                 </TableCell>
