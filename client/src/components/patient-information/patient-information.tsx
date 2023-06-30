@@ -1,51 +1,26 @@
-import { useState, useContext, useEffect } from 'react'
+import { useState, useContext } from 'react'
 import { useQuery, UseQueryResult } from 'react-query'
 import { Container, Typography, Box, List, ListItemText } from '@mui/material'
 import { AppointmentDetail, PatientDetail } from '../../types'
 import patientService from '../../services/patients'
 import { ErrorCtx } from '../../App'
-// import {SetStateAction, Dispatch } from 'react'
-import { useFetchPatientByIdQuery } from '../patientActions'
+
 interface InformationListProps {
   patientId: number
 }
-
-// const useGetPatientByIdQuery = (setPatient: Dispatch<SetStateAction<PatientDetail>>, patientId: number) => {
-//   useQuery({
-//     queryKey: [`GET_PATIENT_${patientId}`] as [string],
-//     queryFn: () => patientService.getOneById(patientId),
-//     onSuccess: (data) => setPatient(data),
-//     onError: (error: Error) =>
-//       errorCtx?.setError('error fetching patient ' + error.message),
-//   })
-// }
 
 const InformationList = ({ patientId }: InformationListProps) => {
   const [patient, setPatient] = useState<PatientDetail>()
   const [appointments, setAppointments] = useState<AppointmentDetail[]>([])
   const errorCtx = useContext(ErrorCtx)
 
-  // pass in state setters to call from onSuccess directly
-  const { error, isStale, isFetching } = useFetchPatientByIdQuery(
-    setPatient,
-    patientId,
-  )
-
-  useEffect(() => {
-    if (isFetching) {
-      console.log('Query is currently fetching data...')
-    } else if (!isStale) {
-      console.log('Query data has been read from cache.')
-    }
-  }, [isFetching, isStale])
-
-  // useQuery({
-  //   queryKey: [`GET_PATIENT_${patientId}`] as [string],
-  //   queryFn: () => patientService.getOneById(patientId),
-  //   onSuccess: (data) => setPatient(data),
-  //   onError: (error: Error) =>
-  //     errorCtx?.setError('error fetching patient ' + error.message),
-  // })
+  useQuery({
+    queryKey: [`GET_PATIENT_${patientId}`] as [string],
+    queryFn: () => patientService.getOneById(patientId),
+    onSuccess: (data) => setPatient(data),
+    onError: (error: Error) =>
+      errorCtx?.setError('error fetching patient ' + error.message),
+  })
 
   const { data: appointmentData }: UseQueryResult<AppointmentDetail[]> =
     useQuery({
@@ -67,10 +42,6 @@ const InformationList = ({ patientId }: InformationListProps) => {
     })
 
     return { history, upcoming }
-  }
-
-  if (error) {
-    errorCtx?.setError(error.message)
   }
 
   if (!patient) {
