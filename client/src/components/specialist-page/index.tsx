@@ -1,16 +1,9 @@
 import { useState } from 'react'
 import Table from './table'
 import SpecialistModal from '../specialist-modal'
-import { Specialist } from '../../types'
 import { Alert, Button } from '@mui/material'
 import { queryClient } from '../../App'
 import { QueryClientProvider } from 'react-query'
-
-export interface TableData {
-  specialist: Specialist
-  appointmentCount: number
-  patientCount: number
-}
 
 const SpecialistPage = () => {
   const [modalOpen, setModalOpen] = useState(false)
