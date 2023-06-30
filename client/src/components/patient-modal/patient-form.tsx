@@ -9,20 +9,22 @@ import {
 import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import dayjs, { Dayjs } from 'dayjs'
-import specialistService from '../../services/specialist'
-import { useQuery, UseQueryResult, useMutation } from 'react-query'
 import { SyntheticEvent, useState, useContext } from 'react'
 import { useParams } from 'react-router-dom'
-import { Gender, PatientDetail, PatientInput, Specialist } from '../../types'
+import { Gender, PatientDetail, Specialist } from '../../types'
 import {
   validateTextInput,
   sanitizeTextInput,
   sanitizeEmail,
 } from '../../validations/inputs'
-import patientService from '../../services/patients'
 import { formatPhone, validateEmail } from '../../validations/inputs'
 import { ErrorCtx } from '../../App'
-import { queryClient } from '../../App'
+import { useFetchSpecialists } from '../specialistActions'
+import {
+  useAddPatient,
+  useFetchPatientByIdQuery,
+  useUpdatePatientById,
+} from '../patientActions'
 
 interface PatientFormProps {
   type: string
@@ -31,10 +33,8 @@ interface PatientFormProps {
 
 const PatientForm = ({ type, closeModal }: PatientFormProps) => {
   const [specialists, setSpecialists] = useState<Specialist[]>([])
-
   const [patientId, setPatientId] = useState<number | undefined>()
   const [specialistId, setSpecialistId] = useState<string>('')
-
   const [firstName, setFirstName] = useState('')
   const [lastName, setLastName] = useState('')
   const [email, setEmail] = useState('')
@@ -47,61 +47,12 @@ const PatientForm = ({ type, closeModal }: PatientFormProps) => {
 
   const { id } = useParams<{ id: string }>()
 
-  const { data: specialistsData }: UseQueryResult<Specialist[]> = useQuery({
-    queryKey: ['GET_SPECIALISTS'],
-    queryFn: specialistService.getAll,
-    onSuccess: (data) => setSpecialists(data),
-    onError: (error: Error) =>
-      errorCtx?.setError('error fetching specialists ' + error.message),
-  })
-
-  const updatePatient = useMutation<
-    PatientDetail,
-    unknown,
-    [number, PatientInput]
-  >(
-    (variables) => {
-      const [patientId, values] = variables
-      return patientService.updateById(patientId, values)
-    },
-    {
-      onSuccess: (_, variables: [number, PatientInput]) => {
-        const [patientId] = variables
-        queryClient.invalidateQueries({
-          queryKey: [`GET_PATIENT_${patientId}`],
-        })
-        queryClient.invalidateQueries({
-          queryKey: ['GET_PATIENTS'],
-        })
-        closeModal()
-      },
-    },
-  )
-
-  const addPatient = useMutation<PatientDetail, unknown, [PatientInput]>(
-    (variables) => {
-      const [values] = variables
-      return patientService.create(values)
-    },
-    {
-      onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ['GET_PATIENTS'] })
-        closeModal()
-      },
-    },
-  )
+  const { error: fetchSpecialistsError } = useFetchSpecialists(setSpecialists)
+  const updatePatient = useUpdatePatientById()
+  const addPatient = useAddPatient()
 
   if (type === 'update') {
     if (id) {
-      useQuery({
-        enabled: true,
-        queryKey: [`GET_PATIENT_${+id}`] as [string],
-        queryFn: () => patientService.getOneById(+id),
-        onSuccess: (data) => handleSetFormState(data),
-        onError: (error: Error) =>
-          errorCtx?.setError('error fetching patient ' + error.message),
-      })
-
       const handleSetFormState = ({
         dateOfBirth,
         name,
@@ -123,6 +74,15 @@ const PatientForm = ({ type, closeModal }: PatientFormProps) => {
         setGender(gender)
         setAddress(address)
         setSpecialistId(specialistId.toString())
+      }
+
+      const { error: fetchPatientByIdError } = useFetchPatientByIdQuery(
+        handleSetFormState,
+        +id,
+      )
+
+      if (fetchPatientByIdError) {
+        console.log(fetchPatientByIdError.message)
       }
     }
   }
@@ -203,10 +163,23 @@ const PatientForm = ({ type, closeModal }: PatientFormProps) => {
     setGender('')
     setAddress('')
     setSpecialistId('')
+    closeModal()
   }
 
-  if (!specialistsData) {
+  if (!specialists) {
     return <div>fetching specialists</div>
+  }
+
+  if (fetchSpecialistsError) {
+    console.log(fetchSpecialistsError.message)
+  }
+
+  if (updatePatient.isError) {
+    console.log(updatePatient.error.message)
+  }
+
+  if (addPatient.isError) {
+    console.log(addPatient.error.message)
   }
 
   return (
