@@ -60,7 +60,7 @@ export const useDeletePatientById = (
     (id: number) => patientService.deleteById(id),
     {
       onSuccess: (_data, id: number) => {
-        queryClient.invalidateQueries('GET_PATIENTS')
+        queryClient.invalidateQueries({ queryKey: ['GET_PATIENTS'] })
         setPatients(patients?.filter(({ patientId }) => patientId !== id))
       },
       onError: (error: Error) => console.error('Error:', error),
