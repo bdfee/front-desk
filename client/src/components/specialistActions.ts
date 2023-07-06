@@ -10,6 +10,8 @@ interface TableData {
   patientCount: number
 }
 
+// type TableDataUpdater = (prev: TableData[]) => TableData[]
+
 export const useFetchSpecialists = (
   setSpecialists: Dispatch<SetStateAction<Specialist[]>>,
 ) => {
@@ -39,8 +41,22 @@ export const useAddSpecialist = () => {
       return specialistService.create(values)
     },
     {
-      onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ['GET_SPECIALISTS_TABLE'] })
+      onSuccess: (newSpecialist) => {
+        queryClient.setQueryData<TableData[]>(
+          ['GET_SPECIALISTS_TABLE'],
+          (existingTableData = []) =>
+            existingTableData.concat({
+              specialist: newSpecialist,
+              appointmentCount: 0,
+              patientCount: 0,
+            }),
+        )
+        queryClient.setQueryData<Specialist[]>(
+          ['GET_SPECIALISTS'],
+          (existingSpecialistData = []) =>
+            existingSpecialistData.concat(newSpecialist),
+        )
+        queryClient.invalidateQueries({ queryKey: ['GET_SPECIALISTS'] })
       },
       onError: (error: Error) => console.log('Error: ', error.message),
     },
@@ -55,7 +71,13 @@ export const useDeleteSpecialistById = (
     (id: number) => specialistService.deleteById(id),
     {
       onSuccess: (_data, id: number) => {
-        queryClient.invalidateQueries({ queryKey: ['GET_SPECIALISTS'] })
+        queryClient.setQueryData<Specialist[]>(
+          ['GET_SPECIALISTS'],
+          (existingSpecialistsData = []) =>
+            existingSpecialistsData.filter(
+              (specialist) => specialist.id !== id,
+            ),
+        )
         setTableData(
           tableData.filter(({ specialist }) => specialist.specialistId !== id),
         )
@@ -77,15 +99,16 @@ export const useUpdateTableRowBySpecialistId = (
       return specialistService.updateById(specialistId, values)
     },
     {
-      onSuccess: (data: Specialist, variables: [number, SpecialistInput]) => {
-        const [specialistId] = variables
-        handleUpdateTableRowBySpecialistId(specialistId, data)
-        queryClient.invalidateQueries({
-          queryKey: [`UPDATE_SPECIALIST_${specialistId}`],
-        })
-        queryClient.invalidateQueries({
-          queryKey: ['GET_SPECIALISTS'],
-        })
+      onSuccess: (data: Specialist) => {
+        handleUpdateTableRowBySpecialistId(data.specialistId, data)
+
+        queryClient.setQueryData<Specialist[]>(
+          ['GET_SPECIALISTS'],
+          (existingSpecialistsData = []) =>
+            existingSpecialistsData.filter(
+              (specialist) => specialist.id !== data.specialistId,
+            ),
+        )
       },
       onError: (error: Error) => console.error('Error:', error),
     },

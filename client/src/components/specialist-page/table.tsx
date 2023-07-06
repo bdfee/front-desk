@@ -183,6 +183,9 @@ const SpecialistTable = ({ setError }: TableProps) => {
                 <TableCell>{row.appointmentCount}</TableCell>
                 <TableCell>
                   <Button
+                    disabled={
+                      row.patientCount !== 0 || row.appointmentCount !== 0
+                    }
                     onClick={() =>
                       deleteSpecialistById.mutate(row.specialist.specialistId)
                     }
