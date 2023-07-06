@@ -99,15 +99,16 @@ export const useUpdateTableRowBySpecialistId = (
       return specialistService.updateById(specialistId, values)
     },
     {
-      onSuccess: (data: Specialist, variables: [number, SpecialistInput]) => {
-        const [specialistId] = variables
-        handleUpdateTableRowBySpecialistId(specialistId, data)
-        queryClient.invalidateQueries({
-          queryKey: [`UPDATE_SPECIALIST_${specialistId}`],
-        })
-        queryClient.invalidateQueries({
-          queryKey: ['GET_SPECIALISTS'],
-        })
+      onSuccess: (data: Specialist) => {
+        handleUpdateTableRowBySpecialistId(data.specialistId, data)
+
+        queryClient.setQueryData<Specialist[]>(
+          ['GET_SPECIALISTS'],
+          (existingSpecialistsData = []) =>
+            existingSpecialistsData.filter(
+              (specialist) => specialist.id !== data.specialistId,
+            ),
+        )
       },
       onError: (error: Error) => console.error('Error:', error),
     },
