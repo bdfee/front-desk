@@ -22,9 +22,7 @@ interface RBCProps {
 }
 
 const RBC = ({ openModal }: RBCProps) => {
-  // query appointments
   const [appointments, setAppointments] = useState<AppointmentDetail[]>([])
-
   const [specialistIdFilter, setSpecialistIdFilter] = useState<string>('')
   const [patientIdFilter, setPatientIdFilter] = useState<string>('')
   const [typeFilter, setTypeFilter] = useState<string>('')
