@@ -52,6 +52,19 @@ export const useAddAppointment = () => {
   )
 }
 
+export const useDeleteAppointmentById = () => {
+  return useMutation<void, Error, number>(
+    (id: number) => appointmentService.deleteById(id),
+    {
+      onSuccess: (_data, id: number) => {
+        queryClient.invalidateQueries({ queryKey: ['GET_APPOINTMENTS'] })
+        queryClient.invalidateQueries({ queryKey: [`GET_APPOINTMENT_${id}`] })
+      },
+      onError: (error: Error) => console.error('Error: ' + error.message),
+    },
+  )
+}
+
 export const useFetchAppointmentById = (
   stateSetter: HandleSetAppointmentFormState,
   id: number,
