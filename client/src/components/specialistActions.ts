@@ -45,13 +45,17 @@ export const useAddSpecialist = () => {
         queryClient.setQueryData<TableData[]>(
           ['GET_SPECIALISTS_TABLE'],
           (existingTableData = []) =>
-            (existingTableData || []).concat({
+            existingTableData.concat({
               specialist: newSpecialist,
               appointmentCount: 0,
               patientCount: 0,
             }),
         )
-
+        queryClient.setQueryData<Specialist[]>(
+          ['GET_SPECIALISTS'],
+          (existingSpecialistData = []) =>
+            existingSpecialistData.concat(newSpecialist),
+        )
         queryClient.invalidateQueries({ queryKey: ['GET_SPECIALISTS'] })
       },
       onError: (error: Error) => console.log('Error: ', error.message),
