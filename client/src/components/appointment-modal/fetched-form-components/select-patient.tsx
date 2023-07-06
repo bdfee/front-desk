@@ -1,4 +1,4 @@
-import { useState, useEffect, Dispatch, SetStateAction } from 'react'
+import { useState, Dispatch, SetStateAction } from 'react'
 import {
   InputLabel,
   Select,
@@ -7,9 +7,10 @@ import {
   FormControl,
   OutlinedInput,
 } from '@mui/material'
-import { useQuery } from 'react-query'
+
 import { PatientDetail } from '../../../types'
-import patientService from '../../../services/patients'
+
+import { useFetchPatients } from '../../patientActions'
 
 export interface SelectPatientProps {
   patientId: string
@@ -19,25 +20,9 @@ export interface SelectPatientProps {
 const SelectPatient = ({ patientId, setPatientId }: SelectPatientProps) => {
   const [patients, setPatients] = useState<PatientDetail[]>([])
 
-  const { error, data } = useQuery('GET_PATIENTS', patientService.getAll)
+  const { error: fetchPatientError } = useFetchPatients(setPatients)
 
-  useEffect(() => {
-    if (data) {
-      setPatients(data)
-    }
-  }, [data])
-
-  if (!data) {
-    return (
-      <>
-        <InputLabel id="loading-patients" size="small">
-          Loading Patients
-        </InputLabel>
-      </>
-    )
-  }
-
-  if (error) {
+  if (fetchPatientError) {
     return <div>error fetching patients</div>
   }
 

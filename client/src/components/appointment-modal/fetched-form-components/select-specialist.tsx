@@ -1,4 +1,4 @@
-import { useState, Dispatch, SetStateAction, useEffect } from 'react'
+import { useState, Dispatch, SetStateAction } from 'react'
 import {
   InputLabel,
   Select,
@@ -7,9 +7,8 @@ import {
   FormControl,
   OutlinedInput,
 } from '@mui/material'
-import { useQuery } from 'react-query'
 import { Specialist } from '../../../types'
-import specialistService from '../../../services/specialist'
+import { useFetchSpecialists } from '../../specialistActions'
 
 export interface SelectSpecialistProps {
   specialistId: string
@@ -22,23 +21,9 @@ const SelectSpecialist = ({
 }: SelectSpecialistProps) => {
   const [specialists, setSpecialists] = useState<Specialist[]>([])
 
-  const { error, data } = useQuery('GET_SPECIALISTS', specialistService.getAll)
+  const { error: fetchSpecialistsError } = useFetchSpecialists(setSpecialists)
 
-  useEffect(() => {
-    if (data) {
-      setSpecialists(data)
-    }
-  }, [data])
-
-  if (!data) {
-    return (
-      <InputLabel id="loading-patients" size="small">
-        Loading Specialists
-      </InputLabel>
-    )
-  }
-
-  if (error) {
+  if (fetchSpecialistsError) {
     return <div>error fetching specialists</div>
   }
 

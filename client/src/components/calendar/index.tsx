@@ -1,8 +1,8 @@
-import { useEffect, useState } from 'react'
-import appointmentService from '../../services/appointment'
-import { isAxiosError } from 'axios'
+import { useState, useEffect } from 'react'
 import { Button } from '@mui/material'
 import RBC from './rbc'
+import { queryClient } from '../../App'
+import { QueryClientProvider } from 'react-query'
 
 export interface RBCEventProps {
   title: string
@@ -20,35 +20,20 @@ export interface RBCEventPropsForForm {
 
 export type NewEvent = Omit<RBCEventProps, 'title' | 'appointmentId' | 'type'>
 
-import { AppointmentDetail } from '../../types'
 import AppointmentModal from '../appointment-modal'
 
 const Calendar = () => {
-  const [appointments, setAppointments] = useState<AppointmentDetail[]>()
   const [formValues, setFormValues] = useState<
     RBCEventPropsForForm | undefined
   >()
   const [modalOpen, setModalOpen] = useState(false)
 
+  // in lieu of element blur, clear form if modal closed by clicking away
   useEffect(() => {
-    const fetchAppointments = async () => {
-      try {
-        const fetchedAppointments = await appointmentService.getAll()
-        setAppointments(fetchedAppointments)
-      } catch (error) {
-        if (isAxiosError(error)) {
-          console.log('axios error' + error.message)
-        } else {
-          console.log('unknown error fetching patient')
-        }
-      }
+    if (!modalOpen) {
+      clearForm()
     }
-    void fetchAppointments()
-  }, [])
-
-  if (!appointments) {
-    return <div>fetching appointments</div>
-  }
+  }, [modalOpen])
 
   const openModal = (values: RBCEventPropsForForm) => {
     setModalOpen(true)
@@ -60,8 +45,8 @@ const Calendar = () => {
   }
 
   return (
-    <>
-      <RBC appointments={appointments} openModal={openModal} />
+    <QueryClientProvider client={queryClient}>
+      <RBC openModal={openModal} />
       <Button onClick={() => setModalOpen(true)}>add appointment</Button>
       <AppointmentModal
         modalOpen={modalOpen}
@@ -69,10 +54,8 @@ const Calendar = () => {
         serviceType={formValues ? 'addFromCalendar' : 'add'}
         clearFormValues={clearForm}
         formValues={formValues}
-        state={appointments}
-        stateSetter={setAppointments}
       />
-    </>
+    </QueryClientProvider>
   )
 }
 

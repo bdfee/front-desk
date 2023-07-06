@@ -1,11 +1,25 @@
 import { Container, Typography, Box, List, ListItemText } from '@mui/material'
+import { useState } from 'react'
 import { AppointmentDetail } from '../../types'
+import { useFetchAppointmentById } from '../appointmentActions'
 
 interface AppointmentListProps {
-  appointment: AppointmentDetail
+  id: number
 }
 
-const InformationList = ({ appointment }: AppointmentListProps) => {
+const InformationList = ({ id }: AppointmentListProps) => {
+  const [appointment, setAppointment] = useState<AppointmentDetail>()
+
+  const { error } = useFetchAppointmentById(setAppointment, +id)
+
+  if (error) {
+    return <div>error fetching appointment</div>
+  }
+
+  if (!appointment) {
+    return <div>fetching appointment</div>
+  }
+
   return (
     <Container>
       <Typography>{appointment.patient.name}</Typography>
