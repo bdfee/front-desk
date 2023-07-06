@@ -47,10 +47,8 @@ const PatientForm = ({ type, closeModal }: PatientFormProps) => {
 
   const { id } = useParams<{ id: string }>()
 
-  const { error: fetchSpecialistsError } = useFetchSpecialists(setSpecialists)
-  const updatePatient = useUpdatePatientById()
-  const addPatient = useAddPatient()
-
+  // if type is update, populate form with existing values
+  // useEffect?
   if (type === 'update') {
     if (id) {
       const handleSetFormState = ({
@@ -75,17 +73,19 @@ const PatientForm = ({ type, closeModal }: PatientFormProps) => {
         setAddress(address)
         setSpecialistId(specialistId.toString())
       }
-
       const { error: fetchPatientByIdError } = useFetchPatientByIdQuery(
         handleSetFormState,
         +id,
       )
-
       if (fetchPatientByIdError) {
         console.log(fetchPatientByIdError.message)
       }
     }
   }
+
+  const { error: fetchSpecialistsError } = useFetchSpecialists(setSpecialists)
+  const updatePatient = useUpdatePatientById()
+  const addPatient = useAddPatient()
 
   const fieldsFilled =
     !firstName.trim() ||
@@ -135,7 +135,6 @@ const PatientForm = ({ type, closeModal }: PatientFormProps) => {
       address: sanitizeTextInput(address),
       specialistId: +specialistId,
     }
-
     switch (type) {
       case 'update': {
         if (patientId) {
@@ -144,9 +143,7 @@ const PatientForm = ({ type, closeModal }: PatientFormProps) => {
         break
       }
       case 'add': {
-        if (patientId) {
-          addPatient.mutate([patientValues])
-        }
+        addPatient.mutate([patientValues])
         break
       }
       default: {

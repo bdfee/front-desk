@@ -9,34 +9,32 @@ import dayjs, { Dayjs } from 'dayjs'
 
 import FetchedFormComponents from './fetched-form-components'
 
-import { SyntheticEvent, useEffect, useState, useContext } from 'react'
-import { AppointmentDetail, AppointmentInput } from '../../types'
+import { SyntheticEvent, useState, useContext, useEffect } from 'react'
+import { AppointmentDetail } from '../../types'
 
 import { ErrorCtx } from '../../App'
 import { validateTextInput } from '../../validations/inputs'
 import { RBCEventPropsForForm } from '../calendar'
-
-type UpdateAppointment = (id: number, values: AppointmentInput) => Promise<void>
-type AddAppointment = (values: AppointmentInput) => Promise<void>
+import { useParams } from 'react-router-dom'
+import {
+  useUpdateAppointmentById,
+  useAddAppointment,
+  useFetchAppointmentById,
+} from '../appointmentActions'
 
 interface AppointmentFormProps {
   serviceType: string
-  onCancel: () => void
+  closeModal: () => void
   formValues?: RBCEventPropsForForm
-  state: AppointmentDetail | AppointmentDetail[] | undefined
-  service: UpdateAppointment | AddAppointment | undefined
 }
 
 const AppointmentForm = ({
   serviceType,
-  onCancel,
+  closeModal,
   formValues,
-  state,
-  service,
 }: AppointmentFormProps) => {
   const [specialistId, setSpecialistId] = useState<string>('')
   const [patientId, setPatientId] = useState<string>('')
-  const [appointmentId, setAppointmentId] = useState<number | undefined>()
   const [type, setType] = useState<string>('')
   const [start, setStart] = useState<Dayjs | null>(null)
   const [end, setEnd] = useState<Dayjs | null>(null)
@@ -44,20 +42,33 @@ const AppointmentForm = ({
   const [description, setDescription] = useState<string>('')
 
   const errorCtx = useContext(ErrorCtx)
+  const { id } = useParams<{ id: string }>()
 
   useEffect(() => {
-    if (serviceType === 'update') {
-      const {
-        appointmentId,
+    if (formValues) {
+      const handleCalendarFormValues = ({
+        date,
         start,
         end,
-        date,
-        description,
-        patientId,
-        type,
-        specialistId,
-      } = state as AppointmentDetail
-      setAppointmentId(appointmentId)
+      }: RBCEventPropsForForm) => {
+        setDate(() => dayjs(date))
+        setStart(() => dayjs(start, 'HH:mm:ss'))
+        setEnd(() => dayjs(end, 'HH:mm:ss'))
+      }
+      handleCalendarFormValues(formValues)
+    }
+  }, [formValues])
+
+  if (id) {
+    const handleSetFormState = ({
+      start,
+      end,
+      date,
+      description,
+      patientId,
+      type,
+      specialistId,
+    }: AppointmentDetail) => {
       setStart(() => dayjs(start, 'HH:mm:ss'))
       setEnd(() => dayjs(end, 'HH:mm:ss'))
       setDate(() => dayjs(date))
@@ -66,13 +77,17 @@ const AppointmentForm = ({
       setSpecialistId(specialistId.toString())
       setPatientId(patientId.toString())
     }
-
-    if (serviceType === 'addFromCalendar' && formValues) {
-      setDate(() => dayjs(formValues.date))
-      setStart(() => dayjs(formValues.start, 'HH:mm:ss'))
-      setEnd(() => dayjs(formValues.end, 'HH:mm:ss'))
+    const { error: fetchAppointmentByIdError } = useFetchAppointmentById(
+      handleSetFormState,
+      +id,
+    )
+    if (fetchAppointmentByIdError) {
+      console.log(fetchAppointmentByIdError.message)
     }
-  }, [])
+  }
+
+  const updateAppointment = useUpdateAppointmentById()
+  const addAppointment = useAddAppointment()
 
   const fieldsFilled =
     !start ||
@@ -97,8 +112,6 @@ const AppointmentForm = ({
       return
     }
 
-    // validate start comes before end
-
     const appointmentValues = {
       start: start.format('HH:mm:ss'),
       end: end.format('HH:mm:ss'),
@@ -111,24 +124,18 @@ const AppointmentForm = ({
 
     switch (serviceType) {
       case 'update': {
-        if (service && appointmentId) {
-          const updateAppointment = service as UpdateAppointment
-          updateAppointment(appointmentId, appointmentValues)
+        if (id) {
+          console.log(serviceType)
+          updateAppointment.mutate([+id, appointmentValues])
         }
         break
       }
       case 'add': {
-        if (service) {
-          const addAppointment = service as AddAppointment
-          addAppointment(appointmentValues)
-        }
+        addAppointment.mutate([appointmentValues])
         break
       }
       case 'addFromCalendar': {
-        if (service) {
-          const addAppointment = service as AddAppointment
-          addAppointment(appointmentValues)
-        }
+        addAppointment.mutate([appointmentValues])
         break
       }
       default: {
@@ -136,14 +143,16 @@ const AppointmentForm = ({
         return
       }
     }
-    setAppointmentId(undefined)
     setStart(null)
     setEnd(null)
     setDate(null)
     setDescription('')
     setSpecialistId('')
     setPatientId('')
+    closeModal()
   }
+
+  console.log(serviceType)
 
   return (
     <form onSubmit={submitForm}>
@@ -186,7 +195,7 @@ const AppointmentForm = ({
             variant="contained"
             style={{ float: 'right' }}
             type="button"
-            onClick={onCancel}
+            onClick={closeModal}
             aria-label="Cancel button"
           >
             Cancel

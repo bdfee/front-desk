@@ -1,51 +1,29 @@
 import InformationList from './information-list'
 import AppointmentModal from '../appointment-modal'
-import { useState, useEffect } from 'react'
-import { AppointmentDetail } from '../../types'
+import { useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { Button } from '@mui/material'
-import axios from 'axios'
-import appointmentService from '../../services/appointment'
+import { queryClient } from '../../App'
+import { QueryClientProvider } from 'react-query'
 
 const AppointmentInformation = () => {
-  const [appointment, setAppointment] = useState<AppointmentDetail>()
   const [modalOpen, setModalOpen] = useState<boolean>(false)
   const { id } = useParams<{ id: string }>()
 
-  useEffect(() => {
-    const fetchAppointment = async () => {
-      try {
-        if (id) {
-          const appointment = await appointmentService.getOneById(+id)
-          setAppointment(appointment)
-        }
-      } catch (error) {
-        if (axios.isAxiosError(error)) {
-          console.log('axios error' + error.message)
-        } else {
-          console.log('unknown error fetching appointment')
-        }
-      }
-    }
-    void fetchAppointment()
-  }, [id])
-
-  if (!appointment) {
-    return <div>fetching patient info</div>
+  if (!id) {
+    return <div>error</div>
   }
 
   return (
-    <>
-      <InformationList appointment={appointment} />
+    <QueryClientProvider client={queryClient}>
+      <InformationList id={+id} />
       <Button onClick={() => setModalOpen(true)}>edit appointment</Button>
       <AppointmentModal
         modalOpen={modalOpen}
         setModalOpen={setModalOpen}
         serviceType="update"
-        state={appointment}
-        stateSetter={setAppointment}
       />
-    </>
+    </QueryClientProvider>
   )
 }
 

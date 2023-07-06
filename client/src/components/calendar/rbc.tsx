@@ -11,21 +11,35 @@ import { useMemo, useCallback, useState } from 'react'
 import { AppointmentDetail } from '../../types'
 import 'react-big-calendar/lib/css/react-big-calendar.css'
 import FetchedFormComponents from '../appointment-modal/fetched-form-components'
+import { useQuery } from 'react-query'
+import appointmentService from '../../services/appointment'
 
 dayjs.extend(timezone)
 dayjs.extend(utc)
 
 interface RBCProps {
-  appointments: AppointmentDetail[]
   openModal: (values: RBCEventPropsForForm) => void
 }
 
-const RBC = ({ appointments, openModal }: RBCProps) => {
+const RBC = ({ openModal }: RBCProps) => {
+  // query appointments
+  const [appointments, setAppointments] = useState<AppointmentDetail[]>([])
+
   const [specialistIdFilter, setSpecialistIdFilter] = useState<string>('')
   const [patientIdFilter, setPatientIdFilter] = useState<string>('')
   const [typeFilter, setTypeFilter] = useState<string>('')
 
   const navigate = useNavigate()
+
+  const { error: fetchAppointmentsError } = useQuery<
+    AppointmentDetail[],
+    Error
+  >({
+    queryKey: ['GET_APPOINTMENTS'],
+    queryFn: () => appointmentService.getAll(),
+    onSuccess: (data) => setAppointments(data),
+    onError: (error: Error) => 'error ' + error.message,
+  })
 
   const formatEvents = (filteredEvents: AppointmentDetail[]) => {
     return filteredEvents.map((appointment) => {
@@ -108,6 +122,10 @@ const RBC = ({ appointments, openModal }: RBCProps) => {
       },
     }
   }, [])
+
+  if (fetchAppointmentsError) {
+    console.log(fetchAppointmentsError.message)
+  }
 
   return (
     <>

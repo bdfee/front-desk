@@ -18,13 +18,13 @@ type SetPatient = Dispatch<SetStateAction<PatientDetail | undefined>>
 type SetStateActions = HandleSetFormState | SetPatient
 
 export const useFetchPatientByIdQuery = (
-  setStateACtion: SetStateActions,
+  setStateAction: SetStateActions,
   patientId: number,
 ) => {
   return useQuery<PatientDetail, Error>({
     queryKey: [`GET_PATIENT_${patientId}`] as [string],
     queryFn: () => patientService.getOneById(patientId),
-    onSuccess: (data) => setStateACtion(data),
+    onSuccess: (data) => setStateAction(data),
     onError: (error: Error) => 'error ' + error?.message,
   })
 }
