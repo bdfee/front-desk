@@ -10,6 +10,8 @@ interface TableData {
   patientCount: number
 }
 
+// type TableDataUpdater = (prev: TableData[]) => TableData[]
+
 export const useFetchSpecialists = (
   setSpecialists: Dispatch<SetStateAction<Specialist[]>>,
 ) => {
@@ -39,8 +41,18 @@ export const useAddSpecialist = () => {
       return specialistService.create(values)
     },
     {
-      onSuccess: () => {
-        queryClient.invalidateQueries({ queryKey: ['GET_SPECIALISTS_TABLE'] })
+      onSuccess: (newSpecialist) => {
+        queryClient.setQueryData<TableData[]>(
+          ['GET_SPECIALISTS_TABLE'],
+          (existingTableData = []) =>
+            (existingTableData || []).concat({
+              specialist: newSpecialist,
+              appointmentCount: 0,
+              patientCount: 0,
+            }),
+        )
+
+        queryClient.invalidateQueries({ queryKey: ['GET_SPECIALISTS'] })
       },
       onError: (error: Error) => console.log('Error: ', error.message),
     },
