@@ -71,7 +71,13 @@ export const useDeleteSpecialistById = (
     (id: number) => specialistService.deleteById(id),
     {
       onSuccess: (_data, id: number) => {
-        queryClient.invalidateQueries({ queryKey: ['GET_SPECIALISTS'] })
+        queryClient.setQueryData<Specialist[]>(
+          ['GET_SPECIALISTS'],
+          (existingSpecialistsData = []) =>
+            existingSpecialistsData.filter(
+              (specialist) => specialist.id !== id,
+            ),
+        )
         setTableData(
           tableData.filter(({ specialist }) => specialist.specialistId !== id),
         )
