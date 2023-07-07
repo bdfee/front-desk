@@ -11,7 +11,7 @@ import { useMemo, useCallback, useState } from 'react'
 import { AppointmentDetail } from '../../types'
 import 'react-big-calendar/lib/css/react-big-calendar.css'
 import FetchedFormComponents from '../appointment-modal/fetched-form-components'
-import { useQuery } from 'react-query'
+import { useQuery } from '@tanstack/react-query'
 import appointmentService from '../../services/appointment'
 
 dayjs.extend(timezone)

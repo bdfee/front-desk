@@ -3,8 +3,6 @@ import SelectSpecialist from './select-specialist'
 import SelectType from './select-type'
 
 import { Dispatch, SetStateAction } from 'react'
-import { QueryClientProvider } from 'react-query'
-import { queryClient } from '../../../App'
 
 interface FetchedFormComponentsProps {
   patientId: string
@@ -24,7 +22,7 @@ const FetchedFormComponents = ({
   setType,
 }: FetchedFormComponentsProps) => {
   return (
-    <QueryClientProvider client={queryClient}>
+    <>
       <div style={{ minHeight: '71px' }}>
         <SelectPatient patientId={patientId} setPatientId={setPatientId} />
         <SelectSpecialist
@@ -33,7 +31,7 @@ const FetchedFormComponents = ({
         />
         <SelectType type={type} setType={setType} />
       </div>
-    </QueryClientProvider>
+    </>
   )
 }
 

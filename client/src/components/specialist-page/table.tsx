@@ -22,6 +22,8 @@ import {
   useUpdateTableRowBySpecialistId,
 } from '../specialistActions'
 
+// import { useQuery, QueryClientProvider } from '@tanstack/react-query'
+
 export interface TableData {
   specialist: Specialist
   appointmentCount: number

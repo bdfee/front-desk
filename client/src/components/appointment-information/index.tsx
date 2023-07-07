@@ -3,8 +3,6 @@ import AppointmentModal from '../appointment-modal'
 import { useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { Button } from '@mui/material'
-import { queryClient } from '../../App'
-import { QueryClientProvider } from 'react-query'
 import { useDeleteAppointmentById } from '../appointmentActions'
 
 const DeleteButton = ({ id }: { id: number }) => {
@@ -28,7 +26,7 @@ const AppointmentInformation = () => {
   }
 
   return (
-    <QueryClientProvider client={queryClient}>
+    <>
       <InformationList id={+id} />
       <Button onClick={() => setModalOpen(true)}>edit</Button>
       <DeleteButton id={+id} />
@@ -37,7 +35,7 @@ const AppointmentInformation = () => {
         setModalOpen={setModalOpen}
         serviceType="update"
       />
-    </QueryClientProvider>
+    </>
   )
 }
 

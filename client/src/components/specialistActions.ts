@@ -1,15 +1,14 @@
-import { useQuery, useMutation } from 'react-query'
+import { useQuery, useMutation, QueryClient } from '@tanstack/react-query'
 import { Dispatch, SetStateAction } from 'react'
 import { Specialist, SpecialistInput } from '../types'
 import specialistService from '../services/specialist'
-import { queryClient } from '../App'
 
 interface TableData {
   specialist: Specialist
   appointmentCount: number
   patientCount: number
 }
-
+const queryClient = new QueryClient()
 // type TableDataUpdater = (prev: TableData[]) => TableData[]
 
 export const useFetchSpecialists = (

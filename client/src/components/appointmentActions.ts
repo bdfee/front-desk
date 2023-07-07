@@ -1,7 +1,6 @@
-import { useMutation, useQuery } from 'react-query'
+import { useMutation, useQuery, QueryClient } from '@tanstack/react-query'
 import { AppointmentInput } from '../types'
 import appointmentService from '../services/appointment'
-import { queryClient } from '../App'
 import { AppointmentDetail } from '../types'
 
 type HandleSetAppointmentFormState = ({
@@ -13,6 +12,8 @@ type HandleSetAppointmentFormState = ({
   type,
   specialistId,
 }: AppointmentDetail) => void
+
+const queryClient = new QueryClient()
 
 export const useUpdateAppointmentById = () => {
   return useMutation<AppointmentInput, Error, [number, AppointmentInput]>(

@@ -1,8 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Button } from '@mui/material'
 import RBC from './rbc'
-import { queryClient } from '../../App'
-import { QueryClientProvider } from 'react-query'
 
 export interface RBCEventProps {
   title: string
@@ -45,7 +43,7 @@ const Calendar = () => {
   }
 
   return (
-    <QueryClientProvider client={queryClient}>
+    <>
       <RBC openModal={openModal} />
       <Button onClick={() => setModalOpen(true)}>add appointment</Button>
       <AppointmentModal
@@ -55,7 +53,7 @@ const Calendar = () => {
         clearFormValues={clearForm}
         formValues={formValues}
       />
-    </QueryClientProvider>
+    </>
   )
 }
 

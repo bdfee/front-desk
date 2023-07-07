@@ -1,8 +1,7 @@
 import { SetStateAction, Dispatch } from 'react'
-import { useQuery, useMutation } from 'react-query'
+import { useQuery, useMutation, QueryClient } from '@tanstack/react-query'
 import { AppointmentDetail, PatientDetail, PatientInput } from '../types'
 import patientService from '../services/patients'
-import { queryClient } from '../App'
 
 type HandleSetFormState = ({
   dateOfBirth,
@@ -16,6 +15,8 @@ type HandleSetFormState = ({
 }: PatientDetail) => void
 type SetPatient = Dispatch<SetStateAction<PatientDetail | undefined>>
 type SetStateActions = HandleSetFormState | SetPatient
+
+const queryClient = new QueryClient()
 
 export const useFetchPatientByIdQuery = (
   setStateAction: SetStateActions,
@@ -45,7 +46,7 @@ export const useFetchPatients = (
   setPatients: Dispatch<SetStateAction<PatientDetail[]>>,
 ) => {
   return useQuery<PatientDetail[], Error>({
-    queryKey: 'GET_PATIENTS',
+    queryKey: ['GET_PATIENTS'],
     queryFn: patientService.getAll,
     onSuccess: (data) => setPatients(data),
     onError: (error: Error) => 'error ' + error?.message,
