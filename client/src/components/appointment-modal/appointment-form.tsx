@@ -1,3 +1,7 @@
+import dayjs, { Dayjs } from 'dayjs'
+import { useState, useContext, useEffect, SyntheticEvent } from 'react'
+import { useParams } from 'react-router-dom'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { TextField, Grid, Button, Divider } from '@mui/material'
 import {
   DatePicker,
@@ -5,25 +9,17 @@ import {
   TimeField,
 } from '@mui/x-date-pickers'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
-import dayjs, { Dayjs } from 'dayjs'
 
-import FetchedFormComponents from './fetched-form-components'
-
-import { SyntheticEvent, useState, useContext, useEffect } from 'react'
-import { AppointmentDetail, AppointmentInput } from '../../types'
-
+import {
+  AppointmentDetail,
+  AppointmentInput,
+  RBCEventPropsForForm,
+  AppointmentFormProps,
+} from '../../types'
 import { ErrorCtx } from '../../App'
 import { validateTextInput } from '../../validations/inputs'
-import { RBCEventPropsForForm } from '../calendar'
-import { useParams } from 'react-router-dom'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
 import appointmentService from '../../services/appointment'
-
-interface AppointmentFormProps {
-  serviceType: string
-  closeModal: () => void
-  formValues?: RBCEventPropsForForm
-}
+import FetchedFormComponents from './fetched-form-components'
 
 const AppointmentForm = ({
   serviceType,
@@ -89,32 +85,29 @@ const AppointmentForm = ({
     Error,
     { appointmentId: number; values: AppointmentInput }
   >({
-    mutationFn: ({ appointmentId, values }) => {
-      return appointmentService.updateById(appointmentId, values)
-    },
-    onSuccess: (data, variables) => {
+    mutationFn: ({ appointmentId, values }) =>
+      appointmentService.updateById(appointmentId, values),
+    onSuccess: (data) => {
       queryClient.setQueryData<AppointmentDetail>(
-        ['APPOINTMENT', variables.appointmentId],
+        ['APPOINTMENT', data.appointmentId],
         data,
       )
       queryClient.setQueryData<AppointmentDetail[]>(
         ['APPOINTMENTS'],
-        (oldAppointments) => {
-          return (oldAppointments || []).map((appointment) => {
-            return appointment.appointmentId === variables.appointmentId
+        (oldAppointments = []) =>
+          oldAppointments.map((appointment) =>
+            appointment.appointmentId === data.appointmentId
               ? data
-              : appointment
-          })
-        },
+              : appointment,
+          ),
       )
     },
   })
 
   const { mutate: addAppointment } = useMutation({
     mutationFn: appointmentService.create,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['APPOINTMENTS'] })
-    },
+    onSuccess: () =>
+      queryClient.invalidateQueries({ queryKey: ['APPOINTMENTS'] }),
   })
 
   const fieldsFilled =

@@ -1,3 +1,5 @@
+import { useContext, useState, useEffect } from 'react'
+import { useLocation } from 'react-router-dom'
 import {
   Dialog,
   DialogContent,
@@ -6,14 +8,9 @@ import {
   Alert,
   Button,
 } from '@mui/material'
-import PatientForm from './patient-form'
-import { useContext, useState, useEffect } from 'react'
-import { useLocation } from 'react-router-dom'
 import { ErrorCtx } from '../../App'
-
-interface PatientModalProps {
-  type: string
-}
+import PatientForm from './patient-form'
+import { PatientModalProps } from '../../types'
 
 const PatientModal = (props: PatientModalProps) => {
   const [modalOpen, setModalOpen] = useState(false)

@@ -1,43 +1,47 @@
-import dayjs from 'dayjs'
+import { useState, useMemo, useCallback } from 'react'
+import { useNavigate } from 'react-router-dom'
 import {
   Calendar as ReactBigCalendar,
   dayjsLocalizer,
 } from 'react-big-calendar'
+import dayjs from 'dayjs'
 import timezone from 'dayjs/plugin/timezone'
 import utc from 'dayjs/plugin/utc'
-import { RBCEventProps, NewEvent, RBCEventPropsForForm } from './index'
-import { useNavigate } from 'react-router-dom'
-import { useMemo, useCallback, useState } from 'react'
-import { AppointmentDetail } from '../../types'
 import 'react-big-calendar/lib/css/react-big-calendar.css'
+
 import FetchedFormComponents from '../appointment-modal/fetched-form-components'
 import { useQuery } from '@tanstack/react-query'
 import appointmentService from '../../services/appointment'
+import { RBCEventProps, NewEvent, RBCProps } from '../../types'
+import { AppointmentDetail } from '../../types'
 
 dayjs.extend(timezone)
 dayjs.extend(utc)
 
-interface RBCProps {
-  openModal: (values: RBCEventPropsForForm) => void
-}
-
 const RBC = ({ openModal }: RBCProps) => {
-  const [appointments, setAppointments] = useState<AppointmentDetail[]>([])
   const [specialistIdFilter, setSpecialistIdFilter] = useState<string>('')
   const [patientIdFilter, setPatientIdFilter] = useState<string>('')
   const [typeFilter, setTypeFilter] = useState<string>('')
 
   const navigate = useNavigate()
 
-  const { error: fetchAppointmentsError } = useQuery<
+  let appointments: AppointmentDetail[]
+
+  const { data: appointmentsData, status: appointmentsStatus } = useQuery<
     AppointmentDetail[],
     Error
   >({
     queryKey: ['APPOINTMENTS'],
     queryFn: () => appointmentService.getAll(),
-    onSuccess: (data) => setAppointments(data),
-    onError: (error: Error) => 'error ' + error.message,
   })
+
+  if (appointmentsStatus === 'error') {
+    return <div>error fetching appointments</div>
+  }
+
+  if (appointmentsStatus === 'loading') {
+    appointments = []
+  } else appointments = appointmentsData
 
   const formatEvents = (filteredEvents: AppointmentDetail[]) => {
     return filteredEvents.map((appointment) => {
@@ -120,10 +124,6 @@ const RBC = ({ openModal }: RBCProps) => {
       },
     }
   }, [])
-
-  if (fetchAppointmentsError) {
-    console.log(fetchAppointmentsError.message)
-  }
 
   return (
     <>

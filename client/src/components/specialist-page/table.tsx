@@ -6,28 +6,15 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  TextField,
-  Paper,
-  Button,
-  Typography,
 } from '@mui/material'
-import { Specialist, SpecialistInput } from '../../types'
+import { TextField, Paper, Button, Typography } from '@mui/material'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { Specialist, SpecialistInput, TableData, TableProps } from '../../types'
 import { sanitizeTextInput, validateTextInput } from '../../validations/inputs'
 import { isSpecialist } from '../../typeUtils'
 import 'dayjs/plugin/utc'
 import 'dayjs/plugin/timezone'
 import specialistService from '../../services/specialist'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-
-export interface TableData {
-  specialist: Specialist
-  appointmentCount: number
-  patientCount: number
-}
-
-interface TableProps {
-  setError: (errorMessage: string) => () => void
-}
 
 const SpecialistTable = ({ setError }: TableProps) => {
   const [editMode, setEditMode] = useState(false)
@@ -50,22 +37,18 @@ const SpecialistTable = ({ setError }: TableProps) => {
     onSuccess: (_, specialistId: number) => {
       queryClient.setQueryData<Specialist[]>(
         ['SPECIALISTS'],
-        (oldSpecialists) => {
-          const updatedList = (oldSpecialists || []).filter(
+        (oldSpecialists = []) =>
+          oldSpecialists.filter(
             (specialist) => specialist.specialistId !== specialistId,
-          )
-          return updatedList
-        },
+          ),
       )
 
       queryClient.setQueryData<TableData[]>(
         ['SPECIALISTS_TABLE'],
-        (oldTableData) => {
-          const updatedTableData = (oldTableData || []).filter(
+        (oldTableData = []) =>
+          oldTableData.filter(
             (row) => row.specialist.specialistId !== specialistId,
-          )
-          return updatedTableData
-        },
+          ),
       )
     },
   })
@@ -73,19 +56,16 @@ const SpecialistTable = ({ setError }: TableProps) => {
   const { mutate: updateSpecialistById } = useMutation<
     Specialist,
     Error,
-    [number, SpecialistInput]
+    { specialistId: number; values: SpecialistInput }
   >({
-    mutationFn: (variables) => {
-      const [specialistId, values] = variables
-      return specialistService.updateById(specialistId, values)
-    },
-    onSuccess: (_, variables: [number, SpecialistInput]) => {
-      const [specialistId, values] = variables
+    mutationFn: ({ specialistId, values }) =>
+      specialistService.updateById(specialistId, values),
+    onSuccess: (_, { specialistId, values }) => {
       queryClient.setQueryData<TableData[]>(
         ['SPECIALISTS_TABLE'],
-        (oldTableData) => {
-          const updatedTableData = (oldTableData || []).map((row) => {
-            return row.specialist.specialistId === specialistId
+        (oldTableData = []) =>
+          oldTableData.map((row) =>
+            row.specialist.specialistId === specialistId
               ? {
                   specialist: {
                     specialistId: specialistId,
@@ -95,33 +75,24 @@ const SpecialistTable = ({ setError }: TableProps) => {
                   appointmentCount: +row.appointmentCount,
                   patientCount: +row.patientCount,
                 }
-              : row
-          })
-          console.log('oldtableData', oldTableData)
-          console.log('updatedTableData', updatedTableData)
-          return updatedTableData
-        },
+              : row,
+          ),
       )
 
       queryClient.setQueryData<Specialist[]>(
         ['SPECIALISTS'],
-        (oldSpecialistsData) => {
-          const updatedSpecialistsData = (oldSpecialistsData || []).map(
-            (specialist) => {
-              return specialist.specialistId === specialistId
-                ? {
-                    specialistId,
-                    name: String(values.name),
-                    speciality: String(values.speciality),
-                  }
-                : specialist
-            },
-          )
-          return updatedSpecialistsData
-        },
+        (oldSpecialistsData = []) =>
+          oldSpecialistsData.map((specialist) =>
+            specialist.specialistId === specialistId
+              ? {
+                  specialistId,
+                  name: String(values.name),
+                  speciality: String(values.speciality),
+                }
+              : specialist,
+          ),
       )
     },
-    onError: (error: Error) => console.error('Error:', error),
   })
 
   if (tableDataStatus === 'loading') {
@@ -172,13 +143,10 @@ const SpecialistTable = ({ setError }: TableProps) => {
 
     try {
       if (isSpecialist(editRowData)) {
-        updateSpecialistById([
-          +editRowData.specialistId,
-          {
-            name,
-            speciality,
-          },
-        ])
+        updateSpecialistById({
+          specialistId: +editRowData.specialistId,
+          values: { name, speciality },
+        })
         setEditMode(false)
         setEditRowIdx(-1)
       }

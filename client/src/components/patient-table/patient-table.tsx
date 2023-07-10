@@ -13,15 +13,11 @@ import {
 import { useNavigate } from 'react-router-dom'
 import { PatientDetail } from '../../types'
 import { formatPhone } from '../../validations/inputs'
-
-import patientService from '../../services/patients'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import patientService from '../../services/patients'
 
 const PatientTable = () => {
   const navigate = useNavigate()
-
-  let patients: PatientDetail[]
-
   const queryClient = useQueryClient()
 
   const { data: patientsData, status: patientsStatus } = useQuery({
@@ -32,11 +28,11 @@ const PatientTable = () => {
   const { mutate: deletePatientById } = useMutation({
     mutationFn: (patientId: number) => patientService.deleteById(patientId),
     onSuccess: (_, patientId) => {
-      queryClient.setQueryData<PatientDetail[]>(['PATIENTS'], (oldPatients) => {
-        return (oldPatients || []).filter(
-          (patient) => patient.patientId !== patientId,
-        )
-      })
+      queryClient.setQueryData<PatientDetail[]>(
+        ['PATIENTS'],
+        (oldPatients = []) =>
+          oldPatients.filter((patient) => patient.patientId !== patientId),
+      )
     },
   })
 
@@ -59,8 +55,8 @@ const PatientTable = () => {
   }
 
   if (patientsStatus === 'loading') {
-    patients = []
-  } else patients = patientsData
+    return <div>loading...</div>
+  }
 
   return (
     <TableContainer component={Paper}>
@@ -76,7 +72,7 @@ const PatientTable = () => {
           </TableRow>
         </TableHead>
         <TableBody>
-          {patients.map(({ patientId, name, email, phone, specialist }) => {
+          {patientsData.map(({ patientId, name, email, phone, specialist }) => {
             return (
               <TableRow key={patientId}>
                 <TableCell>

@@ -14,14 +14,13 @@ const DeleteButton = ({ id }: { id: number }) => {
   const { mutate: deleteAppointmentById } = useMutation<void, Error, number>({
     mutationFn: (appointmentId: number) =>
       appointmentService.deleteById(appointmentId),
-    onSuccess: (data, appointmentId: number) => {
+    onSuccess: (_, appointmentId: number) => {
       queryClient.setQueryData<AppointmentDetail[]>(
         ['APPOINTMENTS'],
-        (oldAppointments) => {
-          return (oldAppointments || []).filter(
+        (oldAppointments = []) =>
+          oldAppointments.filter(
             (appointment) => appointment.appointmentId !== appointmentId,
-          )
-        },
+          ),
       )
       queryClient.invalidateQueries(['SPECIALISTS_TABLE'])
       queryClient.removeQueries(['APPOINTMENT', appointmentId])

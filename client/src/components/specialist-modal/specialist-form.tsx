@@ -2,14 +2,8 @@ import { TextField, Grid, Button } from '@mui/material'
 import { SyntheticEvent, useState } from 'react'
 import { validateTextInput, sanitizeTextInput } from '../../validations/inputs'
 import { useQueryClient, useMutation } from '@tanstack/react-query'
-import { Specialist, SpecialistInput } from '../../types'
-import { TableData } from '../specialist-page/table'
+import { Specialist, SpecialistFormProps, TableData } from '../../types'
 import specialistService from '../../services/specialist'
-
-interface SpecialistFormProps {
-  closeModal: () => void
-  setError: (errorMessage: string) => () => void
-}
 
 const SpecialistForm = ({ closeModal, setError }: SpecialistFormProps) => {
   const [firstName, setFirstName] = useState('')
@@ -29,12 +23,18 @@ const SpecialistForm = ({ closeModal, setError }: SpecialistFormProps) => {
 
       queryClient.setQueryData<TableData[]>(
         ['SPECIALISTS_TABLE'],
-        (oldTableData) => {
-          return (oldTableData || []).concat(updatedRow)
-        },
+        (oldTableData = []) => oldTableData.concat(updatedRow),
       )
 
-      queryClient.setQueryData<Specialist>(['SPECIALISTS'], newSpecialist)
+      queryClient.setQueryData<Specialist[]>(
+        ['SPECIALISTS'],
+        (oldSpecialistsData = []) => oldSpecialistsData.concat(newSpecialist),
+      )
+
+      queryClient.setQueryData<Specialist>(
+        ['SPECIALIST', newSpecialist.specialistId],
+        newSpecialist,
+      )
     },
   })
 

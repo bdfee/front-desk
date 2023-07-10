@@ -1,4 +1,3 @@
-import { Dispatch, SetStateAction } from 'react'
 import {
   InputLabel,
   Select,
@@ -7,15 +6,9 @@ import {
   FormControl,
   OutlinedInput,
 } from '@mui/material'
-import { Specialist } from '../../../types'
+import { Specialist, SelectSpecialistProps } from '../../../types'
 import { useQuery } from '@tanstack/react-query'
-// import { useFetchSpecialists } from '../../specialistActions'
 import specialistService from '../../../services/specialist'
-
-export interface SelectSpecialistProps {
-  specialistId: string
-  setSpecialistId: Dispatch<SetStateAction<string>>
-}
 
 const SelectSpecialist = ({
   specialistId,

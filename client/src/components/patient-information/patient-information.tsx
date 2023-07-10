@@ -1,20 +1,13 @@
-// import { useContext } from 'react'
 import { Container, Typography, Box, List, ListItemText } from '@mui/material'
-import { AppointmentDetail, PatientDetail } from '../../types'
+import {
+  AppointmentDetail,
+  PatientDetail,
+  InformationListProps,
+} from '../../types'
 import { useQuery } from '@tanstack/react-query'
-// import { ErrorCtx } from '../../App'
 import patientService from '../../services/patients'
 
-interface InformationListProps {
-  patientId: number
-}
-
 const InformationList = ({ patientId }: InformationListProps) => {
-  // const errorCtx = useContext(ErrorCtx)
-
-  let patient: PatientDetail
-  let appointments: AppointmentDetail[]
-
   const {
     data: appointmentsByPatientIdData,
     status: appointmentsByPatientIdStatus,
@@ -41,53 +34,50 @@ const InformationList = ({ patientId }: InformationListProps) => {
     return { history, upcoming }
   }
 
-  if (patientStatus === 'error') {
-    return <div>error fetching patients</div>
+  if (patientStatus === 'error' || appointmentsByPatientIdStatus === 'error') {
+    return <div>Error fetching data</div>
   }
 
-  if (appointmentsByPatientIdStatus === 'error') {
-    return <div>error fetching patient appointments</div>
+  if (
+    patientStatus === 'loading' ||
+    appointmentsByPatientIdStatus === 'loading'
+  ) {
+    return <div>Loading...</div>
   }
 
-  if (patientStatus === 'loading') {
-    return <div>loading patient</div>
-  } else patient = patientData
-
-  if (appointmentsByPatientIdStatus === 'loading') {
-    return <div>loading patient</div>
-  } else appointments = appointmentsByPatientIdData
-
-  const { history, upcoming } = sortAppointments(appointments)
+  const { history, upcoming } = sortAppointments(appointmentsByPatientIdData)
 
   return (
     <Container>
-      <Typography>{patient.name}</Typography>
+      <Typography>{patientData.name}</Typography>
       <Box>
         <List>
-          <ListItemText primary="gender" secondary={patient.gender} />
+          <ListItemText primary="gender" secondary={patientData.gender} />
           <ListItemText
             primary="date of birth"
-            secondary={patient.dateOfBirth}
+            secondary={patientData.dateOfBirth}
           />
-          <ListItemText primary="email" secondary={patient.email} />
-          <ListItemText primary="dateOfBirth" secondary={patient.dateOfBirth} />
-          <ListItemText primary="address" secondary={patient.address} />
+          <ListItemText primary="email" secondary={patientData.email} />
+          <ListItemText
+            primary="dateOfBirth"
+            secondary={patientData.dateOfBirth}
+          />
+          <ListItemText primary="address" secondary={patientData.address} />
           <ListItemText
             primary="specialist"
-            secondary={patient.specialist.name}
+            secondary={patientData.specialist.name}
           />
         </List>
         <Typography>Appointment History</Typography>
         <List>
-          {appointments.length &&
-            history.map((appointment) => {
-              return (
-                <ListItemText
-                  key={appointment.appointmentId}
-                  primary={appointment.date + ' ' + appointment.specialist.name}
-                />
-              )
-            })}
+          {history.map((appointment) => {
+            return (
+              <ListItemText
+                key={appointment.appointmentId}
+                primary={appointment.date + ' ' + appointment.specialist.name}
+              />
+            )
+          })}
         </List>
         <Typography>Upcoming Appointments</Typography>
         <List>

@@ -6,13 +6,8 @@ import {
   InputLabel,
   OutlinedInput,
 } from '@mui/material'
-import { Dispatch, SetStateAction } from 'react'
+import { SelectTypeProps } from '../../../types'
 import Swatch from '../swatch'
-
-export interface SelectTypeProps {
-  type: string
-  setType: Dispatch<SetStateAction<string>>
-}
 
 const SelectType = ({ type, setType }: SelectTypeProps) => {
   return (

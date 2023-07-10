@@ -6,13 +6,7 @@ import {
   Alert,
 } from '@mui/material'
 import SpecialistForm from './specialist-form'
-
-interface SpecialistModalProps {
-  closeModal: () => void
-  modalOpen: boolean
-  setError: (errorMessage: string) => () => void
-  error: string | undefined
-}
+import { SpecialistModalProps } from '../../types'
 
 const SpecialistModal = ({
   closeModal,

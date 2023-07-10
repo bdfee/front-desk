@@ -1,3 +1,5 @@
+import { SyntheticEvent, useState, useContext, useEffect } from 'react'
+import { useParams } from 'react-router-dom'
 import {
   TextField,
   Grid,
@@ -9,23 +11,24 @@ import {
 import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import dayjs, { Dayjs } from 'dayjs'
-import { SyntheticEvent, useState, useContext, useEffect } from 'react'
-import { useParams } from 'react-router-dom'
-import { Gender, PatientDetail, PatientInput, Specialist } from '../../types'
+import {
+  Gender,
+  PatientDetail,
+  PatientInput,
+  Specialist,
+  PatientFormProps,
+} from '../../types'
 import {
   validateTextInput,
   sanitizeTextInput,
   sanitizeEmail,
+  formatPhone,
+  validateEmail,
 } from '../../validations/inputs'
-import { formatPhone, validateEmail } from '../../validations/inputs'
 import { ErrorCtx } from '../../App'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import specialistService from '../../services/specialist'
 import patientService from '../../services/patients'
-interface PatientFormProps {
-  type: string
-  closeModal: () => void
-}
 
 const PatientForm = ({ type, closeModal }: PatientFormProps) => {
   const [patientId, setPatientId] = useState<number | undefined>()
@@ -79,20 +82,20 @@ const PatientForm = ({ type, closeModal }: PatientFormProps) => {
     }
   }, [id])
 
-  let specialists: Specialist[]
-
-  const { data: specialistData, status } = useQuery<Specialist[]>({
+  const { data: specialistData, status: specialistsStatus } = useQuery<
+    Specialist[]
+  >({
     queryKey: ['SPECIALISTS'],
     queryFn: specialistService.getAll,
   })
 
-  if (status === 'error') {
-    return <div>error fetching specialists</div>
+  if (specialistsStatus === 'error') {
+    return <div>error fetching data</div>
   }
 
-  if (status === 'loading') {
-    specialists = []
-  } else specialists = specialistData
+  if (specialistsStatus === 'loading') {
+    return <div>loading...</div>
+  }
 
   const { mutate: addPatient } = useMutation({
     mutationFn: patientService.create,
@@ -102,9 +105,14 @@ const PatientForm = ({ type, closeModal }: PatientFormProps) => {
         newPatient,
       )
 
-      queryClient.setQueryData<PatientDetail[]>(['PATIENTS'], (oldPatients) =>
-        oldPatients?.concat(newPatient),
+      queryClient.setQueryData<PatientDetail[]>(
+        ['PATIENTS'],
+        (oldPatients = []) => oldPatients.concat(newPatient),
       )
+
+      queryClient.invalidateQueries({
+        queryKey: ['SPECIALIST_TABLE'],
+      })
     },
   })
 
@@ -113,13 +121,10 @@ const PatientForm = ({ type, closeModal }: PatientFormProps) => {
     Error,
     { patientId: number; values: PatientInput }
   >({
-    mutationFn: (variables) =>
-      patientService.updateById(variables.patientId, variables.values),
-    onSuccess: (data, variables) => {
-      queryClient.setQueryData<PatientDetail>(
-        ['PATIENT', variables.patientId],
-        data,
-      )
+    mutationFn: ({ patientId, values }) =>
+      patientService.updateById(patientId, values),
+    onSuccess: (data, { patientId }) => {
+      queryClient.setQueryData<PatientDetail>(['PATIENT', patientId], data)
       queryClient.invalidateQueries({ queryKey: ['PATIENTS'] })
     },
   })
@@ -256,29 +261,25 @@ const PatientForm = ({ type, closeModal }: PatientFormProps) => {
           )
         })}
       </Select>
-      {!specialists ? (
-        <div>fetching specialists</div>
-      ) : (
-        <>
-          <InputLabel id="specialist">Assign Specialist</InputLabel>
-          <Select
-            labelId="specialist"
-            value={specialistId}
-            onChange={({ target }) => setSpecialistId(target.value)}
-          >
-            {specialists.map((specialist) => {
-              return (
-                <MenuItem
-                  key={specialist.specialistId}
-                  value={specialist.specialistId}
-                >
-                  {specialist.name}
-                </MenuItem>
-              )
-            })}
-          </Select>
-        </>
-      )}
+
+      <InputLabel id="specialist">Assign Specialist</InputLabel>
+      <Select
+        labelId="specialist"
+        value={specialistId}
+        onChange={({ target }) => setSpecialistId(target.value)}
+      >
+        {specialistData.map((specialist) => {
+          return (
+            <MenuItem
+              key={specialist.specialistId}
+              value={specialist.specialistId}
+            >
+              {specialist.name}
+            </MenuItem>
+          )
+        })}
+      </Select>
+
       <Grid>
         <Grid item>
           <Button

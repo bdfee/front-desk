@@ -1,4 +1,3 @@
-import { useState, Dispatch, SetStateAction } from 'react'
 import {
   InputLabel,
   Select,
@@ -8,14 +7,9 @@ import {
   OutlinedInput,
 } from '@mui/material'
 
-import { PatientDetail } from '../../../types'
+import { PatientDetail, SelectPatientProps } from '../../../types'
 import { useQuery } from '@tanstack/react-query'
 import patientService from '../../../services/patients'
-
-export interface SelectPatientProps {
-  patientId: string
-  setPatientId: Dispatch<SetStateAction<string>>
-}
 
 const SelectPatient = ({ patientId, setPatientId }: SelectPatientProps) => {
   let patients: PatientDetail[]

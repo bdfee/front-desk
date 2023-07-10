@@ -1,10 +1,7 @@
 import { Container, Typography, Box, List, ListItemText } from '@mui/material'
-import { AppointmentDetail } from '../../types'
+import { AppointmentDetail, AppointmentListProps } from '../../types'
 import { useQuery } from '@tanstack/react-query'
 import appointmentService from '../../services/appointment'
-interface AppointmentListProps {
-  id: number
-}
 
 const InformationList = ({ id }: AppointmentListProps) => {
   const { data: appointment, status: appointmentStatus } =
