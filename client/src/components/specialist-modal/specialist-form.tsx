@@ -1,7 +1,10 @@
 import { TextField, Grid, Button } from '@mui/material'
 import { SyntheticEvent, useState } from 'react'
 import { validateTextInput, sanitizeTextInput } from '../../validations/inputs'
-import { useAddSpecialist } from '../specialistActions'
+import { useQueryClient, useMutation } from '@tanstack/react-query'
+import { Specialist, SpecialistInput } from '../../types'
+import { TableData } from '../specialist-page/table'
+import specialistService from '../../services/specialist'
 
 interface SpecialistFormProps {
   closeModal: () => void
@@ -13,7 +16,27 @@ const SpecialistForm = ({ closeModal, setError }: SpecialistFormProps) => {
   const [lastName, setLastName] = useState('')
   const [speciality, setSpeciality] = useState('')
 
-  const addSpecialist = useAddSpecialist()
+  const queryClient = useQueryClient()
+
+  const { mutate: createSpecialist } = useMutation({
+    mutationFn: specialistService.create,
+    onSuccess: (newSpecialist) => {
+      const updatedRow: TableData = {
+        specialist: newSpecialist,
+        appointmentCount: 0,
+        patientCount: 0,
+      }
+
+      queryClient.setQueryData<TableData[]>(
+        ['SPECIALISTS_TABLE'],
+        (oldTableData) => {
+          return (oldTableData || []).concat(updatedRow)
+        },
+      )
+
+      queryClient.setQueryData<Specialist>(['SPECIALISTS'], newSpecialist)
+    },
+  })
 
   const handleAddSpecialist = (event: SyntheticEvent) => {
     event.preventDefault()
@@ -36,21 +59,17 @@ const SpecialistForm = ({ closeModal, setError }: SpecialistFormProps) => {
       return
     }
 
-    addSpecialist.mutate([
-      {
-        name: sanitizeTextInput(firstName) + ' ' + sanitizeTextInput(lastName),
-        speciality: sanitizeTextInput(speciality),
-      },
-    ])
+    createSpecialist({
+      name: sanitizeTextInput(firstName) + ' ' + sanitizeTextInput(lastName),
+      speciality: sanitizeTextInput(speciality),
+    })
+
     closeModal()
     setFirstName('')
     setLastName('')
     setSpeciality('')
   }
 
-  if (addSpecialist.isError) {
-    setError('Error ' + addSpecialist.error.message)
-  }
   const fieldsFilled =
     !firstName.trim() || !lastName.trim() || !speciality.trim()
 

@@ -9,8 +9,8 @@ import {
 } from '@mui/material'
 
 import { PatientDetail } from '../../../types'
-
-import { useFetchPatients } from '../../patientActions'
+import { useQuery } from '@tanstack/react-query'
+import patientService from '../../../services/patients'
 
 export interface SelectPatientProps {
   patientId: string
@@ -18,13 +18,20 @@ export interface SelectPatientProps {
 }
 
 const SelectPatient = ({ patientId, setPatientId }: SelectPatientProps) => {
-  const [patients, setPatients] = useState<PatientDetail[]>([])
+  let patients: PatientDetail[]
 
-  const { error: fetchPatientError } = useFetchPatients(setPatients)
+  const { data: patientsData, status: patientsStatus } = useQuery({
+    queryKey: ['PATIENTS'],
+    queryFn: patientService.getAll,
+  })
 
-  if (fetchPatientError) {
+  if (patientsStatus === 'error') {
     return <div>error fetching patients</div>
   }
+
+  if (patientsStatus === 'loading') {
+    patients = []
+  } else patients = patientsData
 
   return (
     <FormControl

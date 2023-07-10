@@ -11,18 +11,13 @@ import {
   Button,
   Typography,
 } from '@mui/material'
-import { Specialist } from '../../types'
+import { Specialist, SpecialistInput } from '../../types'
 import { sanitizeTextInput, validateTextInput } from '../../validations/inputs'
 import { isSpecialist } from '../../typeUtils'
 import 'dayjs/plugin/utc'
 import 'dayjs/plugin/timezone'
-import {
-  useDeleteSpecialistById,
-  useFetchSpecialistTable,
-  useUpdateTableRowBySpecialistId,
-} from '../specialistActions'
-
-// import { useQuery, QueryClientProvider } from '@tanstack/react-query'
+import specialistService from '../../services/specialist'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 
 export interface TableData {
   specialist: Specialist
@@ -35,39 +30,107 @@ interface TableProps {
 }
 
 const SpecialistTable = ({ setError }: TableProps) => {
-  const [tableData, setTableData] = useState<TableData[]>([])
   const [editMode, setEditMode] = useState(false)
   const [editRowIdx, setEditRowIdx] = useState(-1)
   const [editRowData, setEditRowData] = useState<Specialist | undefined>()
 
-  const { error: fetchTableDataError } = useFetchSpecialistTable(setTableData)
+  const queryClient = useQueryClient()
 
-  const deleteSpecialistById = useDeleteSpecialistById(setTableData, tableData)
+  const {
+    data: tableData,
+    error: getTableDataError,
+    status: tableDataStatus,
+  } = useQuery<TableData[], Error>({
+    queryKey: ['SPECIALISTS_TABLE'],
+    queryFn: specialistService.getTableData,
+  })
 
-  const handleUpdateTableRowBySpecialistId = (
-    specialistId: number,
-    data: Specialist,
-  ) => {
-    const { appointmentCount, patientCount } = tableData.filter(
-      (obj) => obj.specialist.specialistId === specialistId,
-    )[0]
+  const { mutate: deleteSpecialistById } = useMutation({
+    mutationFn: specialistService.deleteById,
+    onSuccess: (_, specialistId: number) => {
+      queryClient.setQueryData<Specialist[]>(
+        ['SPECIALISTS'],
+        (oldSpecialists) => {
+          const updatedList = (oldSpecialists || []).filter(
+            (specialist) => specialist.specialistId !== specialistId,
+          )
+          return updatedList
+        },
+      )
 
-    setTableData(
-      tableData.map((obj) =>
-        obj.specialist.specialistId === specialistId
-          ? {
-              specialist: data,
-              appointmentCount: appointmentCount,
-              patientCount: patientCount,
-            }
-          : obj,
-      ),
-    )
+      queryClient.setQueryData<TableData[]>(
+        ['SPECIALISTS_TABLE'],
+        (oldTableData) => {
+          const updatedTableData = (oldTableData || []).filter(
+            (row) => row.specialist.specialistId !== specialistId,
+          )
+          return updatedTableData
+        },
+      )
+    },
+  })
+
+  const { mutate: updateSpecialistById } = useMutation<
+    Specialist,
+    Error,
+    [number, SpecialistInput]
+  >({
+    mutationFn: (variables) => {
+      const [specialistId, values] = variables
+      return specialistService.updateById(specialistId, values)
+    },
+    onSuccess: (_, variables: [number, SpecialistInput]) => {
+      const [specialistId, values] = variables
+      queryClient.setQueryData<TableData[]>(
+        ['SPECIALISTS_TABLE'],
+        (oldTableData) => {
+          const updatedTableData = (oldTableData || []).map((row) => {
+            return row.specialist.specialistId === specialistId
+              ? {
+                  specialist: {
+                    specialistId: specialistId,
+                    name: String(values.name),
+                    speciality: String(values.speciality),
+                  },
+                  appointmentCount: +row.appointmentCount,
+                  patientCount: +row.patientCount,
+                }
+              : row
+          })
+          console.log('oldtableData', oldTableData)
+          console.log('updatedTableData', updatedTableData)
+          return updatedTableData
+        },
+      )
+
+      queryClient.setQueryData<Specialist[]>(
+        ['SPECIALISTS'],
+        (oldSpecialistsData) => {
+          const updatedSpecialistsData = (oldSpecialistsData || []).map(
+            (specialist) => {
+              return specialist.specialistId === specialistId
+                ? {
+                    specialistId,
+                    name: String(values.name),
+                    speciality: String(values.speciality),
+                  }
+                : specialist
+            },
+          )
+          return updatedSpecialistsData
+        },
+      )
+    },
+    onError: (error: Error) => console.error('Error:', error),
+  })
+
+  if (tableDataStatus === 'loading') {
+    return <div>fetching table data</div>
   }
 
-  const updateTableRowBySpecialistId = useUpdateTableRowBySpecialistId(
-    handleUpdateTableRowBySpecialistId,
-  )
+  if (tableDataStatus === 'error') {
+    return <div>error fetching table data: {getTableDataError.message}</div>
+  }
 
   const handleRowEdit = (rowIdx: number) => {
     if (tableData) {
@@ -109,7 +172,7 @@ const SpecialistTable = ({ setError }: TableProps) => {
 
     try {
       if (isSpecialist(editRowData)) {
-        updateTableRowBySpecialistId.mutate([
+        updateSpecialistById([
           +editRowData.specialistId,
           {
             name,
@@ -122,22 +185,6 @@ const SpecialistTable = ({ setError }: TableProps) => {
     } catch (error) {
       console.log('Error saving changes:' + error)
     }
-  }
-
-  if (fetchTableDataError) {
-    console.log(fetchTableDataError.message)
-  }
-
-  if (updateTableRowBySpecialistId.isError) {
-    console.log(updateTableRowBySpecialistId.error.message)
-  }
-
-  if (deleteSpecialistById.isError) {
-    console.log(deleteSpecialistById.error.message)
-  }
-
-  if (!tableData) {
-    return <div>fetching table data</div>
   }
 
   return (
@@ -189,7 +236,7 @@ const SpecialistTable = ({ setError }: TableProps) => {
                       row.patientCount !== 0 || row.appointmentCount !== 0
                     }
                     onClick={() =>
-                      deleteSpecialistById.mutate(row.specialist.specialistId)
+                      deleteSpecialistById(+row.specialist.specialistId)
                     }
                     aria-label="Delete specialist"
                   >

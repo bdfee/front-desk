@@ -10,17 +10,14 @@ import dayjs, { Dayjs } from 'dayjs'
 import FetchedFormComponents from './fetched-form-components'
 
 import { SyntheticEvent, useState, useContext, useEffect } from 'react'
-import { AppointmentDetail } from '../../types'
+import { AppointmentDetail, AppointmentInput } from '../../types'
 
 import { ErrorCtx } from '../../App'
 import { validateTextInput } from '../../validations/inputs'
 import { RBCEventPropsForForm } from '../calendar'
 import { useParams } from 'react-router-dom'
-import {
-  useUpdateAppointmentById,
-  useAddAppointment,
-  useFetchAppointmentById,
-} from '../appointmentActions'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import appointmentService from '../../services/appointment'
 
 interface AppointmentFormProps {
   serviceType: string
@@ -43,6 +40,7 @@ const AppointmentForm = ({
 
   const errorCtx = useContext(ErrorCtx)
   const { id } = useParams<{ id: string }>()
+  const queryClient = useQueryClient()
 
   useEffect(() => {
     if (formValues) {
@@ -59,35 +57,65 @@ const AppointmentForm = ({
     }
   }, [formValues])
 
-  if (id) {
-    const handleSetFormState = ({
-      start,
-      end,
-      date,
-      description,
-      patientId,
-      type,
-      specialistId,
-    }: AppointmentDetail) => {
-      setStart(() => dayjs(start, 'HH:mm:ss'))
-      setEnd(() => dayjs(end, 'HH:mm:ss'))
-      setDate(() => dayjs(date))
-      setType(type)
-      setDescription(description)
-      setSpecialistId(specialistId.toString())
-      setPatientId(patientId.toString())
+  useEffect(() => {
+    if (id) {
+      const handleSetFormState = ({
+        start,
+        end,
+        date,
+        description,
+        patientId,
+        type,
+        specialistId,
+      }: AppointmentDetail) => {
+        setStart(() => dayjs(start, 'HH:mm:ss'))
+        setEnd(() => dayjs(end, 'HH:mm:ss'))
+        setDate(() => dayjs(date))
+        setType(type)
+        setDescription(description)
+        setSpecialistId(specialistId.toString())
+        setPatientId(patientId.toString())
+      }
+      const formData = queryClient.getQueryData<AppointmentDetail>([
+        'APPOINTMENT',
+        +id,
+      ])
+      if (formData) handleSetFormState(formData)
     }
-    const { error: fetchAppointmentByIdError } = useFetchAppointmentById(
-      handleSetFormState,
-      +id,
-    )
-    if (fetchAppointmentByIdError) {
-      console.log(fetchAppointmentByIdError.message)
-    }
-  }
+  }, [id])
 
-  const updateAppointment = useUpdateAppointmentById()
-  const addAppointment = useAddAppointment()
+  const { mutate: updateAppointmentById } = useMutation<
+    AppointmentDetail,
+    Error,
+    { appointmentId: number; values: AppointmentInput }
+  >({
+    mutationFn: ({ appointmentId, values }) => {
+      return appointmentService.updateById(appointmentId, values)
+    },
+    onSuccess: (data, variables) => {
+      queryClient.setQueryData<AppointmentDetail>(
+        ['APPOINTMENT', variables.appointmentId],
+        data,
+      )
+      queryClient.setQueryData<AppointmentDetail[]>(
+        ['APPOINTMENTS'],
+        (oldAppointments) => {
+          return (oldAppointments || []).map((appointment) => {
+            return appointment.appointmentId === variables.appointmentId
+              ? data
+              : appointment
+          })
+        },
+      )
+    },
+  })
+
+  const { mutate: addAppointment } = useMutation({
+    mutationFn: appointmentService.create,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['APPOINTMENTS'] })
+    },
+  })
 
   const fieldsFilled =
     !start ||
@@ -125,17 +153,19 @@ const AppointmentForm = ({
     switch (serviceType) {
       case 'update': {
         if (id) {
-          console.log(serviceType)
-          updateAppointment.mutate([+id, appointmentValues])
+          updateAppointmentById({
+            appointmentId: +id,
+            values: appointmentValues,
+          })
         }
         break
       }
       case 'add': {
-        addAppointment.mutate([appointmentValues])
+        addAppointment(appointmentValues)
         break
       }
       case 'addFromCalendar': {
-        addAppointment.mutate([appointmentValues])
+        addAppointment(appointmentValues)
         break
       }
       default: {

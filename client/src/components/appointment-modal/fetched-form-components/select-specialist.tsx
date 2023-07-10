@@ -1,4 +1,4 @@
-import { useState, Dispatch, SetStateAction } from 'react'
+import { Dispatch, SetStateAction } from 'react'
 import {
   InputLabel,
   Select,
@@ -8,7 +8,9 @@ import {
   OutlinedInput,
 } from '@mui/material'
 import { Specialist } from '../../../types'
-import { useFetchSpecialists } from '../../specialistActions'
+import { useQuery } from '@tanstack/react-query'
+// import { useFetchSpecialists } from '../../specialistActions'
+import specialistService from '../../../services/specialist'
 
 export interface SelectSpecialistProps {
   specialistId: string
@@ -19,13 +21,20 @@ const SelectSpecialist = ({
   specialistId,
   setSpecialistId,
 }: SelectSpecialistProps) => {
-  const [specialists, setSpecialists] = useState<Specialist[]>([])
+  let specialists: Specialist[]
 
-  const { error: fetchSpecialistsError } = useFetchSpecialists(setSpecialists)
+  const { data: specialistData, status } = useQuery<Specialist[]>({
+    queryKey: ['SPECIALISTS'],
+    queryFn: specialistService.getAll,
+  })
 
-  if (fetchSpecialistsError) {
+  if (status === 'error') {
     return <div>error fetching specialists</div>
   }
+
+  if (status === 'loading') {
+    specialists = []
+  } else specialists = specialistData
 
   return (
     <FormControl sx={{ width: 175 }}>

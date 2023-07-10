@@ -33,7 +33,7 @@ const RBC = ({ openModal }: RBCProps) => {
     AppointmentDetail[],
     Error
   >({
-    queryKey: ['GET_APPOINTMENTS'],
+    queryKey: ['APPOINTMENTS'],
     queryFn: () => appointmentService.getAll(),
     onSuccess: (data) => setAppointments(data),
     onError: (error: Error) => 'error ' + error.message,

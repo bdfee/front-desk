@@ -1,30 +1,32 @@
-import { useState, useContext } from 'react'
+// import { useContext } from 'react'
 import { Container, Typography, Box, List, ListItemText } from '@mui/material'
 import { AppointmentDetail, PatientDetail } from '../../types'
-import { ErrorCtx } from '../../App'
-import {
-  useFetchPatientByIdQuery,
-  useFetchAppointmentsByPatientId,
-} from '../patientActions'
+import { useQuery } from '@tanstack/react-query'
+// import { ErrorCtx } from '../../App'
+import patientService from '../../services/patients'
+
 interface InformationListProps {
   patientId: number
 }
 
 const InformationList = ({ patientId }: InformationListProps) => {
-  const [patient, setPatient] = useState<PatientDetail>()
-  const [appointments, setAppointments] = useState<AppointmentDetail[]>([])
-  const errorCtx = useContext(ErrorCtx)
+  // const errorCtx = useContext(ErrorCtx)
 
-  // pass in state setters and patientId to call from onSuccess directly
-  const { error: fetchPatientError } = useFetchPatientByIdQuery(
-    setPatient,
-    patientId,
-  )
+  let patient: PatientDetail
+  let appointments: AppointmentDetail[]
 
-  const { error: fetchAppointmentError } = useFetchAppointmentsByPatientId(
-    setAppointments,
-    patientId,
-  )
+  const {
+    data: appointmentsByPatientIdData,
+    status: appointmentsByPatientIdStatus,
+  } = useQuery<AppointmentDetail[]>({
+    queryKey: ['PATIENT_APPOINTMENTS', patientId],
+    queryFn: () => patientService.getAppointmentsByPatient(patientId),
+  })
+
+  const { data: patientData, status: patientStatus } = useQuery<PatientDetail>({
+    queryKey: ['PATIENT', patientId],
+    queryFn: () => patientService.getOneById(patientId),
+  })
 
   const sortAppointments = (appointments: AppointmentDetail[]) => {
     const history: AppointmentDetail[] = []
@@ -39,17 +41,21 @@ const InformationList = ({ patientId }: InformationListProps) => {
     return { history, upcoming }
   }
 
-  if (fetchPatientError) {
-    errorCtx?.setError(fetchPatientError.message)
+  if (patientStatus === 'error') {
+    return <div>error fetching patients</div>
   }
 
-  if (fetchAppointmentError) {
-    errorCtx?.setError(fetchAppointmentError.message)
+  if (appointmentsByPatientIdStatus === 'error') {
+    return <div>error fetching patient appointments</div>
   }
 
-  if (!patient) {
-    return <div>fetching patient</div>
-  }
+  if (patientStatus === 'loading') {
+    return <div>loading patient</div>
+  } else patient = patientData
+
+  if (appointmentsByPatientIdStatus === 'loading') {
+    return <div>loading patient</div>
+  } else appointments = appointmentsByPatientIdData
 
   const { history, upcoming } = sortAppointments(appointments)
 
