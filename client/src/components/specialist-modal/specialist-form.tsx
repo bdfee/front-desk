@@ -1,19 +1,42 @@
 import { TextField, Grid, Button } from '@mui/material'
 import { SyntheticEvent, useState } from 'react'
 import { validateTextInput, sanitizeTextInput } from '../../validations/inputs'
-import { useAddSpecialist } from '../specialistActions'
-
-interface SpecialistFormProps {
-  closeModal: () => void
-  setError: (errorMessage: string) => () => void
-}
+import { useQueryClient, useMutation } from '@tanstack/react-query'
+import { Specialist, SpecialistFormProps, TableData } from '../../types'
+import specialistService from '../../services/specialist'
 
 const SpecialistForm = ({ closeModal, setError }: SpecialistFormProps) => {
   const [firstName, setFirstName] = useState('')
   const [lastName, setLastName] = useState('')
   const [speciality, setSpeciality] = useState('')
 
-  const addSpecialist = useAddSpecialist()
+  const queryClient = useQueryClient()
+
+  const { mutate: createSpecialist } = useMutation({
+    mutationFn: specialistService.create,
+    onSuccess: (newSpecialist) => {
+      const updatedRow: TableData = {
+        specialist: newSpecialist,
+        appointmentCount: 0,
+        patientCount: 0,
+      }
+
+      queryClient.setQueryData<TableData[]>(
+        ['SPECIALISTS_TABLE'],
+        (oldTableData = []) => oldTableData.concat(updatedRow),
+      )
+
+      queryClient.setQueryData<Specialist[]>(
+        ['SPECIALISTS'],
+        (oldSpecialistsData = []) => oldSpecialistsData.concat(newSpecialist),
+      )
+
+      queryClient.setQueryData<Specialist>(
+        ['SPECIALIST', newSpecialist.specialistId],
+        newSpecialist,
+      )
+    },
+  })
 
   const handleAddSpecialist = (event: SyntheticEvent) => {
     event.preventDefault()
@@ -36,21 +59,17 @@ const SpecialistForm = ({ closeModal, setError }: SpecialistFormProps) => {
       return
     }
 
-    addSpecialist.mutate([
-      {
-        name: sanitizeTextInput(firstName) + ' ' + sanitizeTextInput(lastName),
-        speciality: sanitizeTextInput(speciality),
-      },
-    ])
+    createSpecialist({
+      name: sanitizeTextInput(firstName) + ' ' + sanitizeTextInput(lastName),
+      speciality: sanitizeTextInput(speciality),
+    })
+
     closeModal()
     setFirstName('')
     setLastName('')
     setSpeciality('')
   }
 
-  if (addSpecialist.isError) {
-    setError('Error ' + addSpecialist.error.message)
-  }
   const fieldsFilled =
     !firstName.trim() || !lastName.trim() || !speciality.trim()
 

@@ -5,19 +5,11 @@ import {
   Divider,
   Alert,
 } from '@mui/material'
-import { Dispatch, SetStateAction, useContext, useEffect } from 'react'
+import { useContext, useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
 import { ErrorCtx } from '../../App'
 import AppointmentForm from './appointment-form'
-import { RBCEventPropsForForm } from '../calendar'
-
-interface BaseAppointmentModalProps {
-  serviceType: string
-  modalOpen: boolean
-  setModalOpen: Dispatch<SetStateAction<boolean>>
-  formValues?: RBCEventPropsForForm
-  clearFormValues?: () => void
-}
+import { BaseAppointmentModalProps } from '../../types'
 
 const AppointmentModal = (props: BaseAppointmentModalProps) => {
   const { modalOpen, setModalOpen, serviceType, formValues } = props

@@ -6,15 +6,7 @@ import {
   Alert,
 } from '@mui/material'
 import SpecialistForm from './specialist-form'
-import { queryClient } from '../../App'
-import { QueryClientProvider } from 'react-query'
-
-interface SpecialistModalProps {
-  closeModal: () => void
-  modalOpen: boolean
-  setError: (errorMessage: string) => () => void
-  error: string | undefined
-}
+import { SpecialistModalProps } from '../../types'
 
 const SpecialistModal = ({
   closeModal,
@@ -23,7 +15,7 @@ const SpecialistModal = ({
   error,
 }: SpecialistModalProps) => {
   return (
-    <QueryClientProvider client={queryClient}>
+    <>
       <Dialog
         fullWidth={true}
         open={modalOpen}
@@ -42,7 +34,7 @@ const SpecialistModal = ({
           <SpecialistForm closeModal={closeModal} setError={setError} />
         </DialogContent>
       </Dialog>
-    </QueryClientProvider>
+    </>
   )
 }
 

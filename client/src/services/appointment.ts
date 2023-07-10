@@ -45,7 +45,10 @@ const deleteById = async (id: number) => {
 
 const updateById = async (id: number, object: unknown) => {
   try {
-    const { data } = await axios.put(url + id, object)
+    const { data }: { data: AppointmentDetail } = await axios.put(
+      url + id,
+      object,
+    )
     if (!isAppointment(data)) {
       throw new Error('invalid appointment data')
     }

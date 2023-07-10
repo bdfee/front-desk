@@ -1,24 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Button } from '@mui/material'
 import RBC from './rbc'
-import { queryClient } from '../../App'
-import { QueryClientProvider } from 'react-query'
-
-export interface RBCEventProps {
-  title: string
-  appointmentId: number
-  type: string
-  start: Date
-  end: Date
-}
-
-export interface RBCEventPropsForForm {
-  start: string
-  end: string
-  date: string
-}
-
-export type NewEvent = Omit<RBCEventProps, 'title' | 'appointmentId' | 'type'>
+import { RBCEventPropsForForm } from '../../types'
 
 import AppointmentModal from '../appointment-modal'
 
@@ -28,7 +11,6 @@ const Calendar = () => {
   >()
   const [modalOpen, setModalOpen] = useState(false)
 
-  // in lieu of element blur, clear form if modal closed by clicking away
   useEffect(() => {
     if (!modalOpen) {
       clearForm()
@@ -45,7 +27,7 @@ const Calendar = () => {
   }
 
   return (
-    <QueryClientProvider client={queryClient}>
+    <>
       <RBC openModal={openModal} />
       <Button onClick={() => setModalOpen(true)}>add appointment</Button>
       <AppointmentModal
@@ -55,7 +37,7 @@ const Calendar = () => {
         clearFormValues={clearForm}
         formValues={formValues}
       />
-    </QueryClientProvider>
+    </>
   )
 }
 

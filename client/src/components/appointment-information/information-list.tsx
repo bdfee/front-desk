@@ -1,23 +1,21 @@
 import { Container, Typography, Box, List, ListItemText } from '@mui/material'
-import { useState } from 'react'
-import { AppointmentDetail } from '../../types'
-import { useFetchAppointmentById } from '../appointmentActions'
-
-interface AppointmentListProps {
-  id: number
-}
+import { AppointmentDetail, AppointmentListProps } from '../../types'
+import { useQuery } from '@tanstack/react-query'
+import appointmentService from '../../services/appointment'
 
 const InformationList = ({ id }: AppointmentListProps) => {
-  const [appointment, setAppointment] = useState<AppointmentDetail>()
+  const { data: appointment, status: appointmentStatus } =
+    useQuery<AppointmentDetail>({
+      queryKey: ['APPOINTMENT', id],
+      queryFn: () => appointmentService.getOneById(id),
+    })
 
-  const { error } = useFetchAppointmentById(setAppointment, +id)
-
-  if (error) {
+  if (appointmentStatus === 'error') {
     return <div>error fetching appointment</div>
   }
 
-  if (!appointment) {
-    return <div>fetching appointment</div>
+  if (appointmentStatus === 'loading') {
+    return <div>loading appointment</div>
   }
 
   return (

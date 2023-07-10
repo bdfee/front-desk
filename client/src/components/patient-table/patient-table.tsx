@@ -11,36 +11,51 @@ import {
   Link,
 } from '@mui/material'
 import { useNavigate } from 'react-router-dom'
-import { useState } from 'react'
 import { PatientDetail } from '../../types'
 import { formatPhone } from '../../validations/inputs'
-
-import { useDeletePatientById, useFetchPatients } from '../patientActions'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import patientService from '../../services/patients'
 
 const PatientTable = () => {
-  const [patients, setPatients] = useState<PatientDetail[]>([])
   const navigate = useNavigate()
+  const queryClient = useQueryClient()
 
-  const { error: fetchPatientsError } = useFetchPatients(setPatients)
+  const { data: patientsData, status: patientsStatus } = useQuery({
+    queryKey: ['PATIENTS'],
+    queryFn: patientService.getAll,
+  })
 
-  const deletePatient = useDeletePatientById(setPatients, patients)
+  const { mutate: deletePatientById } = useMutation({
+    mutationFn: (patientId: number) => patientService.deleteById(patientId),
+    onSuccess: (_, patientId) => {
+      queryClient.setQueryData<PatientDetail[]>(
+        ['PATIENTS'],
+        (oldPatients = []) =>
+          oldPatients.filter((patient) => patient.patientId !== patientId),
+      )
+    },
+  })
 
   const navigateToPatient = (patientId: number) => {
     navigate(`/patients/${patientId}`)
   }
 
-  const navigateToPatientEditor = (patientId: number) => {
+  const navigateToPatientEditor = async (patientId: number) => {
+    await queryClient.prefetchQuery({
+      queryKey: ['PATIENT', patientId],
+      queryFn: () => patientService.getOneById(patientId),
+    })
     navigate(`/patients/${patientId}`, {
       state: { openModalOnLoad: true },
     })
   }
 
-  if (fetchPatientsError) {
-    console.log(fetchPatientsError.message)
+  if (patientsStatus === 'error') {
+    return <div>error fetching patients</div>
   }
 
-  if (deletePatient.isError) {
-    console.log(deletePatient.error.message)
+  if (patientsStatus === 'loading') {
+    return <div>loading...</div>
   }
 
   return (
@@ -53,12 +68,11 @@ const PatientTable = () => {
             <TableCell>Email</TableCell>
             <TableCell>Phone</TableCell>
             <TableCell>Specialist</TableCell>
-
             <TableCell>Actions</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
-          {patients.map(({ patientId, name, email, phone, specialist }) => {
+          {patientsData.map(({ patientId, name, email, phone, specialist }) => {
             return (
               <TableRow key={patientId}>
                 <TableCell>
@@ -77,7 +91,7 @@ const PatientTable = () => {
                   <Button onClick={() => navigateToPatientEditor(patientId)}>
                     Edit
                   </Button>
-                  <Button onClick={() => deletePatient.mutate(+patientId)}>
+                  <Button onClick={() => deletePatientById(+patientId)}>
                     Delete
                   </Button>
                 </TableCell>

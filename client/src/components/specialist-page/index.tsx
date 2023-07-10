@@ -2,8 +2,6 @@ import { useState } from 'react'
 import Table from './table'
 import SpecialistModal from '../specialist-modal'
 import { Alert, Button } from '@mui/material'
-import { queryClient } from '../../App'
-import { QueryClientProvider } from 'react-query'
 
 const SpecialistPage = () => {
   const [modalOpen, setModalOpen] = useState(false)
@@ -25,7 +23,7 @@ const SpecialistPage = () => {
   }
 
   return (
-    <QueryClientProvider client={queryClient}>
+    <>
       {!modalOpen && error && (
         <Alert severity="error" role="alert">
           {error}
@@ -41,7 +39,7 @@ const SpecialistPage = () => {
         modalOpen={modalOpen}
         error={error}
       />
-    </QueryClientProvider>
+    </>
   )
 }
 

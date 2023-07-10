@@ -1,6 +1,4 @@
-interface SwatchProps {
-  color: string
-}
+import { SwatchProps } from '../../types'
 
 const Swatch = (props: SwatchProps) => {
   return (

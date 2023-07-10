@@ -1,3 +1,5 @@
+import { SyntheticEvent, useState, useContext, useEffect } from 'react'
+import { useParams } from 'react-router-dom'
 import {
   TextField,
   Grid,
@@ -9,30 +11,26 @@ import {
 import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import dayjs, { Dayjs } from 'dayjs'
-import { SyntheticEvent, useState, useContext } from 'react'
-import { useParams } from 'react-router-dom'
-import { Gender, PatientDetail, Specialist } from '../../types'
+import {
+  Gender,
+  PatientDetail,
+  PatientInput,
+  Specialist,
+  PatientFormProps,
+} from '../../types'
 import {
   validateTextInput,
   sanitizeTextInput,
   sanitizeEmail,
+  formatPhone,
+  validateEmail,
 } from '../../validations/inputs'
-import { formatPhone, validateEmail } from '../../validations/inputs'
 import { ErrorCtx } from '../../App'
-import { useFetchSpecialists } from '../specialistActions'
-import {
-  useAddPatient,
-  useFetchPatientByIdQuery,
-  useUpdatePatientById,
-} from '../patientActions'
-
-interface PatientFormProps {
-  type: string
-  closeModal: () => void
-}
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import specialistService from '../../services/specialist'
+import patientService from '../../services/patients'
 
 const PatientForm = ({ type, closeModal }: PatientFormProps) => {
-  const [specialists, setSpecialists] = useState<Specialist[]>([])
   const [patientId, setPatientId] = useState<number | undefined>()
   const [specialistId, setSpecialistId] = useState<string>('')
   const [firstName, setFirstName] = useState('')
@@ -47,45 +45,89 @@ const PatientForm = ({ type, closeModal }: PatientFormProps) => {
 
   const { id } = useParams<{ id: string }>()
 
-  // if type is update, populate form with existing values
-  // useEffect?
-  if (type === 'update') {
-    if (id) {
-      const handleSetFormState = ({
-        dateOfBirth,
-        name,
-        email,
-        phone,
-        gender,
-        address,
-        specialistId,
-        patientId,
-      }: PatientDetail) => {
-        const dob = dayjs(dateOfBirth)
-        const [first, last] = name.split(' ')
-        setPatientId(patientId)
-        setFirstName(first)
-        setLastName(last)
-        setEmail(email)
-        setPhone(phone)
-        setDateOfBirth(dob)
-        setGender(gender)
-        setAddress(address)
-        setSpecialistId(specialistId.toString())
-      }
-      const { error: fetchPatientByIdError } = useFetchPatientByIdQuery(
-        handleSetFormState,
-        +id,
-      )
-      if (fetchPatientByIdError) {
-        console.log(fetchPatientByIdError.message)
+  const queryClient = useQueryClient()
+
+  useEffect(() => {
+    if (type === 'update') {
+      if (id) {
+        const handleSetFormState = ({
+          dateOfBirth,
+          name,
+          email,
+          phone,
+          gender,
+          address,
+          specialistId,
+          patientId,
+        }: PatientDetail) => {
+          const dob = dayjs(dateOfBirth)
+          const [first, last] = name.split(' ')
+          setPatientId(patientId)
+          setFirstName(first)
+          setLastName(last)
+          setEmail(email)
+          setPhone(phone)
+          setDateOfBirth(dob)
+          setGender(gender)
+          setAddress(address)
+          setSpecialistId(specialistId.toString())
+        }
+        const formData = queryClient.getQueryData<PatientDetail>([
+          'PATIENT',
+          +id,
+        ])
+
+        if (formData) handleSetFormState(formData)
       }
     }
+  }, [id])
+
+  const { data: specialistData, status: specialistsStatus } = useQuery<
+    Specialist[]
+  >({
+    queryKey: ['SPECIALISTS'],
+    queryFn: specialistService.getAll,
+  })
+
+  if (specialistsStatus === 'error') {
+    return <div>error fetching data</div>
   }
 
-  const { error: fetchSpecialistsError } = useFetchSpecialists(setSpecialists)
-  const updatePatient = useUpdatePatientById()
-  const addPatient = useAddPatient()
+  if (specialistsStatus === 'loading') {
+    return <div>loading...</div>
+  }
+
+  const { mutate: addPatient } = useMutation({
+    mutationFn: patientService.create,
+    onSuccess: (newPatient) => {
+      queryClient.setQueryData<PatientDetail>(
+        ['PATIENT', newPatient.patientId],
+        newPatient,
+      )
+
+      queryClient.setQueryData<PatientDetail[]>(
+        ['PATIENTS'],
+        (oldPatients = []) => oldPatients.concat(newPatient),
+      )
+
+      queryClient.invalidateQueries({
+        queryKey: ['SPECIALIST_TABLE'],
+      })
+    },
+  })
+
+  const { mutate: updatePatientById } = useMutation<
+    PatientDetail,
+    Error,
+    { patientId: number; values: PatientInput }
+  >({
+    mutationFn: ({ patientId, values }) =>
+      patientService.updateById(patientId, values),
+    onSuccess: (data, { patientId }) => {
+      queryClient.setQueryData<PatientDetail>(['PATIENT', patientId], data)
+      queryClient.invalidateQueries({ queryKey: ['PATIENTS'] })
+    },
+  })
 
   const fieldsFilled =
     !firstName.trim() ||
@@ -138,12 +180,12 @@ const PatientForm = ({ type, closeModal }: PatientFormProps) => {
     switch (type) {
       case 'update': {
         if (patientId) {
-          updatePatient.mutate([patientId, patientValues])
+          updatePatientById({ patientId, values: patientValues })
         }
         break
       }
       case 'add': {
-        addPatient.mutate([patientValues])
+        addPatient(patientValues)
         break
       }
       default: {
@@ -161,22 +203,6 @@ const PatientForm = ({ type, closeModal }: PatientFormProps) => {
     setAddress('')
     setSpecialistId('')
     closeModal()
-  }
-
-  if (!specialists) {
-    return <div>fetching specialists</div>
-  }
-
-  if (fetchSpecialistsError) {
-    console.log(fetchSpecialistsError.message)
-  }
-
-  if (updatePatient.isError) {
-    console.log(updatePatient.error.message)
-  }
-
-  if (addPatient.isError) {
-    console.log(addPatient.error.message)
   }
 
   return (
@@ -235,29 +261,25 @@ const PatientForm = ({ type, closeModal }: PatientFormProps) => {
           )
         })}
       </Select>
-      {!specialists ? (
-        <div>fetching specialists</div>
-      ) : (
-        <>
-          <InputLabel id="specialist">Assign Specialist</InputLabel>
-          <Select
-            labelId="specialist"
-            value={specialistId}
-            onChange={({ target }) => setSpecialistId(target.value)}
-          >
-            {specialists?.map((specialist) => {
-              return (
-                <MenuItem
-                  key={specialist.specialistId}
-                  value={specialist.specialistId}
-                >
-                  {specialist.name}
-                </MenuItem>
-              )
-            })}
-          </Select>
-        </>
-      )}
+
+      <InputLabel id="specialist">Assign Specialist</InputLabel>
+      <Select
+        labelId="specialist"
+        value={specialistId}
+        onChange={({ target }) => setSpecialistId(target.value)}
+      >
+        {specialistData.map((specialist) => {
+          return (
+            <MenuItem
+              key={specialist.specialistId}
+              value={specialist.specialistId}
+            >
+              {specialist.name}
+            </MenuItem>
+          )
+        })}
+      </Select>
+
       <Grid>
         <Grid item>
           <Button
