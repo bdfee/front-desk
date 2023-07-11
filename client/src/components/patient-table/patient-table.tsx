@@ -11,40 +11,28 @@ import {
   Link,
 } from '@mui/material'
 import { useNavigate } from 'react-router-dom'
-import { PatientDetail } from '../../types'
 import { formatPhone } from '../../validations/inputs'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import patientService from '../../services/patients'
+import { useQueryClient } from '@tanstack/react-query'
+import {
+  useFetchPatients,
+  useDeletePatientById,
+  usePrefetchPatientById,
+} from './actions'
 
 const PatientTable = () => {
   const navigate = useNavigate()
   const queryClient = useQueryClient()
 
-  const { data: patientsData, status: patientsStatus } = useQuery({
-    queryKey: ['PATIENTS'],
-    queryFn: patientService.getAll,
-  })
+  const { data: patientsData, status: patientsStatus } = useFetchPatients()
 
-  const { mutate: deletePatientById } = useMutation({
-    mutationFn: (patientId: number) => patientService.deleteById(patientId),
-    onSuccess: (_, patientId) => {
-      queryClient.setQueryData<PatientDetail[]>(
-        ['PATIENTS'],
-        (oldPatients = []) =>
-          oldPatients.filter((patient) => patient.patientId !== patientId),
-      )
-    },
-  })
+  const { mutate: deletePatientById } = useDeletePatientById(queryClient)
 
   const navigateToPatient = (patientId: number) => {
     navigate(`/patients/${patientId}`)
   }
 
   const navigateToPatientEditor = async (patientId: number) => {
-    await queryClient.prefetchQuery({
-      queryKey: ['PATIENT', patientId],
-      queryFn: () => patientService.getOneById(patientId),
-    })
+    await usePrefetchPatientById(queryClient, patientId)
     navigate(`/patients/${patientId}`, {
       state: { openModalOnLoad: true },
     })

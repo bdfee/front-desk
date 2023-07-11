@@ -11,13 +11,7 @@ import {
 import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 import dayjs, { Dayjs } from 'dayjs'
-import {
-  Gender,
-  PatientDetail,
-  PatientInput,
-  Specialist,
-  PatientFormProps,
-} from '../../types'
+import { Gender, PatientDetail, PatientFormProps } from '../../types'
 import {
   validateTextInput,
   sanitizeTextInput,
@@ -26,9 +20,10 @@ import {
   validateEmail,
 } from '../../validations/inputs'
 import { ErrorCtx } from '../../App'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import specialistService from '../../services/specialist'
-import patientService from '../../services/patients'
+import { useQueryClient } from '@tanstack/react-query'
+import SelectSpecialist from '../appointment-modal/fetched-form-components/select-specialist'
+
+import { useAddPatient, useUpdatePatientById } from './actions'
 
 const PatientForm = ({ type, closeModal }: PatientFormProps) => {
   const [patientId, setPatientId] = useState<number | undefined>()
@@ -42,9 +37,7 @@ const PatientForm = ({ type, closeModal }: PatientFormProps) => {
   const [address, setAddress] = useState('')
 
   const errorCtx = useContext(ErrorCtx)
-
   const { id } = useParams<{ id: string }>()
-
   const queryClient = useQueryClient()
 
   useEffect(() => {
@@ -80,54 +73,10 @@ const PatientForm = ({ type, closeModal }: PatientFormProps) => {
         if (formData) handleSetFormState(formData)
       }
     }
-  }, [id])
+  }, [])
 
-  const { data: specialistData, status: specialistsStatus } = useQuery<
-    Specialist[]
-  >({
-    queryKey: ['SPECIALISTS'],
-    queryFn: specialistService.getAll,
-  })
-
-  if (specialistsStatus === 'error') {
-    return <div>error fetching data</div>
-  }
-
-  if (specialistsStatus === 'loading') {
-    return <div>loading...</div>
-  }
-
-  const { mutate: addPatient } = useMutation({
-    mutationFn: patientService.create,
-    onSuccess: (newPatient) => {
-      queryClient.setQueryData<PatientDetail>(
-        ['PATIENT', newPatient.patientId],
-        newPatient,
-      )
-
-      queryClient.setQueryData<PatientDetail[]>(
-        ['PATIENTS'],
-        (oldPatients = []) => oldPatients.concat(newPatient),
-      )
-
-      queryClient.invalidateQueries({
-        queryKey: ['SPECIALIST_TABLE'],
-      })
-    },
-  })
-
-  const { mutate: updatePatientById } = useMutation<
-    PatientDetail,
-    Error,
-    { patientId: number; values: PatientInput }
-  >({
-    mutationFn: ({ patientId, values }) =>
-      patientService.updateById(patientId, values),
-    onSuccess: (data, { patientId }) => {
-      queryClient.setQueryData<PatientDetail>(['PATIENT', patientId], data)
-      queryClient.invalidateQueries({ queryKey: ['PATIENTS'] })
-    },
-  })
+  const { mutate: addPatient } = useAddPatient(queryClient)
+  const { mutate: updatePatientById } = useUpdatePatientById(queryClient)
 
   const fieldsFilled =
     !firstName.trim() ||
@@ -263,22 +212,10 @@ const PatientForm = ({ type, closeModal }: PatientFormProps) => {
       </Select>
 
       <InputLabel id="specialist">Assign Specialist</InputLabel>
-      <Select
-        labelId="specialist"
-        value={specialistId}
-        onChange={({ target }) => setSpecialistId(target.value)}
-      >
-        {specialistData.map((specialist) => {
-          return (
-            <MenuItem
-              key={specialist.specialistId}
-              value={specialist.specialistId}
-            >
-              {specialist.name}
-            </MenuItem>
-          )
-        })}
-      </Select>
+      <SelectSpecialist
+        specialistId={specialistId}
+        setSpecialistId={setSpecialistId}
+      />
 
       <Grid>
         <Grid item>

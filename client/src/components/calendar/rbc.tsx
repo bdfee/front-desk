@@ -10,10 +10,10 @@ import utc from 'dayjs/plugin/utc'
 import 'react-big-calendar/lib/css/react-big-calendar.css'
 
 import FetchedFormComponents from '../appointment-modal/fetched-form-components'
-import { useQuery } from '@tanstack/react-query'
-import appointmentService from '../../services/appointment'
+
 import { RBCEventProps, NewEvent, RBCProps } from '../../types'
 import { AppointmentDetail } from '../../types'
+import { useFetchAppointments } from './actions'
 
 dayjs.extend(timezone)
 dayjs.extend(utc)
@@ -27,13 +27,8 @@ const RBC = ({ openModal }: RBCProps) => {
 
   let appointments: AppointmentDetail[]
 
-  const { data: appointmentsData, status: appointmentsStatus } = useQuery<
-    AppointmentDetail[],
-    Error
-  >({
-    queryKey: ['APPOINTMENTS'],
-    queryFn: () => appointmentService.getAll(),
-  })
+  const { data: appointmentsData, status: appointmentsStatus } =
+    useFetchAppointments()
 
   if (appointmentsStatus === 'error') {
     return <div>error fetching appointments</div>

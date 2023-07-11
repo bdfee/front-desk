@@ -6,7 +6,7 @@ const PatientInformation = () => {
   const { id } = useParams<{ id: string }>()
 
   if (!id) {
-    return <div></div>
+    return <div>Error in ID param</div>
   }
   return (
     <>

@@ -3,51 +3,32 @@ import AppointmentModal from '../appointment-modal'
 import { useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { Button } from '@mui/material'
-import { useQueryClient, useMutation } from '@tanstack/react-query'
-import appointmentService from '../../services/appointment'
-import { AppointmentDetail } from '../../types'
-
-const DeleteButton = ({ id }: { id: number }) => {
-  const navigate = useNavigate()
-  const queryClient = useQueryClient()
-
-  const { mutate: deleteAppointmentById } = useMutation<void, Error, number>({
-    mutationFn: (appointmentId: number) =>
-      appointmentService.deleteById(appointmentId),
-    onSuccess: (_, appointmentId: number) => {
-      queryClient.setQueryData<AppointmentDetail[]>(
-        ['APPOINTMENTS'],
-        (oldAppointments = []) =>
-          oldAppointments.filter(
-            (appointment) => appointment.appointmentId !== appointmentId,
-          ),
-      )
-      queryClient.invalidateQueries(['SPECIALISTS_TABLE'])
-      queryClient.removeQueries(['APPOINTMENT', appointmentId])
-    },
-  })
-
-  const handleDelete = () => {
-    deleteAppointmentById(id)
-    return navigate('/calendar')
-  }
-
-  return <Button onClick={handleDelete}>delete</Button>
-}
+import { useQueryClient } from '@tanstack/react-query'
+import { useDeleteAppointmentById } from './actions'
 
 const AppointmentInformation = () => {
   const [modalOpen, setModalOpen] = useState<boolean>(false)
   const { id } = useParams<{ id: string }>()
+  const navigate = useNavigate()
+  const queryClient = useQueryClient()
+
+  const { mutate: deleteAppointmentById } =
+    useDeleteAppointmentById(queryClient)
 
   if (!id) {
     return <div>appointment not found, returning to calendar</div>
+  }
+
+  const handleDelete = () => {
+    deleteAppointmentById(+id)
+    return navigate('/calendar')
   }
 
   return (
     <>
       <InformationList id={+id} />
       <Button onClick={() => setModalOpen(true)}>edit</Button>
-      <DeleteButton id={+id} />
+      <Button onClick={handleDelete}>delete</Button>
       <AppointmentModal
         modalOpen={modalOpen}
         setModalOpen={setModalOpen}

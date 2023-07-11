@@ -1,7 +1,7 @@
 import dayjs, { Dayjs } from 'dayjs'
 import { useState, useContext, useEffect, SyntheticEvent } from 'react'
 import { useParams } from 'react-router-dom'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useQueryClient } from '@tanstack/react-query'
 import { TextField, Grid, Button, Divider } from '@mui/material'
 import {
   DatePicker,
@@ -12,15 +12,13 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 
 import {
   AppointmentDetail,
-  AppointmentInput,
   RBCEventPropsForForm,
   AppointmentFormProps,
 } from '../../types'
 import { ErrorCtx } from '../../App'
 import { validateTextInput } from '../../validations/inputs'
-import appointmentService from '../../services/appointment'
 import FetchedFormComponents from './fetched-form-components'
-
+import { useUpdateAppointmentById, useAddAppointment } from './actions'
 const AppointmentForm = ({
   serviceType,
   closeModal,
@@ -80,35 +78,9 @@ const AppointmentForm = ({
     }
   }, [id])
 
-  const { mutate: updateAppointmentById } = useMutation<
-    AppointmentDetail,
-    Error,
-    { appointmentId: number; values: AppointmentInput }
-  >({
-    mutationFn: ({ appointmentId, values }) =>
-      appointmentService.updateById(appointmentId, values),
-    onSuccess: (data) => {
-      queryClient.setQueryData<AppointmentDetail>(
-        ['APPOINTMENT', data.appointmentId],
-        data,
-      )
-      queryClient.setQueryData<AppointmentDetail[]>(
-        ['APPOINTMENTS'],
-        (oldAppointments = []) =>
-          oldAppointments.map((appointment) =>
-            appointment.appointmentId === data.appointmentId
-              ? data
-              : appointment,
-          ),
-      )
-    },
-  })
-
-  const { mutate: addAppointment } = useMutation({
-    mutationFn: appointmentService.create,
-    onSuccess: () =>
-      queryClient.invalidateQueries({ queryKey: ['APPOINTMENTS'] }),
-  })
+  const { mutate: updateAppointmentById } =
+    useUpdateAppointmentById(queryClient)
+  const { mutate: addAppointment } = useAddAppointment(queryClient)
 
   const fieldsFilled =
     !start ||
@@ -174,8 +146,6 @@ const AppointmentForm = ({
     setPatientId('')
     closeModal()
   }
-
-  console.log(serviceType)
 
   return (
     <form onSubmit={submitForm}>

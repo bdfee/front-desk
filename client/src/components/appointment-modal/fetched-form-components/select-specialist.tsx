@@ -7,8 +7,7 @@ import {
   OutlinedInput,
 } from '@mui/material'
 import { Specialist, SelectSpecialistProps } from '../../../types'
-import { useQuery } from '@tanstack/react-query'
-import specialistService from '../../../services/specialist'
+import { useFetchSpecialists } from './actions'
 
 const SelectSpecialist = ({
   specialistId,
@@ -16,10 +15,7 @@ const SelectSpecialist = ({
 }: SelectSpecialistProps) => {
   let specialists: Specialist[]
 
-  const { data: specialistData, status } = useQuery<Specialist[]>({
-    queryKey: ['SPECIALISTS'],
-    queryFn: specialistService.getAll,
-  })
+  const { data: specialistData, status } = useFetchSpecialists()
 
   if (status === 'error') {
     return <div>error fetching specialists</div>
