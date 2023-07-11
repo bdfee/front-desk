@@ -21,12 +21,9 @@ import {
 } from '../../validations/inputs'
 import { ErrorCtx } from '../../App'
 import { useQueryClient } from '@tanstack/react-query'
+import SelectSpecialist from '../appointment-modal/fetched-form-components/select-specialist'
 
-import {
-  useAddPatient,
-  useUpdatePatientById,
-  useFetchSpecialists,
-} from './actions'
+import { useAddPatient, useUpdatePatientById } from './actions'
 
 const PatientForm = ({ type, closeModal }: PatientFormProps) => {
   const [patientId, setPatientId] = useState<number | undefined>()
@@ -78,19 +75,8 @@ const PatientForm = ({ type, closeModal }: PatientFormProps) => {
     }
   }, [])
 
-  const { data: specialistData, status: specialistsStatus } =
-    useFetchSpecialists()
-
   const { mutate: addPatient } = useAddPatient(queryClient)
   const { mutate: updatePatientById } = useUpdatePatientById(queryClient)
-
-  if (specialistsStatus === 'error') {
-    return <div>error fetching data</div>
-  }
-
-  if (specialistsStatus === 'loading') {
-    return <div>loading...</div>
-  }
 
   const fieldsFilled =
     !firstName.trim() ||
@@ -226,22 +212,10 @@ const PatientForm = ({ type, closeModal }: PatientFormProps) => {
       </Select>
 
       <InputLabel id="specialist">Assign Specialist</InputLabel>
-      <Select
-        labelId="specialist"
-        value={specialistId}
-        onChange={({ target }) => setSpecialistId(target.value)}
-      >
-        {specialistData.map((specialist) => {
-          return (
-            <MenuItem
-              key={specialist.specialistId}
-              value={specialist.specialistId}
-            >
-              {specialist.name}
-            </MenuItem>
-          )
-        })}
-      </Select>
+      <SelectSpecialist
+        specialistId={specialistId}
+        setSpecialistId={setSpecialistId}
+      />
 
       <Grid>
         <Grid item>

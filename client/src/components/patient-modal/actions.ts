@@ -1,7 +1,6 @@
-import { QueryClient, useMutation, useQuery } from '@tanstack/react-query'
-import specialistService from '../../services/specialist'
+import { QueryClient, useMutation } from '@tanstack/react-query'
 import patientService from '../../services/patients'
-import { PatientDetail, PatientInput, Specialist } from '../../types'
+import { PatientDetail, PatientInput } from '../../types'
 
 export const useAddPatient = (queryClient: QueryClient) =>
   useMutation({
@@ -35,10 +34,4 @@ export const useUpdatePatientById = (queryClient: QueryClient) =>
       queryClient.setQueryData<PatientDetail>(['PATIENT', patientId], data)
       queryClient.invalidateQueries({ queryKey: ['PATIENTS'] })
     },
-  })
-
-export const useFetchSpecialists = () =>
-  useQuery<Specialist[]>({
-    queryKey: ['SPECIALISTS'],
-    queryFn: specialistService.getAll,
   })

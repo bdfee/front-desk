@@ -8,16 +8,12 @@ import {
 } from '@mui/material'
 
 import { PatientDetail, SelectPatientProps } from '../../../types'
-import { useQuery } from '@tanstack/react-query'
-import patientService from '../../../services/patients'
+import { useFetchPatients } from './actions'
 
 const SelectPatient = ({ patientId, setPatientId }: SelectPatientProps) => {
   let patients: PatientDetail[]
 
-  const { data: patientsData, status: patientsStatus } = useQuery({
-    queryKey: ['PATIENTS'],
-    queryFn: patientService.getAll,
-  })
+  const { data: patientsData, status: patientsStatus } = useFetchPatients()
 
   if (patientsStatus === 'error') {
     return <div>error fetching patients</div>
