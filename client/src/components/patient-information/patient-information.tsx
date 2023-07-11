@@ -1,25 +1,15 @@
 import { Container, Typography, Box, List, ListItemText } from '@mui/material'
-import {
-  AppointmentDetail,
-  PatientDetail,
-  InformationListProps,
-} from '../../types'
-import { useQuery } from '@tanstack/react-query'
-import patientService from '../../services/patients'
+import { AppointmentDetail, InformationListProps } from '../../types'
+import { useFetchAppointmentsByPatientId, useFetchPatientById } from './actions'
 
 const InformationList = ({ patientId }: InformationListProps) => {
   const {
     data: appointmentsByPatientIdData,
     status: appointmentsByPatientIdStatus,
-  } = useQuery<AppointmentDetail[]>({
-    queryKey: ['PATIENT_APPOINTMENTS', patientId],
-    queryFn: () => patientService.getAppointmentsByPatient(patientId),
-  })
+  } = useFetchAppointmentsByPatientId(patientId)
 
-  const { data: patientData, status: patientStatus } = useQuery<PatientDetail>({
-    queryKey: ['PATIENT', patientId],
-    queryFn: () => patientService.getOneById(patientId),
-  })
+  const { data: patientData, status: patientStatus } =
+    useFetchPatientById(patientId)
 
   const sortAppointments = (appointments: AppointmentDetail[]) => {
     const history: AppointmentDetail[] = []

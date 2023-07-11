@@ -18,9 +18,7 @@ const PatientModal = (props: PatientModalProps) => {
   const location = useLocation()
 
   useEffect(() => {
-    if (location.state?.openModalOnLoad) {
-      openModal()
-    }
+    if (location.state?.openModalOnLoad) openModal()
   }, [])
 
   if (!errorCtx) {
