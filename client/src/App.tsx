@@ -9,27 +9,37 @@ import AppointmentInformation from './components/appointment-information'
 import Status from './components/status'
 
 type AlertType = 'error' | 'success'
+type AlertLocation = 'modal' | 'page'
+type AlertMessage = string
 
 interface AlertPayload {
-  message: string | undefined
   type: AlertType
+  message: AlertMessage
+  location: AlertLocation
 }
 
+type NullableAlertPayload = AlertPayload | undefined
+
 interface AlertCtxType {
-  setAlertPayload: (message: string | undefined, type: AlertType) => () => void
-  alertPayload: AlertPayload | undefined
+  setAlertPayload: (
+    type: AlertType,
+    message: AlertMessage,
+    location: AlertLocation,
+  ) => () => void
+  alertPayload: NullableAlertPayload
 }
 
 export const AlertCtx = createContext<AlertCtxType | null>(null)
 
 const App = () => {
-  const [alertPayload, setAlertPayload] = useState<AlertPayload | undefined>()
+  const [alertPayload, setAlertPayload] = useState<NullableAlertPayload>()
 
-  const setAlertWithTimeout = (
-    message: string | undefined,
-    type: AlertType,
+  const setAlertWithTimeout: AlertCtxType['setAlertPayload'] = (
+    type,
+    message,
+    location,
   ) => {
-    setAlertPayload({ message, type })
+    setAlertPayload({ type, message, location })
 
     const id = setTimeout(() => {
       setAlertPayload(undefined)
@@ -56,7 +66,7 @@ const App = () => {
                   </Typography>
                 </Grid>
                 <Grid item xs={3}>
-                  <Status />
+                  <Status location="page" />
                 </Grid>
               </Grid>
             </Container>

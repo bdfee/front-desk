@@ -5,16 +5,16 @@ import {
   DialogContent,
   DialogTitle,
   Divider,
-  // Alert,
   Button,
+  Grid,
+  Container,
 } from '@mui/material'
-// import { AlertCtx } from '../../App'
 import PatientForm from './patient-form'
 import { PatientModalProps } from '../../types'
+import Status from '../status'
 
 const PatientModal = (props: PatientModalProps) => {
   const [modalOpen, setModalOpen] = useState(false)
-  // const errorCtx = useContext(ErrorCtx)
   const location = useLocation()
 
   useEffect(() => {
@@ -23,7 +23,6 @@ const PatientModal = (props: PatientModalProps) => {
 
   const closeModal = (): void => {
     setModalOpen(false)
-    // errorCtx.setError(undefined)
   }
 
   const openModal = (): void => setModalOpen(true)
@@ -32,14 +31,18 @@ const PatientModal = (props: PatientModalProps) => {
     <>
       <Button onClick={() => openModal()}>{props.type} patient</Button>
       <Dialog fullWidth={true} open={modalOpen} onClose={closeModal}>
-        <DialogTitle>Add a new patient</DialogTitle>
+        <Container>
+          <Grid container spacing={2} alignItems="center">
+            <Grid item xs={6} sx={{ paddingLeft: 0 }}>
+              <DialogTitle>Add a new patient</DialogTitle>
+            </Grid>
+            <Grid item xs={6}>
+              <Status location="modal" />
+            </Grid>
+          </Grid>
+        </Container>
         <Divider />
         <DialogContent>
-          {/* {errorCtx.error && (
-            <Alert severity="error" role="alert">
-              {errorCtx.error}
-            </Alert>
-          )} */}
           <PatientForm type={props.type} closeModal={closeModal}></PatientForm>
         </DialogContent>
       </Dialog>

@@ -20,19 +20,19 @@ const SpecialistForm = ({ closeModal }: SpecialistFormProps) => {
     event.preventDefault()
 
     if (!validateTextInput(firstName)) {
-      alertCtx?.setAlertPayload('invalid first name', 'error')
+      alertCtx?.setAlertPayload('error', 'invalid first name', 'modal')
       setFirstName('')
       return
     }
 
     if (!validateTextInput(lastName)) {
-      alertCtx?.setAlertPayload('invalid last name', 'error')
+      alertCtx?.setAlertPayload('error', 'invalid last name', 'modal')
       setLastName('')
       return
     }
 
     if (!validateTextInput(speciality)) {
-      alertCtx?.setAlertPayload('invalid speciality', 'error')
+      alertCtx?.setAlertPayload('error', 'invalid speciality', 'modal')
       setSpeciality('')
       return
     }
@@ -43,6 +43,11 @@ const SpecialistForm = ({ closeModal }: SpecialistFormProps) => {
     })
 
     closeModal()
+    alertCtx?.setAlertPayload(
+      'success',
+      `added ${firstName} ${lastName}`,
+      'page',
+    )
     setFirstName('')
     setLastName('')
     setSpeciality('')

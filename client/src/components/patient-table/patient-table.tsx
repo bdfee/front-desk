@@ -42,7 +42,7 @@ const PatientTable = () => {
   }
 
   if (patientsStatus === 'error') {
-    alertCtx?.setAlertPayload('error fetching patients', 'error')
+    alertCtx?.setAlertPayload('error', 'error fetching patients', 'page')
     return <div>error fetching patients</div>
   }
 

@@ -91,29 +91,29 @@ const PatientForm = ({ type, closeModal }: PatientFormProps) => {
   const submitForm = (event: SyntheticEvent) => {
     event.preventDefault()
     if (!validateTextInput(firstName)) {
-      alertCtx?.setAlertPayload('invalid first name', 'error')
+      alertCtx?.setAlertPayload('error', 'invalid first name', 'modal')
       setFirstName('')
       return
     }
 
     if (!validateTextInput(lastName)) {
-      alertCtx?.setAlertPayload('invalid last name', 'error')
+      alertCtx?.setAlertPayload('error', 'invalid last name', 'modal')
       setLastName('')
       return
     }
 
     if (!validateEmail(email)) {
-      alertCtx?.setAlertPayload('invalid email', 'error')
+      alertCtx?.setAlertPayload('error', 'invalid email', 'modal')
       return
     }
 
     if (!dateOfBirth) {
-      alertCtx?.setAlertPayload('please add date of birth', 'error')
+      alertCtx?.setAlertPayload('error', 'please add date of birth', 'modal')
       return
     }
 
     if (!gender) {
-      alertCtx?.setAlertPayload('please specify gender', 'error')
+      alertCtx?.setAlertPayload('error', 'please specify gender', 'modal')
       return
     }
 

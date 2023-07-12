@@ -44,7 +44,7 @@ const SpecialistTable = () => {
   }
 
   if (tableDataStatus === 'error') {
-    alertCrx?.setAlertPayload(getTableDataError.message, 'error')
+    alertCrx?.setAlertPayload('error', getTableDataError.message, 'page')
     return <div>error fetching table data</div>
   }
 
@@ -76,10 +76,10 @@ const SpecialistTable = () => {
     let speciality
 
     if (!validateTextInput(editRowData.name)) {
-      alertCrx?.setAlertPayload('invalid update to name', 'error')
+      alertCrx?.setAlertPayload('error', 'invalid update to name', 'page')
       return
     } else if (!validateTextInput(editRowData.speciality)) {
-      alertCrx?.setAlertPayload('invalid update to speciality', 'error')
+      alertCrx?.setAlertPayload('error', 'invalid update to speciality', 'page')
       return
     } else {
       name = sanitizeTextInput(editRowData.name)

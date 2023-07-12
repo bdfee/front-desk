@@ -95,12 +95,20 @@ const AppointmentForm = ({
     event.preventDefault()
 
     if (!date || !start || !end) {
-      alertCtx?.setAlertPayload('please enter scheduling details', 'error')
+      alertCtx?.setAlertPayload(
+        'error',
+        'please enter scheduling details',
+        'modal',
+      )
       return
     }
 
     if (!validateTextInput(description)) {
-      alertCtx?.setAlertPayload('please enter a text description', 'error')
+      alertCtx?.setAlertPayload(
+        'error',
+        'please enter a text description',
+        'modal',
+      )
       setDescription('')
       return
     }
