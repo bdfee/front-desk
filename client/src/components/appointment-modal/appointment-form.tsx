@@ -78,9 +78,14 @@ const AppointmentForm = ({
     }
   }, [id])
 
-  const { mutate: updateAppointmentById } =
-    useUpdateAppointmentById(queryClient)
-  const { mutate: addAppointment } = useAddAppointment(queryClient)
+  const { mutate: updateAppointmentById } = useUpdateAppointmentById(
+    queryClient,
+    alertCtx?.setAlertPayload,
+  )
+  const { mutate: addAppointment } = useAddAppointment(
+    queryClient,
+    alertCtx?.setAlertPayload,
+  )
 
   const fieldsFilled =
     !start ||

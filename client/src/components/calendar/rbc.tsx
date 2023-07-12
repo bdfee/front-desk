@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback } from 'react'
+import { useState, useMemo, useCallback, useContext } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
   Calendar as ReactBigCalendar,
@@ -14,6 +14,7 @@ import FetchedFormComponents from '../appointment-modal/fetched-form-components'
 import { RBCEventProps, NewEvent, RBCProps } from '../../types'
 import { AppointmentDetail } from '../../types'
 import { useFetchAppointments } from './actions'
+import { AlertCtx } from '../../App'
 
 dayjs.extend(timezone)
 dayjs.extend(utc)
@@ -22,21 +23,13 @@ const RBC = ({ openModal }: RBCProps) => {
   const [specialistIdFilter, setSpecialistIdFilter] = useState<string>('')
   const [patientIdFilter, setPatientIdFilter] = useState<string>('')
   const [typeFilter, setTypeFilter] = useState<string>('')
-
+  const alertCtx = useContext(AlertCtx)
   const navigate = useNavigate()
 
   let appointments: AppointmentDetail[]
 
   const { data: appointmentsData, status: appointmentsStatus } =
-    useFetchAppointments()
-
-  if (appointmentsStatus === 'error') {
-    return <div>error fetching appointments</div>
-  }
-
-  if (appointmentsStatus === 'loading') {
-    appointments = []
-  } else appointments = appointmentsData
+    useFetchAppointments(alertCtx?.setAlertPayload)
 
   const formatEvents = (filteredEvents: AppointmentDetail[]) => {
     return filteredEvents.map((appointment) => {
@@ -50,6 +43,10 @@ const RBC = ({ openModal }: RBCProps) => {
       return event
     })
   }
+
+  if (appointmentsStatus === 'error' || appointmentsStatus === 'loading') {
+    return <div>{appointmentsStatus}: fetching appointments</div>
+  } else appointments = appointmentsData
 
   const filterEvents = useMemo(() => {
     const filteredList = appointments.filter((appointment) => {

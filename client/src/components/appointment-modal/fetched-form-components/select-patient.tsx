@@ -6,22 +6,20 @@ import {
   FormControl,
   OutlinedInput,
 } from '@mui/material'
-
-import { PatientDetail, SelectPatientProps } from '../../../types'
+import { useContext } from 'react'
+import { AlertCtx } from '../../../App'
+import { SelectPatientProps } from '../../../types'
 import { useFetchPatients } from './actions'
 
 const SelectPatient = ({ patientId, setPatientId }: SelectPatientProps) => {
-  let patients: PatientDetail[]
+  const alertCtx = useContext(AlertCtx)
 
-  const { data: patientsData, status: patientsStatus } = useFetchPatients()
-
-  if (patientsStatus === 'error') {
-    return <div>error fetching patients</div>
+  const { data: patientsData, status: patientsStatus } = useFetchPatients(
+    alertCtx?.setAlertPayload,
+  )
+  if (patientsStatus === 'error' || patientsStatus == 'loading') {
+    return <div>{patientsStatus}: fetching patients</div>
   }
-
-  if (patientsStatus === 'loading') {
-    patients = []
-  } else patients = patientsData
 
   return (
     <FormControl
@@ -39,7 +37,7 @@ const SelectPatient = ({ patientId, setPatientId }: SelectPatientProps) => {
         onChange={({ target }) => setPatientId(target.value)}
         input={<OutlinedInput label="Patient" />}
       >
-        {patients.map((patient) => {
+        {patientsData.map((patient) => {
           return (
             <MenuItem
               key={patient.patientId}

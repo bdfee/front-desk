@@ -1,8 +1,12 @@
 import appointmentService from '../../services/appointment'
 import { AppointmentDetail, AppointmentInput } from '../../types'
 import { QueryClient, useMutation } from '@tanstack/react-query'
+import { SetAlertPayload } from '../../types'
 
-export const useUpdateAppointmentById = (queryClient: QueryClient) =>
+export const useUpdateAppointmentById = (
+  queryClient: QueryClient,
+  setAlertPayload?: SetAlertPayload,
+) =>
   useMutation<
     AppointmentDetail,
     Error,
@@ -24,12 +28,26 @@ export const useUpdateAppointmentById = (queryClient: QueryClient) =>
               : appointment,
           ),
       )
+
+      setAlertPayload &&
+        setAlertPayload('success', 'appointment updated', 'page')
     },
+    onError: () =>
+      setAlertPayload &&
+      setAlertPayload('error', 'error updating appointment', 'page'),
   })
 
-export const useAddAppointment = (queryClient: QueryClient) =>
+export const useAddAppointment = (
+  queryClient: QueryClient,
+  setAlertPayload?: SetAlertPayload,
+) =>
   useMutation({
     mutationFn: appointmentService.create,
-    onSuccess: () =>
-      queryClient.invalidateQueries({ queryKey: ['APPOINTMENTS'] }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['APPOINTMENTS'] })
+      setAlertPayload && setAlertPayload('success', 'appointment added', 'page')
+    },
+    onError: () =>
+      setAlertPayload &&
+      setAlertPayload('error', 'error updating appointment', 'page'),
   })

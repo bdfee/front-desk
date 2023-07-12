@@ -6,24 +6,24 @@ import {
   FormControl,
   OutlinedInput,
 } from '@mui/material'
-import { Specialist, SelectSpecialistProps } from '../../../types'
+import { SelectSpecialistProps } from '../../../types'
 import { useFetchSpecialists } from './actions'
+import { useContext } from 'react'
+import { AlertCtx } from '../../../App'
 
 const SelectSpecialist = ({
   specialistId,
   setSpecialistId,
 }: SelectSpecialistProps) => {
-  let specialists: Specialist[]
+  const alertCtx = useContext(AlertCtx)
 
-  const { data: specialistData, status } = useFetchSpecialists()
+  const { data: specialistData, status } = useFetchSpecialists(
+    alertCtx?.setAlertPayload,
+  )
 
-  if (status === 'error') {
-    return <div>error fetching specialists</div>
+  if (status === 'error' || status === 'loading') {
+    return <div>{status}: fetching specialists</div>
   }
-
-  if (status === 'loading') {
-    specialists = []
-  } else specialists = specialistData
 
   return (
     <FormControl sx={{ width: 175 }}>
@@ -37,7 +37,7 @@ const SelectSpecialist = ({
         onChange={({ target }) => setSpecialistId(target.value)}
         input={<OutlinedInput label="Specialist" />}
       >
-        {specialists.map((specialist) => (
+        {specialistData.map((specialist) => (
           <MenuItem
             key={specialist.specialistId}
             value={specialist.specialistId.toString()}
