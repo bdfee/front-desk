@@ -7,17 +7,18 @@ import {
   SetAlertPayload,
 } from '../../types'
 
-export const useGetTableData = (setAlertPayload: SetAlertPayload) =>
+export const useGetTableData = (setAlertPayload?: SetAlertPayload) =>
   useQuery<TableData[], Error>({
     queryKey: ['SPECIALISTS_TABLE'],
     queryFn: specialistService.getTableData,
     onError: () =>
+      setAlertPayload &&
       setAlertPayload('error', 'error fetching specialists', 'page'),
   })
 
 export const useDeleteSpecialistById = (
   queryClient: QueryClient,
-  setAlertPayload: SetAlertPayload,
+  setAlertPayload?: SetAlertPayload,
 ) =>
   useMutation({
     mutationFn: specialistService.deleteById,
@@ -38,15 +39,17 @@ export const useDeleteSpecialistById = (
           ),
       )
 
-      setAlertPayload('success', 'specialist deleted', 'page')
+      setAlertPayload &&
+        setAlertPayload('success', 'specialist deleted', 'page')
     },
     onError: () =>
+      setAlertPayload &&
       setAlertPayload('error', 'error deleting specialist', 'page'),
   })
 
 export const useUpdateSpecialistById = (
   queryClient: QueryClient,
-  setAlertPayload: SetAlertPayload,
+  setAlertPayload?: SetAlertPayload,
 ) =>
   useMutation<
     Specialist,
@@ -87,8 +90,10 @@ export const useUpdateSpecialistById = (
               : specialist,
           ),
       )
-      setAlertPayload('success', 'specialist updated', 'page')
+      setAlertPayload &&
+        setAlertPayload('success', 'specialist updated', 'page')
     },
     onError: () =>
+      setAlertPayload &&
       setAlertPayload('error', 'error updating specialist', 'page'),
   })
