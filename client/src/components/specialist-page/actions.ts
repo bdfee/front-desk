@@ -2,13 +2,23 @@ import { useQuery, useMutation, QueryClient } from '@tanstack/react-query'
 import specialistService from '../../services/specialist'
 import { TableData, Specialist, SpecialistInput } from '../../types'
 
+type AlertType = 'error' | 'success'
+type AlertLocation = 'modal' | 'page'
+type AlertMessage = string
 export const useGetTableData = () =>
   useQuery<TableData[], Error>({
     queryKey: ['SPECIALISTS_TABLE'],
     queryFn: specialistService.getTableData,
   })
 
-export const useDeleteSpecialistById = (queryClient: QueryClient) =>
+export const useDeleteSpecialistById = (
+  queryClient: QueryClient,
+  setAlertPayload: (
+    type: AlertType,
+    message: AlertMessage,
+    location: AlertLocation,
+  ) => () => void,
+) =>
   useMutation({
     mutationFn: specialistService.deleteById,
     onSuccess: (_, specialistId: number) => {
@@ -27,6 +37,11 @@ export const useDeleteSpecialistById = (queryClient: QueryClient) =>
             (row) => row.specialist.specialistId !== specialistId,
           ),
       )
+
+      setAlertPayload('success', 'specialist deleted', 'page')
+    },
+    onError: () => {
+      setAlertPayload('error', 'error deleting specialist', 'page')
     },
   })
 

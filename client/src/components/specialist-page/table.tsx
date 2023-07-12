@@ -27,7 +27,11 @@ const SpecialistTable = () => {
   const [editRowData, setEditRowData] = useState<Specialist | undefined>()
 
   const queryClient = useQueryClient()
-  const alertCrx = useContext(AlertCtx)
+  const alertCtx = useContext(AlertCtx)
+
+  if (!alertCtx) {
+    return <div></div>
+  }
 
   const {
     data: tableData,
@@ -35,8 +39,10 @@ const SpecialistTable = () => {
     status: tableDataStatus,
   } = useGetTableData()
 
-  const { mutate: deleteSpecialistById } = useDeleteSpecialistById(queryClient)
-
+  const { mutate: deleteSpecialistById } = useDeleteSpecialistById(
+    queryClient,
+    alertCtx?.setAlertPayload,
+  )
   const { mutate: updateSpecialistById } = useUpdateSpecialistById(queryClient)
 
   if (tableDataStatus === 'loading') {
@@ -44,7 +50,7 @@ const SpecialistTable = () => {
   }
 
   if (tableDataStatus === 'error') {
-    alertCrx?.setAlertPayload('error', getTableDataError.message, 'page')
+    alertCtx?.setAlertPayload('error', getTableDataError.message, 'page')
     return <div>error fetching table data</div>
   }
 
@@ -76,27 +82,23 @@ const SpecialistTable = () => {
     let speciality
 
     if (!validateTextInput(editRowData.name)) {
-      alertCrx?.setAlertPayload('error', 'invalid update to name', 'page')
+      alertCtx?.setAlertPayload('error', 'invalid update to name', 'page')
       return
     } else if (!validateTextInput(editRowData.speciality)) {
-      alertCrx?.setAlertPayload('error', 'invalid update to speciality', 'page')
+      alertCtx?.setAlertPayload('error', 'invalid update to speciality', 'page')
       return
     } else {
       name = sanitizeTextInput(editRowData.name)
       speciality = sanitizeTextInput(editRowData.speciality)
     }
 
-    try {
-      if (isSpecialist(editRowData)) {
-        updateSpecialistById({
-          specialistId: +editRowData.specialistId,
-          values: { name, speciality },
-        })
-        setEditMode(false)
-        setEditRowIdx(-1)
-      }
-    } catch (error) {
-      console.log('Error saving changes:' + error)
+    if (isSpecialist(editRowData)) {
+      updateSpecialistById({
+        specialistId: +editRowData.specialistId,
+        values: { name, speciality },
+      })
+      setEditMode(false)
+      setEditRowIdx(-1)
     }
   }
 
