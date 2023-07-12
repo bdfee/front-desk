@@ -29,28 +29,29 @@ const SpecialistTable = () => {
   const queryClient = useQueryClient()
   const alertCtx = useContext(AlertCtx)
 
-  if (!alertCtx) {
-    return <div></div>
-  }
+  if (!alertCtx) return <div></div>
 
   const {
     data: tableData,
     error: getTableDataError,
     status: tableDataStatus,
-  } = useGetTableData()
+  } = useGetTableData(alertCtx.setAlertPayload)
 
   const { mutate: deleteSpecialistById } = useDeleteSpecialistById(
     queryClient,
-    alertCtx?.setAlertPayload,
+    alertCtx.setAlertPayload,
   )
-  const { mutate: updateSpecialistById } = useUpdateSpecialistById(queryClient)
+  const { mutate: updateSpecialistById } = useUpdateSpecialistById(
+    queryClient,
+    alertCtx.setAlertPayload,
+  )
 
   if (tableDataStatus === 'loading') {
     return <div>fetching table data</div>
   }
 
   if (tableDataStatus === 'error') {
-    alertCtx?.setAlertPayload('error', getTableDataError.message, 'page')
+    alertCtx.setAlertPayload('error', getTableDataError.message, 'page')
     return <div>error fetching table data</div>
   }
 
@@ -82,10 +83,10 @@ const SpecialistTable = () => {
     let speciality
 
     if (!validateTextInput(editRowData.name)) {
-      alertCtx?.setAlertPayload('error', 'invalid update to name', 'page')
+      alertCtx.setAlertPayload('error', 'invalid update to name', 'page')
       return
     } else if (!validateTextInput(editRowData.speciality)) {
-      alertCtx?.setAlertPayload('error', 'invalid update to speciality', 'page')
+      alertCtx.setAlertPayload('error', 'invalid update to speciality', 'page')
       return
     } else {
       name = sanitizeTextInput(editRowData.name)

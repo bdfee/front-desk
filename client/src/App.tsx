@@ -7,27 +7,7 @@ import { Typography, Container, Divider, Button, Grid } from '@mui/material'
 import { createContext, useState } from 'react'
 import AppointmentInformation from './components/appointment-information'
 import Status from './components/status'
-
-type AlertType = 'error' | 'success'
-type AlertLocation = 'modal' | 'page'
-type AlertMessage = string
-
-interface AlertPayload {
-  type: AlertType
-  message: AlertMessage
-  location: AlertLocation
-}
-
-type NullableAlertPayload = AlertPayload | undefined
-
-interface AlertCtxType {
-  setAlertPayload: (
-    type: AlertType,
-    message: AlertMessage,
-    location: AlertLocation,
-  ) => () => void
-  alertPayload: NullableAlertPayload
-}
+import { AlertCtxType, NullableAlertPayload } from './types'
 
 export const AlertCtx = createContext<AlertCtxType | null>(null)
 

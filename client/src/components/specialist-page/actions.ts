@@ -1,23 +1,23 @@
 import { useQuery, useMutation, QueryClient } from '@tanstack/react-query'
 import specialistService from '../../services/specialist'
-import { TableData, Specialist, SpecialistInput } from '../../types'
+import {
+  TableData,
+  Specialist,
+  SpecialistInput,
+  SetAlertPayload,
+} from '../../types'
 
-type AlertType = 'error' | 'success'
-type AlertLocation = 'modal' | 'page'
-type AlertMessage = string
-export const useGetTableData = () =>
+export const useGetTableData = (setAlertPayload: SetAlertPayload) =>
   useQuery<TableData[], Error>({
     queryKey: ['SPECIALISTS_TABLE'],
     queryFn: specialistService.getTableData,
+    onError: () =>
+      setAlertPayload('error', 'error fetching specialists', 'page'),
   })
 
 export const useDeleteSpecialistById = (
   queryClient: QueryClient,
-  setAlertPayload: (
-    type: AlertType,
-    message: AlertMessage,
-    location: AlertLocation,
-  ) => () => void,
+  setAlertPayload: SetAlertPayload,
 ) =>
   useMutation({
     mutationFn: specialistService.deleteById,
@@ -40,12 +40,14 @@ export const useDeleteSpecialistById = (
 
       setAlertPayload('success', 'specialist deleted', 'page')
     },
-    onError: () => {
-      setAlertPayload('error', 'error deleting specialist', 'page')
-    },
+    onError: () =>
+      setAlertPayload('error', 'error deleting specialist', 'page'),
   })
 
-export const useUpdateSpecialistById = (queryClient: QueryClient) =>
+export const useUpdateSpecialistById = (
+  queryClient: QueryClient,
+  setAlertPayload: SetAlertPayload,
+) =>
   useMutation<
     Specialist,
     Error,
@@ -85,5 +87,8 @@ export const useUpdateSpecialistById = (queryClient: QueryClient) =>
               : specialist,
           ),
       )
+      setAlertPayload('success', 'specialist updated', 'page')
     },
+    onError: () =>
+      setAlertPayload('error', 'error updating specialist', 'page'),
   })

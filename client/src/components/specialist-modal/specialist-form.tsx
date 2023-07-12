@@ -10,11 +10,13 @@ const SpecialistForm = ({ closeModal }: SpecialistFormProps) => {
   const [firstName, setFirstName] = useState('')
   const [lastName, setLastName] = useState('')
   const [speciality, setSpeciality] = useState('')
-
   const alertCtx = useContext(AlertCtx)
   const queryClient = useQueryClient()
 
-  const { mutate: createSpecialist } = useCreateSpecialist(queryClient)
+  const { mutate: createSpecialist } = useCreateSpecialist(
+    queryClient,
+    alertCtx?.setAlertPayload,
+  )
 
   const handleAddSpecialist = (event: SyntheticEvent) => {
     event.preventDefault()
@@ -43,11 +45,6 @@ const SpecialistForm = ({ closeModal }: SpecialistFormProps) => {
     })
 
     closeModal()
-    alertCtx?.setAlertPayload(
-      'success',
-      `added ${firstName} ${lastName}`,
-      'page',
-    )
     setFirstName('')
     setLastName('')
     setSpeciality('')
