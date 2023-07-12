@@ -19,7 +19,7 @@ import {
   formatPhone,
   validateEmail,
 } from '../../validations/inputs'
-import { ErrorCtx } from '../../App'
+import { AlertCtx } from '../../App'
 import { useQueryClient } from '@tanstack/react-query'
 import SelectSpecialist from '../appointment-modal/fetched-form-components/select-specialist'
 
@@ -36,7 +36,7 @@ const PatientForm = ({ type, closeModal }: PatientFormProps) => {
   const [gender, setGender] = useState<string>('')
   const [address, setAddress] = useState('')
 
-  const errorCtx = useContext(ErrorCtx)
+  const alertCtx = useContext(AlertCtx)
   const { id } = useParams<{ id: string }>()
   const queryClient = useQueryClient()
 
@@ -91,29 +91,29 @@ const PatientForm = ({ type, closeModal }: PatientFormProps) => {
   const submitForm = (event: SyntheticEvent) => {
     event.preventDefault()
     if (!validateTextInput(firstName)) {
-      errorCtx?.setError('invalid first name')
+      alertCtx?.setAlertPayload('invalid first name', 'error')
       setFirstName('')
       return
     }
 
     if (!validateTextInput(lastName)) {
-      errorCtx?.setError('invalid last name')
+      alertCtx?.setAlertPayload('invalid last name', 'error')
       setLastName('')
       return
     }
 
     if (!validateEmail(email)) {
-      errorCtx?.setError('invalid email')
+      alertCtx?.setAlertPayload('invalid email', 'error')
       return
     }
 
     if (!dateOfBirth) {
-      errorCtx?.setError('please add date of birth')
+      alertCtx?.setAlertPayload('please add date of birth', 'error')
       return
     }
 
     if (!gender) {
-      errorCtx?.setError('please specify gender')
+      alertCtx?.setAlertPayload('please specify gender', 'error')
       return
     }
 

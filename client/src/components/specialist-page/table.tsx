@@ -1,4 +1,4 @@
-import { useState, ChangeEvent } from 'react'
+import { useState, ChangeEvent, useContext } from 'react'
 import {
   Table,
   TableBody,
@@ -9,7 +9,7 @@ import {
 } from '@mui/material'
 import { TextField, Paper, Button, Typography } from '@mui/material'
 import { useQueryClient } from '@tanstack/react-query'
-import { Specialist, TableProps } from '../../types'
+import { Specialist } from '../../types'
 import { sanitizeTextInput, validateTextInput } from '../../validations/inputs'
 import { isSpecialist } from '../../typeUtils'
 import 'dayjs/plugin/utc'
@@ -19,13 +19,15 @@ import {
   useDeleteSpecialistById,
   useUpdateSpecialistById,
 } from './actions'
+import { AlertCtx } from '../../App'
 
-const SpecialistTable = ({ setError }: TableProps) => {
+const SpecialistTable = () => {
   const [editMode, setEditMode] = useState(false)
   const [editRowIdx, setEditRowIdx] = useState(-1)
   const [editRowData, setEditRowData] = useState<Specialist | undefined>()
 
   const queryClient = useQueryClient()
+  const alertCrx = useContext(AlertCtx)
 
   const {
     data: tableData,
@@ -42,7 +44,8 @@ const SpecialistTable = ({ setError }: TableProps) => {
   }
 
   if (tableDataStatus === 'error') {
-    return <div>error fetching table data: {getTableDataError.message}</div>
+    alertCrx?.setAlertPayload(getTableDataError.message, 'error')
+    return <div>error fetching table data</div>
   }
 
   const handleRowEdit = (rowIdx: number) => {
@@ -73,10 +76,10 @@ const SpecialistTable = ({ setError }: TableProps) => {
     let speciality
 
     if (!validateTextInput(editRowData.name)) {
-      setError('invalid update to name')
+      alertCrx?.setAlertPayload('invalid update to name', 'error')
       return
     } else if (!validateTextInput(editRowData.speciality)) {
-      setError('invalid update to speciality')
+      alertCrx?.setAlertPayload('invalid update to speciality', 'error')
       return
     } else {
       name = sanitizeTextInput(editRowData.name)

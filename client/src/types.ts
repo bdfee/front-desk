@@ -22,7 +22,6 @@ export interface Patient {
 
 export interface SpecialistFormProps {
   closeModal: () => void
-  setError: (errorMessage: string) => () => void
 }
 
 export type PatientInput = Omit<Patient, 'patientId'>
@@ -43,8 +42,6 @@ export interface PatientFormProps {
 export interface SpecialistModalProps {
   closeModal: () => void
   modalOpen: boolean
-  setError: (errorMessage: string) => () => void
-  error: string | undefined
 }
 
 export interface InformationListProps {

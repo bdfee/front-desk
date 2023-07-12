@@ -1,15 +1,17 @@
 import { TextField, Grid, Button } from '@mui/material'
-import { SyntheticEvent, useState } from 'react'
+import { SyntheticEvent, useContext, useState } from 'react'
 import { validateTextInput, sanitizeTextInput } from '../../validations/inputs'
 import { useQueryClient } from '@tanstack/react-query'
 import { SpecialistFormProps } from '../../types'
 import { useCreateSpecialist } from './actions'
+import { AlertCtx } from '../../App'
 
-const SpecialistForm = ({ closeModal, setError }: SpecialistFormProps) => {
+const SpecialistForm = ({ closeModal }: SpecialistFormProps) => {
   const [firstName, setFirstName] = useState('')
   const [lastName, setLastName] = useState('')
   const [speciality, setSpeciality] = useState('')
 
+  const alertCtx = useContext(AlertCtx)
   const queryClient = useQueryClient()
 
   const { mutate: createSpecialist } = useCreateSpecialist(queryClient)
@@ -18,19 +20,19 @@ const SpecialistForm = ({ closeModal, setError }: SpecialistFormProps) => {
     event.preventDefault()
 
     if (!validateTextInput(firstName)) {
-      setError('invalid first name')
+      alertCtx?.setAlertPayload('invalid first name', 'error')
       setFirstName('')
       return
     }
 
     if (!validateTextInput(lastName)) {
-      setError('invalid last name')
+      alertCtx?.setAlertPayload('invalid last name', 'error')
       setLastName('')
       return
     }
 
     if (!validateTextInput(speciality)) {
-      setError('invalid speciality')
+      alertCtx?.setAlertPayload('invalid speciality', 'error')
       setSpeciality('')
       return
     }

@@ -3,43 +3,63 @@ import PatientTable from './components/patient-table'
 import PatientInformation from './components/patient-information'
 import Calendar from './components/calendar'
 import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom'
-import { Typography, Container, Divider, Button } from '@mui/material'
+import { Typography, Container, Divider, Button, Grid } from '@mui/material'
 import { createContext, useState } from 'react'
 import AppointmentInformation from './components/appointment-information'
+import Status from './components/status'
 
-interface ErrorCtxType {
-  setError: (errorMessage: string | undefined) => () => void
-  error: string | undefined
+type AlertType = 'error' | 'success'
+
+interface AlertPayload {
+  message: string | undefined
+  type: AlertType
 }
 
-export const ErrorCtx = createContext<ErrorCtxType | null>(null)
+interface AlertCtxType {
+  setAlertPayload: (message: string | undefined, type: AlertType) => () => void
+  alertPayload: AlertPayload | undefined
+}
+
+export const AlertCtx = createContext<AlertCtxType | null>(null)
 
 const App = () => {
-  const [error, setError] = useState<string | undefined>()
+  const [alertPayload, setAlertPayload] = useState<AlertPayload | undefined>()
 
-  const setErrorWithTimeout = (errorMessage: string | undefined) => {
-    setError(errorMessage)
+  const setAlertWithTimeout = (
+    message: string | undefined,
+    type: AlertType,
+  ) => {
+    setAlertPayload({ message, type })
 
     const id = setTimeout(() => {
-      setError(undefined)
+      setAlertPayload(undefined)
     }, 3000)
 
     return () => clearTimeout(id)
   }
 
-  const ErrorCtxValue: ErrorCtxType = {
-    setError: setErrorWithTimeout,
-    error,
+  const AlertCtxValue: AlertCtxType = {
+    setAlertPayload: setAlertWithTimeout,
+    alertPayload,
   }
 
   return (
     <div className="App">
       <Router>
-        <ErrorCtx.Provider value={ErrorCtxValue}>
+        <AlertCtx.Provider value={AlertCtxValue}>
           <Container>
-            <Typography variant="h2" style={{ marginBottom: '.05em' }}>
-              frontdesk
-            </Typography>
+            <Container>
+              <Grid container spacing={2} alignItems="center">
+                <Grid item xs={9}>
+                  <Typography variant="h2" style={{ marginBottom: '.05em' }}>
+                    frontdesk
+                  </Typography>
+                </Grid>
+                <Grid item xs={3}>
+                  <Status />
+                </Grid>
+              </Grid>
+            </Container>
             <Button component={Link} to="/" style={{ margin: '0px 5px' }}>
               front
             </Button>
@@ -65,7 +85,7 @@ const App = () => {
               <Route path="/" element={<div>home</div>} />
             </Routes>
           </Container>
-        </ErrorCtx.Provider>
+        </AlertCtx.Provider>
       </Router>
     </div>
   )
