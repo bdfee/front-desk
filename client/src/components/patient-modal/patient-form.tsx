@@ -75,8 +75,14 @@ const PatientForm = ({ type, closeModal }: PatientFormProps) => {
     }
   }, [])
 
-  const { mutate: addPatient } = useAddPatient(queryClient)
-  const { mutate: updatePatientById } = useUpdatePatientById(queryClient)
+  const { mutate: addPatient } = useAddPatient(
+    queryClient,
+    alertCtx?.setAlertPayload,
+  )
+  const { mutate: updatePatientById } = useUpdatePatientById(
+    queryClient,
+    alertCtx?.setAlertPayload,
+  )
 
   const fieldsFilled =
     !firstName.trim() ||

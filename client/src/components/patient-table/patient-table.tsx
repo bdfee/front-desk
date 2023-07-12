@@ -26,9 +26,14 @@ const PatientTable = () => {
   const queryClient = useQueryClient()
   const alertCtx = useContext(AlertCtx)
 
-  const { data: patientsData, status: patientsStatus } = useFetchPatients()
+  const { data: patientsData, status: patientsStatus } = useFetchPatients(
+    alertCtx?.setAlertPayload,
+  )
 
-  const { mutate: deletePatientById } = useDeletePatientById(queryClient)
+  const { mutate: deletePatientById } = useDeletePatientById(
+    queryClient,
+    alertCtx?.setAlertPayload,
+  )
 
   const navigateToPatient = (patientId: number) => {
     navigate(`/patients/${patientId}`)
@@ -41,13 +46,8 @@ const PatientTable = () => {
     })
   }
 
-  if (patientsStatus === 'error') {
-    alertCtx?.setAlertPayload('error', 'error fetching patients', 'page')
-    return <div>error fetching patients</div>
-  }
-
-  if (patientsStatus === 'loading') {
-    return <div>loading...</div>
+  if (patientsStatus === 'error' || patientsStatus === 'loading') {
+    return <Typography>{patientsStatus}: fetching patients</Typography>
   }
 
   return (
