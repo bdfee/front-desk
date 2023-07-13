@@ -15,7 +15,7 @@ import {
   RBCEventPropsForForm,
   AppointmentFormProps,
 } from '../../types'
-import { ErrorCtx } from '../../App'
+import { AlertCtx } from '../../App'
 import { validateTextInput } from '../../validations/inputs'
 import FetchedFormComponents from './fetched-form-components'
 import { useUpdateAppointmentById, useAddAppointment } from './actions'
@@ -32,7 +32,7 @@ const AppointmentForm = ({
   const [date, setDate] = useState<Dayjs | null>(null)
   const [description, setDescription] = useState<string>('')
 
-  const errorCtx = useContext(ErrorCtx)
+  const alertCtx = useContext(AlertCtx)
   const { id } = useParams<{ id: string }>()
   const queryClient = useQueryClient()
 
@@ -78,9 +78,14 @@ const AppointmentForm = ({
     }
   }, [id])
 
-  const { mutate: updateAppointmentById } =
-    useUpdateAppointmentById(queryClient)
-  const { mutate: addAppointment } = useAddAppointment(queryClient)
+  const { mutate: updateAppointmentById } = useUpdateAppointmentById(
+    queryClient,
+    alertCtx?.setAlertPayload,
+  )
+  const { mutate: addAppointment } = useAddAppointment(
+    queryClient,
+    alertCtx?.setAlertPayload,
+  )
 
   const fieldsFilled =
     !start ||
@@ -95,12 +100,20 @@ const AppointmentForm = ({
     event.preventDefault()
 
     if (!date || !start || !end) {
-      errorCtx?.setError('please enter scheduling details')
+      alertCtx?.setAlertPayload(
+        'error',
+        'please enter scheduling details',
+        'modal',
+      )
       return
     }
 
     if (!validateTextInput(description)) {
-      errorCtx?.setError('please enter a text description')
+      alertCtx?.setAlertPayload(
+        'error',
+        'please enter a text description',
+        'modal',
+      )
       setDescription('')
       return
     }

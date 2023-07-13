@@ -3,38 +3,31 @@ import {
   DialogContent,
   DialogTitle,
   Divider,
-  Alert,
+  Container,
+  Grid,
 } from '@mui/material'
 import SpecialistForm from './specialist-form'
 import { SpecialistModalProps } from '../../types'
+import Status from '../status'
 
-const SpecialistModal = ({
-  closeModal,
-  setError,
-  modalOpen,
-  error,
-}: SpecialistModalProps) => {
+const SpecialistModal = ({ closeModal, modalOpen }: SpecialistModalProps) => {
   return (
-    <>
-      <Dialog
-        fullWidth={true}
-        open={modalOpen}
-        onClose={() => closeModal()}
-        aria-labelledby="dialog-title"
-        aria-describedby="dialog-description"
-      >
-        <DialogTitle id="dialog-title">Add a new specialist</DialogTitle>
-        <Divider />
-        <DialogContent id="dialog-description">
-          {error && (
-            <Alert severity="error" role="alert">
-              {error}
-            </Alert>
-          )}
-          <SpecialistForm closeModal={closeModal} setError={setError} />
-        </DialogContent>
-      </Dialog>
-    </>
+    <Dialog fullWidth={true} open={modalOpen} onClose={() => closeModal()}>
+      <Container>
+        <Grid container spacing={2} alignItems="center">
+          <Grid item xs={6} sx={{ paddingLeft: 0 }}>
+            <DialogTitle id="dialog-title">Add a new specialist</DialogTitle>
+          </Grid>
+          <Grid item xs={6}>
+            <Status location="modal" />
+          </Grid>
+        </Grid>
+      </Container>
+      <Divider />
+      <DialogContent id="dialog-description">
+        <SpecialistForm closeModal={closeModal} />
+      </DialogContent>
+    </Dialog>
   )
 }
 

@@ -1,8 +1,12 @@
 import { useMutation, QueryClient } from '@tanstack/react-query'
 import specialistService from '../../services/specialist'
 import { TableData, Specialist } from '../../types'
+import { SetAlertPayload } from '../../types'
 
-export const useCreateSpecialist = (queryClient: QueryClient) =>
+export const useCreateSpecialist = (
+  queryClient: QueryClient,
+  setAlertPayload?: SetAlertPayload,
+) =>
   useMutation({
     mutationFn: specialistService.create,
     onSuccess: (newSpecialist) => {
@@ -26,5 +30,8 @@ export const useCreateSpecialist = (queryClient: QueryClient) =>
         ['SPECIALIST', newSpecialist.specialistId],
         newSpecialist,
       )
+
+      setAlertPayload &&
+        setAlertPayload('success', 'specialist created', 'page')
     },
   })

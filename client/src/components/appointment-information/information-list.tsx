@@ -1,19 +1,17 @@
 import { Container, Typography, Box, List, ListItemText } from '@mui/material'
+import { useContext } from 'react'
 import { AppointmentListProps } from '../../types'
 import { useGetAppointmentById } from './actions'
+import { AlertCtx } from '../../App'
 
 const InformationList = ({ id }: AppointmentListProps) => {
+  const alertCtx = useContext(AlertCtx)
   const { data: appointment, status: appointmentStatus } =
-    useGetAppointmentById(id)
+    useGetAppointmentById(id, alertCtx?.setAlertPayload)
 
-  if (appointmentStatus === 'error') {
-    return <div>error fetching appointment</div>
+  if (appointmentStatus === 'error' || appointmentStatus === 'loading') {
+    return <Typography>{appointmentStatus} fetching appointment</Typography>
   }
-
-  if (appointmentStatus === 'loading') {
-    return <div>loading appointment</div>
-  }
-
   return (
     <Container>
       <Typography>{appointment.patient.name}</Typography>

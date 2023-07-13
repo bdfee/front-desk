@@ -11,6 +11,8 @@ const Calendar = () => {
   >()
   const [modalOpen, setModalOpen] = useState(false)
 
+  // handles blur related form clearing
+  // replace to onCLose
   useEffect(() => {
     if (!modalOpen) {
       clearForm()

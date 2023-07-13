@@ -1,14 +1,21 @@
 import { useQuery, useMutation, QueryClient } from '@tanstack/react-query'
 import patientService from '../../services/patients'
 import { PatientDetail } from '../../types'
+import { SetAlertPayload } from '../../types'
 
-export const useFetchPatients = () =>
+export const useFetchPatients = (setAlertPayload?: SetAlertPayload) =>
   useQuery({
     queryKey: ['PATIENTS'],
     queryFn: patientService.getAll,
+    onError: () =>
+      setAlertPayload &&
+      setAlertPayload('error', 'error fetching patients', 'page'),
   })
 
-export const useDeletePatientById = (queryClient: QueryClient) =>
+export const useDeletePatientById = (
+  queryClient: QueryClient,
+  setAlertPayload?: SetAlertPayload,
+) =>
   useMutation({
     mutationFn: (patientId: number) => patientService.deleteById(patientId),
     onSuccess: (_, patientId) => {
@@ -17,7 +24,12 @@ export const useDeletePatientById = (queryClient: QueryClient) =>
         (oldPatients = []) =>
           oldPatients.filter((patient) => patient.patientId !== patientId),
       )
+
+      setAlertPayload && setAlertPayload('success', 'patient deleted', 'page')
     },
+    onError: () =>
+      setAlertPayload &&
+      setAlertPayload('error', 'error deleting patient', 'page'),
   })
 
 export const usePrefetchPatientById = async (

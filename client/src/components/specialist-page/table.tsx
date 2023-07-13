@@ -1,4 +1,4 @@
-import { useState, ChangeEvent } from 'react'
+import { useState, ChangeEvent, useContext } from 'react'
 import {
   Table,
   TableBody,
@@ -9,7 +9,7 @@ import {
 } from '@mui/material'
 import { TextField, Paper, Button, Typography } from '@mui/material'
 import { useQueryClient } from '@tanstack/react-query'
-import { Specialist, TableProps } from '../../types'
+import { Specialist } from '../../types'
 import { sanitizeTextInput, validateTextInput } from '../../validations/inputs'
 import { isSpecialist } from '../../typeUtils'
 import 'dayjs/plugin/utc'
@@ -19,30 +19,31 @@ import {
   useDeleteSpecialistById,
   useUpdateSpecialistById,
 } from './actions'
+import { AlertCtx } from '../../App'
 
-const SpecialistTable = ({ setError }: TableProps) => {
+const SpecialistTable = () => {
   const [editMode, setEditMode] = useState(false)
   const [editRowIdx, setEditRowIdx] = useState(-1)
   const [editRowData, setEditRowData] = useState<Specialist | undefined>()
 
   const queryClient = useQueryClient()
+  const alertCtx = useContext(AlertCtx)
 
-  const {
-    data: tableData,
-    error: getTableDataError,
-    status: tableDataStatus,
-  } = useGetTableData()
+  const { data: tableData, status: tableDataStatus } = useGetTableData(
+    alertCtx?.setAlertPayload,
+  )
 
-  const { mutate: deleteSpecialistById } = useDeleteSpecialistById(queryClient)
+  const { mutate: deleteSpecialistById } = useDeleteSpecialistById(
+    queryClient,
+    alertCtx?.setAlertPayload,
+  )
+  const { mutate: updateSpecialistById } = useUpdateSpecialistById(
+    queryClient,
+    alertCtx?.setAlertPayload,
+  )
 
-  const { mutate: updateSpecialistById } = useUpdateSpecialistById(queryClient)
-
-  if (tableDataStatus === 'loading') {
-    return <div>fetching table data</div>
-  }
-
-  if (tableDataStatus === 'error') {
-    return <div>error fetching table data: {getTableDataError.message}</div>
+  if (tableDataStatus === 'loading' || tableDataStatus === 'error') {
+    return <Typography>{tableDataStatus}: table data</Typography>
   }
 
   const handleRowEdit = (rowIdx: number) => {
@@ -73,27 +74,23 @@ const SpecialistTable = ({ setError }: TableProps) => {
     let speciality
 
     if (!validateTextInput(editRowData.name)) {
-      setError('invalid update to name')
+      alertCtx?.setAlertPayload('error', 'invalid update to name', 'page')
       return
     } else if (!validateTextInput(editRowData.speciality)) {
-      setError('invalid update to speciality')
+      alertCtx?.setAlertPayload('error', 'invalid update to speciality', 'page')
       return
     } else {
       name = sanitizeTextInput(editRowData.name)
       speciality = sanitizeTextInput(editRowData.speciality)
     }
 
-    try {
-      if (isSpecialist(editRowData)) {
-        updateSpecialistById({
-          specialistId: +editRowData.specialistId,
-          values: { name, speciality },
-        })
-        setEditMode(false)
-        setEditRowIdx(-1)
-      }
-    } catch (error) {
-      console.log('Error saving changes:' + error)
+    if (isSpecialist(editRowData)) {
+      updateSpecialistById({
+        specialistId: +editRowData.specialistId,
+        values: { name, speciality },
+      })
+      setEditMode(false)
+      setEditRowIdx(-1)
     }
   }
 

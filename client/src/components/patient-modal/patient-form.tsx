@@ -19,7 +19,7 @@ import {
   formatPhone,
   validateEmail,
 } from '../../validations/inputs'
-import { ErrorCtx } from '../../App'
+import { AlertCtx } from '../../App'
 import { useQueryClient } from '@tanstack/react-query'
 import SelectSpecialist from '../appointment-modal/fetched-form-components/select-specialist'
 
@@ -36,7 +36,7 @@ const PatientForm = ({ type, closeModal }: PatientFormProps) => {
   const [gender, setGender] = useState<string>('')
   const [address, setAddress] = useState('')
 
-  const errorCtx = useContext(ErrorCtx)
+  const alertCtx = useContext(AlertCtx)
   const { id } = useParams<{ id: string }>()
   const queryClient = useQueryClient()
 
@@ -75,8 +75,14 @@ const PatientForm = ({ type, closeModal }: PatientFormProps) => {
     }
   }, [])
 
-  const { mutate: addPatient } = useAddPatient(queryClient)
-  const { mutate: updatePatientById } = useUpdatePatientById(queryClient)
+  const { mutate: addPatient } = useAddPatient(
+    queryClient,
+    alertCtx?.setAlertPayload,
+  )
+  const { mutate: updatePatientById } = useUpdatePatientById(
+    queryClient,
+    alertCtx?.setAlertPayload,
+  )
 
   const fieldsFilled =
     !firstName.trim() ||
@@ -91,29 +97,29 @@ const PatientForm = ({ type, closeModal }: PatientFormProps) => {
   const submitForm = (event: SyntheticEvent) => {
     event.preventDefault()
     if (!validateTextInput(firstName)) {
-      errorCtx?.setError('invalid first name')
+      alertCtx?.setAlertPayload('error', 'invalid first name', 'modal')
       setFirstName('')
       return
     }
 
     if (!validateTextInput(lastName)) {
-      errorCtx?.setError('invalid last name')
+      alertCtx?.setAlertPayload('error', 'invalid last name', 'modal')
       setLastName('')
       return
     }
 
     if (!validateEmail(email)) {
-      errorCtx?.setError('invalid email')
+      alertCtx?.setAlertPayload('error', 'invalid email', 'modal')
       return
     }
 
     if (!dateOfBirth) {
-      errorCtx?.setError('please add date of birth')
+      alertCtx?.setAlertPayload('error', 'please add date of birth', 'modal')
       return
     }
 
     if (!gender) {
-      errorCtx?.setError('please specify gender')
+      alertCtx?.setAlertPayload('error', 'please specify gender', 'modal')
       return
     }
 

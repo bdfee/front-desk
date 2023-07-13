@@ -22,7 +22,6 @@ export interface Patient {
 
 export interface SpecialistFormProps {
   closeModal: () => void
-  setError: (errorMessage: string) => () => void
 }
 
 export type PatientInput = Omit<Patient, 'patientId'>
@@ -43,8 +42,6 @@ export interface PatientFormProps {
 export interface SpecialistModalProps {
   closeModal: () => void
   modalOpen: boolean
-  setError: (errorMessage: string) => () => void
-  error: string | undefined
 }
 
 export interface InformationListProps {
@@ -154,3 +151,30 @@ export interface FetchedFormComponentsProps {
 export interface AppointmentListProps {
   id: number
 }
+
+export type AlertType = 'error' | 'success'
+export type AlertLocation = 'modal' | 'page'
+export type AlertMessage = string
+
+export interface AlertPayload {
+  type: AlertType
+  message: AlertMessage
+  location: AlertLocation
+}
+
+export type NullableAlertPayload = AlertPayload | undefined
+
+export interface AlertCtxType {
+  setAlertPayload: (
+    type: AlertType,
+    message: AlertMessage,
+    location: AlertLocation,
+  ) => () => void
+  alertPayload: NullableAlertPayload
+}
+
+export type SetAlertPayload = (
+  type: AlertType,
+  message: AlertMessage,
+  location: AlertLocation,
+) => () => void

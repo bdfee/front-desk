@@ -1,4 +1,4 @@
-import { useState, useMemo, useCallback } from 'react'
+import { useState, useContext } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
   Calendar as ReactBigCalendar,
@@ -14,6 +14,7 @@ import FetchedFormComponents from '../appointment-modal/fetched-form-components'
 import { RBCEventProps, NewEvent, RBCProps } from '../../types'
 import { AppointmentDetail } from '../../types'
 import { useFetchAppointments } from './actions'
+import { AlertCtx } from '../../App'
 
 dayjs.extend(timezone)
 dayjs.extend(utc)
@@ -22,21 +23,15 @@ const RBC = ({ openModal }: RBCProps) => {
   const [specialistIdFilter, setSpecialistIdFilter] = useState<string>('')
   const [patientIdFilter, setPatientIdFilter] = useState<string>('')
   const [typeFilter, setTypeFilter] = useState<string>('')
-
+  const alertCtx = useContext(AlertCtx)
   const navigate = useNavigate()
 
-  let appointments: AppointmentDetail[]
-
   const { data: appointmentsData, status: appointmentsStatus } =
-    useFetchAppointments()
+    useFetchAppointments(alertCtx?.setAlertPayload)
 
-  if (appointmentsStatus === 'error') {
-    return <div>error fetching appointments</div>
+  if (appointmentsStatus === 'error' || appointmentsStatus === 'loading') {
+    return <div>{appointmentsStatus}: fetching appointments</div>
   }
-
-  if (appointmentsStatus === 'loading') {
-    appointments = []
-  } else appointments = appointmentsData
 
   const formatEvents = (filteredEvents: AppointmentDetail[]) => {
     return filteredEvents.map((appointment) => {
@@ -51,8 +46,8 @@ const RBC = ({ openModal }: RBCProps) => {
     })
   }
 
-  const filterEvents = useMemo(() => {
-    const filteredList = appointments.filter((appointment) => {
+  const filterEvents = () => {
+    const filteredList = appointmentsData.filter((appointment) => {
       const bySpecialist =
         !specialistIdFilter || appointment.specialistId === +specialistIdFilter
       const byPatient =
@@ -62,21 +57,18 @@ const RBC = ({ openModal }: RBCProps) => {
       return bySpecialist && byPatient && byType
     })
     return formatEvents(filteredList)
-  }, [appointments, specialistIdFilter, patientIdFilter, typeFilter])
+  }
 
-  const { localizer, defaultDate, max, views, events, min } = useMemo(
-    () => ({
-      defaultDate: new Date(),
-      localizer: dayjsLocalizer(dayjs),
-      min: new Date(1972, 0, 0, 7, 0, 0, 0),
-      max: new Date(1972, 0, 0, 18, 0, 0, 0),
-      views: { month: true, week: true, day: true, agenda: true },
-      events: filterEvents,
-    }),
-    [filterEvents],
-  )
+  const { localizer, defaultDate, max, views, events, min } = (() => ({
+    defaultDate: new Date(),
+    localizer: dayjsLocalizer(dayjs),
+    min: new Date(1972, 0, 0, 7, 0, 0, 0),
+    max: new Date(1972, 0, 0, 18, 0, 0, 0),
+    views: { month: true, week: true, day: true, agenda: true },
+    events: filterEvents(),
+  }))()
 
-  const handleSelectSlot = useCallback((event: NewEvent) => {
+  const handleSelectSlot = (event: NewEvent) => {
     const { start, end } = event
 
     const values = {
@@ -86,9 +78,9 @@ const RBC = ({ openModal }: RBCProps) => {
     }
 
     openModal(values)
-  }, [])
+  }
 
-  const onSelectEvent = useCallback((object: RBCEventProps) => {
+  const onSelectEvent = (object: RBCEventProps) => {
     const navigateToAppointmentEditor = (appointmentId: number) => {
       navigate(`/calendar/${appointmentId}`, {
         state: { openModalOnLoad: false },
@@ -96,9 +88,9 @@ const RBC = ({ openModal }: RBCProps) => {
     }
 
     navigateToAppointmentEditor(object.appointmentId)
-  }, [])
+  }
 
-  const getEventProps = useCallback((event: RBCEventProps) => {
+  const getEventProps = (event: RBCEventProps) => {
     let backgroundColor
 
     if (event.type === 'intake') {
@@ -118,7 +110,7 @@ const RBC = ({ openModal }: RBCProps) => {
         backgroundColor,
       },
     }
-  }, [])
+  }
 
   return (
     <>

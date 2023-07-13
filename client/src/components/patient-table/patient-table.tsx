@@ -11,6 +11,7 @@ import {
   Link,
 } from '@mui/material'
 import { useNavigate } from 'react-router-dom'
+import { useContext } from 'react'
 import { formatPhone } from '../../validations/inputs'
 import { useQueryClient } from '@tanstack/react-query'
 import {
@@ -18,14 +19,21 @@ import {
   useDeletePatientById,
   usePrefetchPatientById,
 } from './actions'
+import { AlertCtx } from '../../App'
 
 const PatientTable = () => {
   const navigate = useNavigate()
   const queryClient = useQueryClient()
+  const alertCtx = useContext(AlertCtx)
 
-  const { data: patientsData, status: patientsStatus } = useFetchPatients()
+  const { data: patientsData, status: patientsStatus } = useFetchPatients(
+    alertCtx?.setAlertPayload,
+  )
 
-  const { mutate: deletePatientById } = useDeletePatientById(queryClient)
+  const { mutate: deletePatientById } = useDeletePatientById(
+    queryClient,
+    alertCtx?.setAlertPayload,
+  )
 
   const navigateToPatient = (patientId: number) => {
     navigate(`/patients/${patientId}`)
@@ -38,12 +46,8 @@ const PatientTable = () => {
     })
   }
 
-  if (patientsStatus === 'error') {
-    return <div>error fetching patients</div>
-  }
-
-  if (patientsStatus === 'loading') {
-    return <div>loading...</div>
+  if (patientsStatus === 'error' || patientsStatus === 'loading') {
+    return <Typography>{patientsStatus}: fetching patients</Typography>
   }
 
   return (

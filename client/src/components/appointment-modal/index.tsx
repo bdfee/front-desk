@@ -3,18 +3,16 @@ import {
   DialogContent,
   DialogTitle,
   Divider,
-  Alert,
+  Grid,
+  Container,
 } from '@mui/material'
-import { useContext, useEffect } from 'react'
+import { useEffect } from 'react'
 import { useLocation } from 'react-router-dom'
-import { ErrorCtx } from '../../App'
 import AppointmentForm from './appointment-form'
 import { BaseAppointmentModalProps } from '../../types'
-
+import Status from '../status'
 const AppointmentModal = (props: BaseAppointmentModalProps) => {
   const { modalOpen, setModalOpen, serviceType, formValues } = props
-
-  const errorCtx = useContext(ErrorCtx)
 
   const location = useLocation()
 
@@ -24,27 +22,27 @@ const AppointmentModal = (props: BaseAppointmentModalProps) => {
     }
   }, [location.state])
 
-  if (!errorCtx) {
-    return <div>no context here</div>
-  }
-
   const closeModal = () => {
     setModalOpen(false)
-    errorCtx.setError(undefined)
   }
 
   const openModal = () => setModalOpen(true)
 
   return (
     <Dialog fullWidth={true} open={modalOpen} onClose={closeModal}>
-      <DialogTitle>{serviceType} an appointment</DialogTitle>
+      <Container>
+        <Grid container spacing={2} alignItems="center">
+          <Grid item xs={6} sx={{ paddingLeft: 0 }}>
+            <DialogTitle>{serviceType} an appointment</DialogTitle>
+          </Grid>
+          <Grid item xs={6}>
+            <Status location="modal" />
+          </Grid>
+        </Grid>
+      </Container>
+
       <Divider />
       <DialogContent>
-        {errorCtx.error && (
-          <Alert severity="error" role="alert">
-            {errorCtx.error}
-          </Alert>
-        )}
         <AppointmentForm
           serviceType={serviceType}
           formValues={formValues}
