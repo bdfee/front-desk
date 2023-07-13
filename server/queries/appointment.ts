@@ -1,5 +1,10 @@
 import { Appointment, Specialist, Patient } from "../models";
 import { Op } from "sequelize";
+import dayjs from "dayjs";
+import timezone from "dayjs/plugin/timezone";
+import utc from "dayjs/plugin/utc";
+dayjs.extend(timezone);
+dayjs.extend(utc);
 
 export const findByPk = async (id: number) => Appointment.findByPk(id);
 
@@ -65,16 +70,30 @@ export const findAllBySpecialist = async (specialistId: number) => {
 };
 
 export const countUpcomingBySpecialist = async (specialistId: number) => {
-  const currentDate = new Date();
-  const nextWeekDate = new Date();
-  nextWeekDate.setDate(currentDate.getDate() + 7);
+  const currentDate = dayjs();
+  const nextWeekDate = currentDate.add(7, "day");
+
+  const { startTime, startDate, endDate } = {
+    startTime: currentDate.format("HH:mm:ss"),
+    startDate: currentDate.format("YYYY-MM-DD"),
+    endDate: nextWeekDate.format("YYYY-MM-DD"),
+  };
 
   return Appointment.count({
     where: {
       specialistId,
       date: {
-        [Op.between]: [currentDate, nextWeekDate],
+        [Op.between]: [startDate, endDate],
       },
+      [Op.or]: [
+        {
+          date: startDate,
+          start: { [Op.gte]: startTime },
+        },
+        {
+          date: { [Op.gt]: startDate },
+        },
+      ],
     },
     include: [
       {
