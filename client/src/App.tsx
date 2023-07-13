@@ -2,6 +2,7 @@ import SpecialistPage from './components/specialist-page'
 import PatientTable from './components/patient-table'
 import PatientInformation from './components/patient-information'
 import Calendar from './components/calendar'
+import Front from './components/front'
 import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom'
 import { Typography, Container, Divider, Button, Grid } from '@mui/material'
 import { createContext, useState } from 'react'
@@ -72,7 +73,7 @@ const App = () => {
                 element={<AppointmentInformation />}
               />
               <Route path="/calendar" element={<Calendar />} />
-              <Route path="/" element={<div>home</div>} />
+              <Route path="/" element={<Front />} />
             </Routes>
           </Container>
         </AlertCtx.Provider>
