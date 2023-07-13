@@ -56,16 +56,16 @@ const RBC = ({ openModal }: RBCProps) => {
     openModal(values)
   }
 
-  const onSelectEvent = (object: RBCEventProps) => {
+  const onSelectEvent = (event: RBCEventProps) => {
     const navigateToAppointmentEditor = (appointmentId: number) => {
       navigate(`/calendar/${appointmentId}`, {
         state: { openModalOnLoad: false },
       })
     }
 
-    navigateToAppointmentEditor(object.appointmentId)
+    navigateToAppointmentEditor(event.appointmentId)
   }
-  console.log(events)
+
   return (
     <>
       <FetchedFormComponents
