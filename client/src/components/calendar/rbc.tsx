@@ -1,23 +1,14 @@
 import { useState, useContext } from 'react'
 import { useNavigate } from 'react-router-dom'
-import {
-  Calendar as ReactBigCalendar,
-  dayjsLocalizer,
-} from 'react-big-calendar'
-import dayjs from 'dayjs'
-import timezone from 'dayjs/plugin/timezone'
-import utc from 'dayjs/plugin/utc'
+import { Calendar as ReactBigCalendar } from 'react-big-calendar'
+import { dayjs } from './dayjs'
 import 'react-big-calendar/lib/css/react-big-calendar.css'
 
 import FetchedFormComponents from '../appointment-modal/fetched-form-components'
-
 import { RBCEventProps, NewEvent, RBCProps } from '../../types'
-import { AppointmentDetail } from '../../types'
 import { useFetchAppointments } from './actions'
 import { AlertCtx } from '../../App'
-
-dayjs.extend(timezone)
-dayjs.extend(utc)
+import { formatEvents, eventPropGetter, RBCDefaultProps } from './utils'
 
 const RBC = ({ openModal }: RBCProps) => {
   const [specialistIdFilter, setSpecialistIdFilter] = useState<string>('')
@@ -33,19 +24,6 @@ const RBC = ({ openModal }: RBCProps) => {
     return <div>{appointmentsStatus}: fetching appointments</div>
   }
 
-  const formatEvents = (filteredEvents: AppointmentDetail[]) => {
-    return filteredEvents.map((appointment) => {
-      const event: RBCEventProps = {
-        title: appointment.specialist.name.toString(),
-        appointmentId: appointment.appointmentId,
-        type: appointment.type,
-        start: new Date(appointment.date + 'T' + appointment.start),
-        end: new Date(appointment.date + 'T' + appointment.end),
-      }
-      return event
-    })
-  }
-
   const filterEvents = () => {
     const filteredList = appointmentsData.filter((appointment) => {
       const bySpecialist =
@@ -59,11 +37,9 @@ const RBC = ({ openModal }: RBCProps) => {
     return formatEvents(filteredList)
   }
 
-  const { localizer, defaultDate, max, views, events, min } = (() => ({
-    defaultDate: new Date(),
-    localizer: dayjsLocalizer(dayjs),
-    min: new Date(1972, 0, 0, 7, 0, 0, 0),
-    max: new Date(1972, 0, 0, 18, 0, 0, 0),
+  const { defaultDate, localizer, min, max } = RBCDefaultProps
+
+  const { views, events } = (() => ({
     views: { month: true, week: true, day: true, agenda: true },
     events: filterEvents(),
   }))()
@@ -89,29 +65,7 @@ const RBC = ({ openModal }: RBCProps) => {
 
     navigateToAppointmentEditor(object.appointmentId)
   }
-
-  const getEventProps = (event: RBCEventProps) => {
-    let backgroundColor
-
-    if (event.type === 'intake') {
-      backgroundColor = 'gray'
-    }
-
-    if (event.type === 'nutrition') {
-      backgroundColor = 'green'
-    }
-
-    if (event.type === 'physicalTherapy') {
-      backgroundColor = 'red'
-    }
-
-    return {
-      style: {
-        backgroundColor,
-      },
-    }
-  }
-
+  console.log(events)
   return (
     <>
       <FetchedFormComponents
@@ -135,7 +89,7 @@ const RBC = ({ openModal }: RBCProps) => {
           min={min}
           max={max}
           views={views}
-          eventPropGetter={getEventProps}
+          eventPropGetter={eventPropGetter}
           onSelectSlot={handleSelectSlot}
           onSelectEvent={onSelectEvent}
         />
