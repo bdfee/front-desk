@@ -54,4 +54,4 @@ Specialist.sync({ alter: isDev }).catch((error) => console.log("error syncing Sp
 Appointment.sync({ alter: isDev }).catch((error) => console.log("error syncing Appointment: " + error));
 Task.sync({ alter: isDev }).catch((error) => console.log("error syncing Tasks: " + error));
 
-export { Patient, Appointment, Specialist, User };
+export { Patient, Appointment, Specialist, User, Task };
