@@ -2,6 +2,7 @@ import { Router } from "express";
 import * as specialistService from "../services/specialist";
 import * as patientService from "../services/patient";
 import * as appointmentService from "../services/appointment";
+import * as taskService from "../services/task";
 import { Error } from "sequelize";
 
 const router = Router();
@@ -59,6 +60,18 @@ router.get("/:id/appointments", async (req, res, next) => {
   } catch (error) {
     if (error instanceof Error) {
       error.message = "Error getting specialist appointments: " + error;
+      next(error);
+    }
+  }
+});
+
+router.get("/:id/tasks", async (req, res, next) => {
+  try {
+    const tasks = await taskService.getAllBySpecialist(+req.params.id);
+    res.json(tasks);
+  } catch (error) {
+    if (error instanceof Error) {
+      error.message = "Error getting specialist tasks: " + error;
       next(error);
     }
   }

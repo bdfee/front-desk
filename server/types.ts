@@ -4,6 +4,7 @@ import {
   Patient as PatientModel,
   Specialist as SpecialistModel,
   User as UserModel,
+  Task as TaskModel,
 } from "./models";
 
 export type Patient = InferAttributes<PatientModel>;
@@ -37,6 +38,16 @@ export type AppointmentProperties = Appointment & {
   description?: string;
 };
 
+export type Task = InferAttributes<TaskModel>;
+
+export type TaskProperties = Task & {
+  dueDate?: string;
+  description?: string;
+  userId?: number;
+  specialistId?: number;
+  patientId?: number;
+};
+
 export type User = InferAttributes<UserModel>;
 
 export type UserLogin = Omit<User, "name">;
@@ -63,4 +74,10 @@ export type PatientDetail = Omit<Patient, "specialistId"> & {
 export type AppointmentDetail = Omit<Appointment, "specialistId" | "patientId"> & {
   specialist: Omit<Specialist, "specialistId" | "speciality">;
   patient: Omit<Patient, "patientId" | "email" | "phone" | "dateOfBirth" | "gender" | "address" | "specialistId">;
+};
+
+export type TaskDetail = Omit<Task, "specialistId" | "patientId" | "appointmentId"> & {
+  specialist: Omit<Specialist, "specialistId" | "speciality">;
+  patient: Omit<Patient, "patientId" | "email" | "phone" | "dateOfBirth" | "gender" | "address" | "specialistId">;
+  appointment: Omit<Appointment, "patientId" | "specialistId" | "start" | "end" | "type" | "description">;
 };

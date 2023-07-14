@@ -3,7 +3,7 @@ import { isAppointmentDetail, isAppointmentInput, validAppointmentProperties, is
 
 export const validateProperties = (object: unknown): object is AppointmentProperties => {
   if (!validAppointmentProperties(object)) {
-    throw new Error("invalid property on appointment input");
+    throw new Error("invalid property on appointment");
   }
   return true;
 };

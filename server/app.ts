@@ -7,6 +7,7 @@ import specialistsRouter from "./controllers/specialists";
 import appointmentsRouter from "./controllers/appointments";
 import userRouter from "./controllers/users";
 import loginRouter from "./controllers/login";
+import tasksRouter from "./controllers/tasks";
 import dbRouter from "./controllers/db";
 
 const app = express();
@@ -22,6 +23,7 @@ app.use(requestLogger);
 
 app.use("/api/login", loginRouter);
 app.use("/api/users", userRouter);
+app.use("/api/tasks", tasksRouter);
 app.use("/api/patients", patientsRouter);
 app.use("/api/specialists", specialistsRouter);
 app.use("/api/appointments", appointmentsRouter);
