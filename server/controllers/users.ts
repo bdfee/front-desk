@@ -1,5 +1,6 @@
 import { Router } from "express";
 import * as userService from "../services/user";
+import * as taskService from "../services/task";
 
 const router = Router();
 
@@ -35,6 +36,18 @@ router.get("/:id", async (req, res, next) => {
   } catch (error) {
     if (error instanceof Error) {
       error.message = "Error getting user: " + error;
+      next(error);
+    }
+  }
+});
+
+router.get("/:id/tasks", async (req, res, next) => {
+  try {
+    const tasks = await taskService.getAllByUser(+req.params.id);
+    res.json(tasks);
+  } catch (error) {
+    if (error instanceof Error) {
+      error.message = "Error getting user tasks: " + error;
       next(error);
     }
   }
