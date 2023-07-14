@@ -1,4 +1,4 @@
-import { Appointment, Patient, Specialist } from './types'
+import { Appointment, Patient, Specialist, Task } from './types'
 
 export const isSpecialist = (object: unknown): object is Specialist => {
   if (!object || typeof object !== 'object') {
@@ -35,6 +35,32 @@ export const isPatient = (object: unknown): object is Patient => {
     typeof gender === 'string' &&
     typeof address === 'string' &&
     typeof specialistId === 'number'
+  )
+}
+
+export const isTask = (object: unknown): object is Task => {
+  if (!object || typeof object !== 'object') {
+    throw new Error('malformed task object')
+  }
+  const {
+    taskId,
+    dueDate,
+    description,
+    userId,
+    specialistId,
+    patientId,
+    appointmentId,
+  } = object as Task
+
+  return (
+    (typeof taskId === 'number' &&
+      typeof dueDate === 'string' &&
+      typeof description === 'string' &&
+      typeof userId === 'number' &&
+      (typeof patientId === 'number' || patientId === null) &&
+      (typeof specialistId === 'number' || specialistId === null) &&
+      typeof appointmentId === 'number') ||
+    appointmentId === null
   )
 }
 

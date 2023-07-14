@@ -2,7 +2,7 @@ import axios, { isAxiosError } from 'axios'
 import { PatientDetail, PatientInput } from '../types'
 import { apiBaseUrl } from '../constants'
 import { isPatient } from '../typeUtils'
-import { AppointmentDetail } from '../types'
+import { AppointmentDetail, TaskDetail } from '../types'
 
 const url = `${apiBaseUrl}/patients/`
 
@@ -67,6 +67,19 @@ const updateById = async (id: number, object: unknown) => {
   }
 }
 
+const getTasksByPatientId = async (id: number) => {
+  try {
+    const { data } = await axios.get<TaskDetail[]>(url + id)
+    return data
+  } catch (error) {
+    if (isAxiosError(error)) {
+      throw new Error(error.response?.data.error)
+    } else {
+      throw new Error('Unknown error fetching tasks')
+    }
+  }
+}
+
 export default {
   getAll,
   getOneById,
@@ -74,4 +87,5 @@ export default {
   deleteById,
   updateById,
   getAppointmentsByPatient,
+  getTasksByPatientId,
 }

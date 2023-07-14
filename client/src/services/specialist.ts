@@ -1,5 +1,5 @@
 import axios, { isAxiosError } from 'axios'
-import { Specialist, SpecialistInput } from '../types'
+import { Specialist, SpecialistInput, TaskDetail } from '../types'
 import { apiBaseUrl } from '../constants'
 import { isSpecialist } from '../typeUtils'
 const url = `${apiBaseUrl}/specialists/`
@@ -66,10 +66,24 @@ const getTableData = async () => {
   }
 }
 
+const getTasksBySpecialistId = async (id: number) => {
+  try {
+    const { data } = await axios.get<TaskDetail[]>(url + id)
+    return data
+  } catch (error) {
+    if (isAxiosError(error)) {
+      throw new Error(error.response?.data.error)
+    } else {
+      throw new Error('Unknown error fetching tasks')
+    }
+  }
+}
+
 export default {
   getAll,
   create,
   deleteById,
   updateById,
   getTableData,
+  getTasksBySpecialistId,
 }
