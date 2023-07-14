@@ -53,7 +53,7 @@ export const findAllByUserId = async (userId: number) => {
   });
 };
 
-export const findAllbySpecialistId = async (specialistId: number) => {
+export const findAllBySpecialistId = async (specialistId: number) => {
   return Task.findAll({
     where: {
       specialistId,

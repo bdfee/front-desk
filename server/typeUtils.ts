@@ -12,6 +12,9 @@ import {
   UserLogin,
   AuthenticatedUser,
   SafeUser,
+  Task,
+  TaskDetail,
+  TaskProperties,
 } from "./types";
 
 // specialist
@@ -40,6 +43,7 @@ export const validSpecialistProperties = (object: unknown): object is Specialist
   return true;
 };
 
+// patient
 export const isPatientInput = (object: unknown): object is Patient => {
   if (typeof object !== "object" || object === null || "patientId" in object) {
     return false;
@@ -134,6 +138,72 @@ export const validAppointmentProperties = (object: unknown): object is Appointme
   return true;
 };
 
+// task
+
+export const isTaskInput = (object: unknown): object is Task => {
+  if (typeof object !== "object" || object === null || "taskId" in object) {
+    return false;
+  }
+
+  const { dueDate, description, userId, specialistId, patientId } = object as Task;
+  return (
+    typeof dueDate === "string" &&
+    typeof description === "string" &&
+    typeof userId === "number" &&
+    typeof patientId === "number" &&
+    typeof specialistId === "number"
+  );
+};
+
+export const isTask = (object: unknown): object is Task => {
+  if (typeof object !== "object" || object === null) {
+    return false;
+  }
+
+  const { taskId, dueDate, description, userId, specialistId, patientId } = object as Task;
+  return (
+    typeof taskId === "number" &&
+    typeof dueDate === "string" &&
+    typeof description === "string" &&
+    typeof userId === "number" &&
+    typeof patientId === "number" &&
+    typeof specialistId === "number"
+  );
+};
+
+export const isTaskDetail = (object: unknown): object is TaskDetail => {
+  if (typeof object !== "object" || object === null) {
+    return false;
+  }
+  const { taskId, dueDate, description, userId, specialist, patient, appointment } = object as TaskDetail;
+  const { name: specialistName } = specialist as { name: string };
+  const { name: patientName } = patient as { name: string };
+  const { date: appointmentDate } = appointment as { date: string };
+
+  return (
+    typeof taskId === "number" &&
+    typeof dueDate === "string" &&
+    typeof description === "string" &&
+    typeof userId === "number" &&
+    typeof patient === "object" &&
+    typeof specialist === "object" &&
+    typeof appointment === "object" &&
+    typeof specialistName === "string" &&
+    typeof patientName === "string" &&
+    typeof appointmentDate === "string"
+  );
+};
+
+export const validTaskProperties = (object: unknown): object is TaskProperties => {
+  for (const key in object as TaskProperties) {
+    if (!["dueDate", "description", "userId", "patientId", "specialistId", "description"].includes(key)) {
+      return false;
+    }
+  }
+  return true;
+};
+
+// user
 export const isUserInput = (object: unknown): object is User => {
   if (typeof object !== "object" || object === null || "id" in object) {
     return false;

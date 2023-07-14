@@ -7,7 +7,7 @@ class Task extends Model<InferAttributes<Task>, InferCreationAttributes<Task>> {
   declare description: string;
   declare userId: ForeignKey<number>;
   declare patientId: ForeignKey<number> | null;
-  declare specialistId?: ForeignKey<number> | null;
+  declare specialistId: ForeignKey<number> | null;
 }
 
 Task.init(
