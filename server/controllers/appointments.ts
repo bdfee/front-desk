@@ -1,6 +1,7 @@
 import { Request, Router } from "express";
 import { isDate, isString } from "../typeUtils";
 import * as appointmentService from "../services/appointment";
+import * as taskService from "../services/task";
 
 const router = Router();
 
@@ -51,6 +52,18 @@ router.get("/:id", async (req, res, next) => {
   } catch (error) {
     if (error instanceof Error) {
       error.message = "Error getting appointment: " + error;
+      next(error);
+    }
+  }
+});
+
+router.get("/:id/tasks", async (req, res, next) => {
+  try {
+    const tasks = await taskService.getAllByAppointment(+req.body.params);
+    res.json(tasks);
+  } catch (error) {
+    if (error instanceof Error) {
+      error.message = "Error getting tasks: " + error;
       next(error);
     }
   }

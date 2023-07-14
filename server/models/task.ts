@@ -8,6 +8,7 @@ class Task extends Model<InferAttributes<Task>, InferCreationAttributes<Task>> {
   declare userId: ForeignKey<number>;
   declare patientId: ForeignKey<number> | null;
   declare specialistId: ForeignKey<number> | null;
+  declare appointmentId: ForeignKey<number> | null;
 }
 
 Task.init(
@@ -41,6 +42,10 @@ Task.init(
       allowNull: true,
     },
     specialistId: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+    },
+    appointmentId: {
       type: DataTypes.INTEGER,
       allowNull: true,
     },

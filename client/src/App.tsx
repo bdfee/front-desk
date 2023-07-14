@@ -3,6 +3,7 @@ import PatientTable from './components/patient-table'
 import PatientInformation from './components/patient-information'
 import Calendar from './components/calendar'
 import Front from './components/front'
+import Tasks from './components/tasks'
 import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom'
 import { Typography, Container, Divider, Button, Grid } from '@mui/material'
 import { createContext, useState } from 'react'
@@ -54,6 +55,9 @@ const App = () => {
             <Button component={Link} to="/" style={{ margin: '0px 5px' }}>
               front
             </Button>
+            <Button component={Link} to="/tasks">
+              tasks
+            </Button>
             <Button component={Link} to="/specialists">
               specialists
             </Button>
@@ -65,6 +69,7 @@ const App = () => {
             </Button>
             <Divider style={{ marginBottom: '1em' }} />
             <Routes>
+              <Route path="/tasks" element={<Tasks />} />
               <Route path="/patients" element={<PatientTable />} />
               <Route path="/patients/:id" element={<PatientInformation />} />
               <Route path="/specialists" element={<SpecialistPage />} />

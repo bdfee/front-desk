@@ -88,3 +88,11 @@ export const findAllByPatientId = async (patientId: number) => {
     ],
   });
 };
+
+export const findAllByAppointmentId = async (appointmentId: number) => {
+  return Task.findAll({
+    where: {
+      appointmentId,
+    },
+  });
+};

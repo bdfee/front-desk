@@ -46,6 +46,7 @@ export type TaskProperties = Task & {
   userId?: number;
   specialistId?: number;
   patientId?: number;
+  appointmentId?: number;
 };
 
 export type User = InferAttributes<UserModel>;
@@ -76,8 +77,8 @@ export type AppointmentDetail = Omit<Appointment, "specialistId" | "patientId"> 
   patient: Omit<Patient, "patientId" | "email" | "phone" | "dateOfBirth" | "gender" | "address" | "specialistId">;
 };
 
-export type TaskDetail = Omit<Task, "specialistId" | "patientId" | "appointmentId"> & {
+export type TaskDetail = Omit<Task, "specialistId" | "patientId" | "userId"> & {
   specialist: Omit<Specialist, "specialistId" | "speciality">;
   patient: Omit<Patient, "patientId" | "email" | "phone" | "dateOfBirth" | "gender" | "address" | "specialistId">;
-  appointment: Omit<Appointment, "patientId" | "specialistId" | "start" | "end" | "type" | "description">;
+  userId: SafeUser;
 };

@@ -1,5 +1,13 @@
 import { Task } from "../models";
-import { findOne, findOneByPk, findAll, findAllByPatient, findAllBySpecialist, findAllByUser } from "./utils/tasks";
+import {
+  findOne,
+  findOneByPk,
+  findAll,
+  findAllByPatient,
+  findAllBySpecialist,
+  findAllByUser,
+  findAllByAppointment,
+} from "./utils/tasks";
 import { validateInput, validateProperties, validateDetail } from "./validation/task";
 
 export const getAll = async (): Promise<Task[]> => findAll();
@@ -11,6 +19,9 @@ export const getAllByPatient = async (patientId: number): Promise<Task[]> => fin
 export const getAllBySpecialist = async (specialistId: number): Promise<Task[]> => findAllBySpecialist(specialistId);
 
 export const getAllByUser = async (userId: number): Promise<Task[]> => findAllByUser(userId);
+
+export const getAllByAppointment = async (appointmentId: number): Promise<Task[]> =>
+  findAllByAppointment(appointmentId);
 
 export const deleteOneById = async (id: number) => {
   await findOneByPk(id).then((task) => task.destroy());

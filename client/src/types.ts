@@ -58,6 +58,56 @@ export interface SelectPatientProps {
   setPatientId: Dispatch<SetStateAction<string>>
 }
 
+export interface User {
+  userId: number
+  name: string
+  username: string
+  password: string
+}
+
+export type UserLogin = Omit<User, 'name'>
+
+export type SafeUser = Omit<User, 'password'>
+
+export type UserForToken = Omit<User, 'password'>
+
+export type AuthenticatedUser = Omit<User, 'password'> & {
+  token: string
+}
+
+export type UserProperties = User & {
+  name?: string
+  username?: string
+  password?: string
+}
+
+export interface Task {
+  taskId: number
+  dueDate: string
+  description: string
+  userId: number
+  specialistId: number | null
+  patientId: number | null
+  appointmentId: number | null
+}
+
+export type TaskInput = Omit<Task, 'taskId'>
+
+export type TaskDetail = Omit<Task, 'specialistId' | 'patientId' | 'userId'> & {
+  specialist: Omit<Specialist, 'specialistId' | 'speciality'>
+  patient: Omit<
+    Patient,
+    | 'patientId'
+    | 'email'
+    | 'phone'
+    | 'dateOfBirth'
+    | 'gender'
+    | 'address'
+    | 'specialistId'
+  >
+  user: SafeUser
+}
+
 export enum Gender {
   Male = 'male',
   Female = 'female',

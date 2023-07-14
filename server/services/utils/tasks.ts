@@ -5,6 +5,7 @@ import {
   findAllByUserId as findByUser,
   findAllBySpecialistId as findBySpecialist,
   findAllByPatientId as findByPatient,
+  findAllByAppointmentId as findByAppointment,
 } from "../../queries/task";
 
 export const findOne = async (id: number) => {
@@ -30,3 +31,5 @@ export const findAllByUser = async (userId: number) => findByUser(userId);
 export const findAllBySpecialist = async (specialistId: number) => findBySpecialist(specialistId);
 
 export const findAllByPatient = async (patientId: number) => findByPatient(patientId);
+
+export const findAllByAppointment = async (appointmentId: number) => findByAppointment(appointmentId);

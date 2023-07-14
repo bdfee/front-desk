@@ -48,6 +48,13 @@ Task.belongsTo(Specialist, {
   },
 });
 
+Task.belongsTo(Appointment, {
+  foreignKey: {
+    name: "appointmentId",
+    allowNull: true,
+  },
+});
+
 User.sync({ alter: isDev }).catch((error) => console.log("error syncing Users: " + error));
 Patient.sync({ alter: isDev }).catch((error) => console.log("error syncing Patient: " + error));
 Specialist.sync({ alter: isDev }).catch((error) => console.log("error syncing Specialist: " + error));
