@@ -38,7 +38,6 @@ const TaskForm = () => {
         patientId: +patientId || null,
         appointmentId: +appointmentId || null,
       }
-      console.log(taskValues)
       addTask(taskValues)
       setDescription('')
       setDueDate(null)
