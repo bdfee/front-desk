@@ -1,35 +1,50 @@
-import { useState } from 'react'
+import { useState, useContext, SyntheticEvent } from 'react'
 import { Dayjs } from 'dayjs'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 
 import { Typography, TextField, Button, Grid, Paper } from '@mui/material'
 import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers'
-// import { TaskDetail } from '../../types'
 import SelectPatient from '../appointment-modal/fetched-form-components/select-patient'
 import SelectSpecialist from '../appointment-modal/fetched-form-components/select-specialist'
+import { AlertCtx } from '../../App'
+import { useQueryClient } from '@tanstack/react-query'
+import { useCreateTask } from './actions'
 
 const TaskForm = () => {
-  // const [tasks, setTasks] = useState<TaskDetail[]>([])
   const [description, setDescription] = useState('')
   const [dueDate, setDueDate] = useState<Dayjs | null>(null)
   const [specialistId, setSpecialistId] = useState<string>('')
+  // add appointments to fetched components
+  const [appointmentId, setAppointmentId] = useState<string>('')
   const [patientId, setPatientId] = useState<string>('')
+  const alertCtx = useContext(AlertCtx)
+  const queryClient = useQueryClient()
 
-  const handleAddTask = () => {
-    const newTask = {
-      userId: 1,
-      description,
-      dueDate,
-      specialistId,
-      patientId,
+  const { mutate: addTask } = useCreateTask(
+    queryClient,
+    alertCtx?.setAlertPayload,
+  )
+
+  const fieldsFilled = !description || !dueDate
+
+  const submitForm = (event: SyntheticEvent) => {
+    event.preventDefault()
+    if (dueDate) {
+      const taskValues = {
+        description,
+        userId: 1,
+        dueDate: dueDate.format('YYYY-MM-DD'),
+        specialistId: +specialistId || null,
+        patientId: +patientId || null,
+        appointmentId: +appointmentId || null,
+      }
+      addTask(taskValues)
+      setDescription('')
+      setDueDate(null)
+      setSpecialistId('')
+      setAppointmentId('')
+      setPatientId('')
     }
-    // setTasks([...tasks, newTask])
-  }
-
-  const handleDeleteTask = () => {
-    // const updatedTasks = [...tasks]
-    // updatedTasks.splice(index, 1)
-    // setTasks(updatedTasks)
   }
 
   return (
@@ -68,7 +83,8 @@ const TaskForm = () => {
             variant="contained"
             color="primary"
             startIcon={<>+</>}
-            onClick={handleAddTask}
+            disabled={fieldsFilled}
+            onClick={submitForm}
           >
             Add Task
           </Button>

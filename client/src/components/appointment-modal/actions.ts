@@ -49,5 +49,5 @@ export const useAddAppointment = (
     },
     onError: () =>
       setAlertPayload &&
-      setAlertPayload('error', 'error updating appointment', 'page'),
+      setAlertPayload('error', 'error creating appointment', 'page'),
   })
