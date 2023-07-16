@@ -20,7 +20,7 @@ export const login = async (object: unknown): Promise<AuthenticatedUser> => {
     return authenticateUser({
       username: user.username,
       name: user.name,
-      id: user.id,
+      userId: user.userId,
     });
   } catch (error) {
     throw new Error("Error logging in: " + (error instanceof Error ? error.message : "Unknown server error"));

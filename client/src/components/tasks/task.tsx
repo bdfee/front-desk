@@ -8,7 +8,7 @@ interface TaskProps {
 
 const Task = ({ task }: TaskProps) => {
   const navigate = useNavigate()
-
+  console.log(task)
   return (
     <Container
       key={task.taskId}
@@ -20,37 +20,44 @@ const Task = ({ task }: TaskProps) => {
       <Typography variant="subtitle1" gutterBottom>
         Due Date: {task.dueDate}
       </Typography>
-      {task.user && (
-        <Chip
-          label={`User: ${task.user.name}`}
-          variant="outlined"
-          style={{ marginRight: '8px', marginBottom: '8px' }}
-        />
-      )}
-      {task.patient && (
-        <Chip
-          label={`Patient: ${task.patient.name}`}
-          variant="outlined"
-          style={{ marginRight: '8px', marginBottom: '8px' }}
-          onClick={() => navigate('/patients/' + task.patientId)}
-        />
-      )}
-      {task.specialist && (
-        <Chip
-          label={`Specialist: ${task.specialist.name}`}
-          variant="outlined"
-          style={{ marginRight: '8px', marginBottom: '8px' }}
-          onClick={() => navigate('/specialists/' + task.specialistId)}
-        />
-      )}
-      {task.appointmentId && (
-        <Chip
-          label={`Appointment: ${task.appointmentId}`}
-          variant="outlined"
-          style={{ marginRight: '8px', marginBottom: '8px' }}
-          onClick={() => navigate('/appointments/' + task.appointmentId)}
-        />
-      )}
+      <Container>
+        {task.user && (
+          <Chip
+            label={`User: ${task.user?.name}`}
+            variant="outlined"
+            style={{ marginRight: '8px', marginBottom: '8px' }}
+            onClick={() => navigate('/users/' + task.user?.userId)}
+          />
+        )}
+        {task.patient && (
+          <Chip
+            label={`Patient: ${task.patient.name}`}
+            variant="outlined"
+            style={{ marginRight: '8px', marginBottom: '8px' }}
+            onClick={() => navigate('/patients/' + task.patient?.patientId)}
+          />
+        )}
+        {task.specialist && (
+          <Chip
+            label={`Specialist: ${task.specialist.name}`}
+            variant="outlined"
+            style={{ marginRight: '8px', marginBottom: '8px' }}
+            onClick={() =>
+              navigate('/specialists/' + task.specialist?.specialistId)
+            }
+          />
+        )}
+        {task.appointment && (
+          <Chip
+            label={`Appointment: ${task.appointment?.date}`}
+            variant="outlined"
+            style={{ marginRight: '8px', marginBottom: '8px' }}
+            onClick={() =>
+              navigate('/appointments/' + task.appointment?.appointmentId)
+            }
+          />
+        )}
+      </Container>
     </Container>
   )
 }

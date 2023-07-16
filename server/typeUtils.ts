@@ -210,7 +210,7 @@ export const validTaskProperties = (object: unknown): object is TaskProperties =
 
 // user
 export const isUserInput = (object: unknown): object is User => {
-  if (typeof object !== "object" || object === null || "id" in object) {
+  if (typeof object !== "object" || object === null || "userId" in object) {
     return false;
   }
 
@@ -249,9 +249,9 @@ export const isSafeUser = (object: unknown): object is SafeUser => {
     }
   }
 
-  const { username, name, id } = object as SafeUser;
+  const { username, name, userId } = object as SafeUser;
 
-  return typeof username === "string" && typeof name === "string" && typeof id === "number";
+  return typeof username === "string" && typeof name === "string" && typeof userId === "number";
 };
 
 export const isAuthenticatedUser = (object: unknown): object is AuthenticatedUser => {
@@ -259,10 +259,10 @@ export const isAuthenticatedUser = (object: unknown): object is AuthenticatedUse
     return false;
   }
 
-  const { username, id, name, token } = object as AuthenticatedUser;
+  const { username, userId, name, token } = object as AuthenticatedUser;
 
   return (
-    typeof username === "string" && typeof name === "string" && typeof id === "number" && typeof token === "string"
+    typeof username === "string" && typeof name === "string" && typeof userId === "number" && typeof token === "string"
   );
 };
 

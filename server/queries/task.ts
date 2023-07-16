@@ -1,4 +1,4 @@
-import { Task, Specialist, Patient } from "../models";
+import { Task, Specialist, Patient, User, Appointment } from "../models";
 
 export const findByPk = async (id: number) => Task.findByPk(id);
 
@@ -10,11 +10,19 @@ export const findOneById = async (id: number) => {
     include: [
       {
         model: Specialist,
-        attributes: ["name"],
+        attributes: ["name", "specialistId"],
       },
       {
         model: Patient,
-        attributes: ["name"],
+        attributes: ["name", "patientId"],
+      },
+      {
+        model: User,
+        attributes: ["name", "userId"],
+      },
+      {
+        model: Appointment,
+        attributes: ["date", "appointmentId"],
       },
     ],
   });
@@ -25,11 +33,19 @@ export const findAll = async () => {
     include: [
       {
         model: Specialist,
-        attributes: ["name"],
+        attributes: ["name", "specialistId"],
       },
       {
         model: Patient,
-        attributes: ["name"],
+        attributes: ["name", "patientId"],
+      },
+      {
+        model: User,
+        attributes: ["name", "userId"],
+      },
+      {
+        model: Appointment,
+        attributes: ["date", "appointmentId"],
       },
     ],
   });

@@ -1,6 +1,7 @@
 import { Container, Typography, Box, List, ListItemText } from '@mui/material'
 import { AppointmentDetail, InformationListProps } from '../../types'
 import { useFetchAppointmentsByPatientId, useFetchPatientById } from './actions'
+import { sortAppointments } from '../utils'
 
 const InformationList = ({ patientId }: InformationListProps) => {
   const {
@@ -11,18 +12,18 @@ const InformationList = ({ patientId }: InformationListProps) => {
   const { data: patientData, status: patientStatus } =
     useFetchPatientById(patientId)
 
-  const sortAppointments = (appointments: AppointmentDetail[]) => {
-    const history: AppointmentDetail[] = []
-    const upcoming: AppointmentDetail[] = []
+  // const sortAppointments = (appointments: AppointmentDetail[]) => {
+  //   const history: AppointmentDetail[] = []
+  //   const upcoming: AppointmentDetail[] = []
 
-    appointments.forEach((appointment) => {
-      new Date() > new Date(appointment.date)
-        ? history.push(appointment)
-        : upcoming.push(appointment)
-    })
+  //   appointments.forEach((appointment) => {
+  //     new Date() > new Date(appointment.date)
+  //       ? history.push(appointment)
+  //       : upcoming.push(appointment)
+  //   })
 
-    return { history, upcoming }
-  }
+  //   return { history, upcoming }
+  // }
 
   if (patientStatus === 'error' || appointmentsByPatientIdStatus === 'error') {
     return <div>Error fetching data</div>

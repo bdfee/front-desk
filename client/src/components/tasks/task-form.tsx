@@ -7,11 +7,13 @@ import {
   Button,
   Grid,
   Paper,
+  Container,
   // Collapse,
 } from '@mui/material'
 import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers'
 import SelectPatient from '../appointment-modal/fetched-form-components/select-patient'
 import SelectSpecialist from '../appointment-modal/fetched-form-components/select-specialist'
+import SelectUpcomingAppointmentsByPatient from '../appointment-modal/fetched-form-components/select-upcoming-appointment-by-patient'
 import { AlertCtx } from '../../App'
 import { useQueryClient } from '@tanstack/react-query'
 import { useCreateTask, useUpdateTaskById } from './actions'
@@ -42,14 +44,6 @@ const TaskForm = ({ task, handleEditIdxs }: FormProps) => {
       setSpecialistId(task.specialistId ? '' + task.specialistId : '')
       setAppointmentId(task.appointmentId ? '' + task.appointmentId : '')
       setPatientId(task.patientId ? '' + task.patientId : '')
-      console.log({
-        taskId,
-        description,
-        dueDate,
-        specialistId,
-        appointmentId,
-        patientId,
-      })
     }
   }, [])
 
@@ -92,36 +86,13 @@ const TaskForm = ({ task, handleEditIdxs }: FormProps) => {
 
   return (
     <form>
-      <Grid item xs={12}>
-        {/* <Typography variant="h4" gutterBottom>
-          Tasks
-        </Typography> */}
-      </Grid>
       <Grid item xs={12} sm={6}>
-        <Paper elevation={1}>
-          {/* <Typography
-            variant="h6"
-            textAlign={'right'}
-            gutterBottom
-            // onClick={() => setCollapsed(!collapsed)}
-            style={{ cursor: 'pointer' }}
-          >
-            + Add Task
-          </Typography> */}
-
+        <Container>
           <TextField
             label="Description"
             value={description}
             onChange={({ target }) => setDescription(target.value)}
-            fullWidth
-            margin="normal"
           />
-          <SelectPatient patientId={patientId} setPatientId={setPatientId} />
-          <SelectSpecialist
-            specialistId={specialistId}
-            setSpecialistId={setSpecialistId}
-          />
-
           <LocalizationProvider dateAdapter={AdapterDayjs}>
             <DatePicker
               label="due date"
@@ -129,7 +100,6 @@ const TaskForm = ({ task, handleEditIdxs }: FormProps) => {
               onChange={(value) => setDueDate(value)}
             />
           </LocalizationProvider>
-
           <Button
             variant="contained"
             color="primary"
@@ -138,6 +108,23 @@ const TaskForm = ({ task, handleEditIdxs }: FormProps) => {
           >
             {taskId ? 'Save' : 'Add'} Task
           </Button>
+        </Container>
+        <Paper elevation={1}>
+          {/* <Select>
+            //assigned to user
+          </Select> */}
+          <SelectSpecialist
+            specialistId={specialistId}
+            setSpecialistId={setSpecialistId}
+          />
+          <SelectPatient patientId={patientId} setPatientId={setPatientId} />
+          {patientId && (
+            <SelectUpcomingAppointmentsByPatient
+              patientId={patientId}
+              appointmentId={appointmentId}
+              setAppointmentId={setAppointmentId}
+            />
+          )}
         </Paper>
       </Grid>
     </form>

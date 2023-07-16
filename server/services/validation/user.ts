@@ -48,7 +48,7 @@ export const authenticateUser = (user: UserForToken): AuthenticatedUser => {
 
   return {
     token,
-    id: user.id,
+    userId: user.userId,
     username: user.username,
     name: user.name,
   };
