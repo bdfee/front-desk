@@ -42,6 +42,7 @@ export const isTask = (object: unknown): object is Task => {
   if (!object || typeof object !== 'object') {
     throw new Error('malformed task object')
   }
+
   const {
     taskId,
     dueDate,

@@ -55,10 +55,10 @@ Task.belongsTo(Appointment, {
   },
 });
 
-User.sync({ alter: isDev }).catch((error) => console.log("error syncing Users: " + error));
-Patient.sync({ alter: isDev }).catch((error) => console.log("error syncing Patient: " + error));
 Specialist.sync({ alter: isDev }).catch((error) => console.log("error syncing Specialist: " + error));
+Patient.sync({ alter: isDev }).catch((error) => console.log("error syncing Patient: " + error));
 Appointment.sync({ alter: isDev }).catch((error) => console.log("error syncing Appointment: " + error));
+User.sync({ alter: isDev }).catch((error) => console.log("error syncing Users: " + error));
 Task.sync({ alter: isDev }).catch((error) => console.log("error syncing Tasks: " + error));
 
 export { Patient, Appointment, Specialist, User, Task };

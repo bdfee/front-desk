@@ -3,7 +3,7 @@ import { sequelize } from "../utils/connectToDb";
 import bcrypt from "bcrypt";
 
 class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
-  declare id: CreationOptional<number>;
+  declare userId: CreationOptional<number>;
   declare password: string;
   declare username: string;
   declare name: string;
@@ -20,7 +20,7 @@ class User extends Model<InferAttributes<User>, InferCreationAttributes<User>> {
 
 User.init(
   {
-    id: {
+    userId: {
       type: DataTypes.INTEGER,
       primaryKey: true,
       autoIncrement: true,

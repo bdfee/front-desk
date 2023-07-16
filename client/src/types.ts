@@ -93,19 +93,17 @@ export interface Task {
 
 export type TaskInput = Omit<Task, 'taskId'>
 
-export type TaskDetail = Omit<Task, 'specialistId' | 'patientId' | 'userId'> & {
-  specialist: Omit<Specialist, 'specialistId' | 'speciality'>
-  patient: Omit<
+export type TaskDetail = Task & {
+  specialist: null | Omit<Specialist, 'speciality'>
+  patient: null | Omit<
     Patient,
-    | 'patientId'
-    | 'email'
-    | 'phone'
-    | 'dateOfBirth'
-    | 'gender'
-    | 'address'
-    | 'specialistId'
+    'email' | 'phone' | 'dateOfBirth' | 'gender' | 'address' | 'specialistId'
   >
-  user: SafeUser
+  user: null | SafeUser
+  appointment: null | Omit<
+    Appointment,
+    'patientId' | 'specialistId' | 'start' | 'end' | 'type' | 'description'
+  >
 }
 
 export enum Gender {

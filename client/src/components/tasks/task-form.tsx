@@ -1,16 +1,31 @@
-import { useState, useContext, SyntheticEvent } from 'react'
-import { Dayjs } from 'dayjs'
+import { useState, useContext, SyntheticEvent, useEffect } from 'react'
+import dayjs, { Dayjs } from 'dayjs'
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs'
 
-import { Typography, TextField, Button, Grid, Paper } from '@mui/material'
+import {
+  TextField,
+  Button,
+  Grid,
+  Paper,
+  Container,
+  // Collapse,
+} from '@mui/material'
 import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers'
 import SelectPatient from '../appointment-modal/fetched-form-components/select-patient'
 import SelectSpecialist from '../appointment-modal/fetched-form-components/select-specialist'
+import SelectUpcomingAppointmentsByPatient from '../appointment-modal/fetched-form-components/select-upcoming-appointment-by-patient'
 import { AlertCtx } from '../../App'
 import { useQueryClient } from '@tanstack/react-query'
-import { useCreateTask } from './actions'
+import { useCreateTask, useUpdateTaskById } from './actions'
+import { TaskDetail } from '../../types'
 
-const TaskForm = () => {
+interface FormProps {
+  handleEditIdxs?: () => void
+  task?: TaskDetail
+}
+
+const TaskForm = ({ task, handleEditIdxs }: FormProps) => {
+  const [taskId, setTaskId] = useState<number>()
   const [description, setDescription] = useState('')
   const [dueDate, setDueDate] = useState<Dayjs | null>(null)
   const [specialistId, setSpecialistId] = useState<string>('')
@@ -19,8 +34,25 @@ const TaskForm = () => {
   const [patientId, setPatientId] = useState<string>('')
   const alertCtx = useContext(AlertCtx)
   const queryClient = useQueryClient()
+  // const [collapsed, setCollapsed] = useState(false)
+
+  useEffect(() => {
+    if (task) {
+      setTaskId(task.taskId)
+      setDescription(task.description)
+      setDueDate(dayjs(task.dueDate))
+      setSpecialistId(task.specialistId ? '' + task.specialistId : '')
+      setAppointmentId(task.appointmentId ? '' + task.appointmentId : '')
+      setPatientId(task.patientId ? '' + task.patientId : '')
+    }
+  }, [])
 
   const { mutate: addTask } = useCreateTask(
+    queryClient,
+    alertCtx?.setAlertPayload,
+  )
+
+  const { mutate: updateTaskById } = useUpdateTaskById(
     queryClient,
     alertCtx?.setAlertPayload,
   )
@@ -38,7 +70,12 @@ const TaskForm = () => {
         patientId: +patientId || null,
         appointmentId: +appointmentId || null,
       }
-      addTask(taskValues)
+
+      if (taskId && handleEditIdxs) {
+        updateTaskById({ taskId, values: taskValues })
+        handleEditIdxs()
+      } else addTask(taskValues)
+
       setDescription('')
       setDueDate(null)
       setSpecialistId('')
@@ -49,29 +86,13 @@ const TaskForm = () => {
 
   return (
     <form>
-      <Grid item xs={12}>
-        <Typography variant="h4" gutterBottom>
-          Task List
-        </Typography>
-      </Grid>
       <Grid item xs={12} sm={6}>
-        <Paper elevation={2} style={{ padding: '16px' }}>
-          <Typography variant="h6" gutterBottom>
-            Add Task
-          </Typography>
+        <Container>
           <TextField
             label="Description"
             value={description}
             onChange={({ target }) => setDescription(target.value)}
-            fullWidth
-            margin="normal"
           />
-          <SelectPatient patientId={patientId} setPatientId={setPatientId} />
-          <SelectSpecialist
-            specialistId={specialistId}
-            setSpecialistId={setSpecialistId}
-          />
-
           <LocalizationProvider dateAdapter={AdapterDayjs}>
             <DatePicker
               label="due date"
@@ -82,12 +103,28 @@ const TaskForm = () => {
           <Button
             variant="contained"
             color="primary"
-            startIcon={<>+</>}
             disabled={fieldsFilled}
             onClick={submitForm}
           >
-            Add Task
+            {taskId ? 'Save' : 'Add'} Task
           </Button>
+        </Container>
+        <Paper elevation={1}>
+          {/* <Select>
+            //assigned to user
+          </Select> */}
+          <SelectSpecialist
+            specialistId={specialistId}
+            setSpecialistId={setSpecialistId}
+          />
+          <SelectPatient patientId={patientId} setPatientId={setPatientId} />
+          {patientId && (
+            <SelectUpcomingAppointmentsByPatient
+              patientId={patientId}
+              appointmentId={appointmentId}
+              setAppointmentId={setAppointmentId}
+            />
+          )}
         </Paper>
       </Grid>
     </form>

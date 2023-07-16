@@ -1,10 +1,13 @@
-import { useContext } from 'react'
-import { Grid, Typography, Button, Paper, Chip } from '@mui/material'
+import { useContext, useState } from 'react'
+import { Grid, Typography, Button, Paper } from '@mui/material'
 import { AlertCtx } from '../../App'
 import { useDeleteTaskById, useFetchTasks } from './actions'
 import { useQueryClient } from '@tanstack/react-query'
+import TaskForm from './task-form'
+import Task from './task'
 
 export const TaskList = () => {
+  const [editIdxs, setEditIdxs] = useState<number[]>([])
   const queryClient = useQueryClient()
   const alertCtx = useContext(AlertCtx)
 
@@ -21,62 +24,58 @@ export const TaskList = () => {
     return <Typography>{taskListStatus}: tasks</Typography>
   }
 
+  const handleEditIdxs = (index: number, action: string) => {
+    if (action === 'add') {
+      return setEditIdxs(editIdxs.concat(index))
+    }
+
+    if (action === 'remove') {
+      return setEditIdxs(editIdxs.filter((idx) => idx !== index))
+    }
+  }
+
   return (
     <Grid item xs={12} sm={6}>
       <Typography variant="h6" gutterBottom>
         Task List
       </Typography>
-      {taskList.map(
-        ({
-          taskId,
-          description,
-          dueDate,
-          patient,
-          specialist,
-          appointmentId,
-        }) => (
-          <Paper
-            key={taskId}
-            elevation={2}
-            style={{ padding: '16px', marginBottom: '16px' }}
+      {taskList.map((task, index) => (
+        <Paper key={task.taskId}>
+          {editIdxs.includes(index) ? (
+            <TaskForm
+              task={task}
+              handleEditIdxs={() => handleEditIdxs(index, 'remove')}
+            />
+          ) : (
+            <Task task={task} />
+          )}
+
+          <Button
+            variant="outlined"
+            color="secondary"
+            onClick={() => deleteTaskById(+task.taskId)}
           >
-            <Typography variant="subtitle1" gutterBottom>
-              Description: {description}
-            </Typography>
-            <Typography variant="subtitle1" gutterBottom>
-              Due Date: {dueDate}
-            </Typography>
-            {patient && (
-              <Chip
-                label={`Patient: ${patient.name}`}
-                variant="outlined"
-                style={{ marginRight: '8px', marginBottom: '8px' }}
-              />
-            )}
-            {specialist && (
-              <Chip
-                label={`Specialist: ${specialist.name}`}
-                variant="outlined"
-                style={{ marginRight: '8px', marginBottom: '8px' }}
-              />
-            )}
-            {appointmentId && (
-              <Chip
-                label={`Appointment: ${appointmentId}`}
-                variant="outlined"
-                style={{ marginRight: '8px', marginBottom: '8px' }}
-              />
-            )}
+            Delete
+          </Button>
+          {editIdxs.includes(index) ? (
             <Button
               variant="outlined"
               color="secondary"
-              onClick={() => deleteTaskById(+taskId)}
+              onClick={() => handleEditIdxs(index, 'remove')}
             >
-              Delete
+              Cancel
             </Button>
-          </Paper>
-        ),
-      )}
+          ) : (
+            <Button
+              variant="outlined"
+              color="secondary"
+              onClick={() => handleEditIdxs(index, 'add')}
+            >
+              Edit
+            </Button>
+          )}
+        </Paper>
+      ))}
     </Grid>
   )
 }

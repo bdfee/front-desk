@@ -47,11 +47,9 @@ const SpecialistTable = () => {
   }
 
   const handleRowEdit = (rowIdx: number) => {
-    if (tableData) {
-      setEditMode(!editMode)
-      setEditRowIdx(editRowIdx === -1 ? rowIdx : -1)
-      setEditRowData(tableData[rowIdx].specialist)
-    }
+    setEditMode(!editMode)
+    setEditRowIdx(editRowIdx === -1 ? rowIdx : -1)
+    setEditRowData(tableData[rowIdx].specialist)
   }
 
   const handleCellEdit = (

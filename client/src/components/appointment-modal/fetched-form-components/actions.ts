@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import { Specialist, PatientDetail } from '../../../types'
+import { Specialist, PatientDetail, AppointmentDetail } from '../../../types'
 import specialistService from '../../../services/specialist'
 import patientService from '../../../services/patients'
 import { SetAlertPayload } from '../../../types'
@@ -20,4 +20,16 @@ export const useFetchPatients = (setAlertPayload?: SetAlertPayload) =>
     onError: () =>
       setAlertPayload &&
       setAlertPayload('error', 'error fetching patients', 'modal'),
+  })
+
+export const useFetchAppointmentsByPatientId = (
+  patientId: number,
+  setAlertPayload?: SetAlertPayload,
+) =>
+  useQuery<AppointmentDetail[]>({
+    queryKey: ['PATIENT_APPOINTMENTS', patientId],
+    queryFn: () => patientService.getAppointmentsByPatient(patientId),
+    onError: () =>
+      setAlertPayload &&
+      setAlertPayload('error', 'error fetching appointments', 'page'),
   })
