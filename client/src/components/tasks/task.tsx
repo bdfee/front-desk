@@ -1,12 +1,14 @@
 import { Typography, Chip, Container } from '@mui/material'
 import { TaskDetail } from '../../types'
+import { useNavigate } from 'react-router-dom'
 
 interface TaskProps {
   task: TaskDetail
 }
 
 const Task = ({ task }: TaskProps) => {
-  console.log(task)
+  const navigate = useNavigate()
+
   return (
     <Container
       key={task.taskId}
@@ -18,25 +20,35 @@ const Task = ({ task }: TaskProps) => {
       <Typography variant="subtitle1" gutterBottom>
         Due Date: {task.dueDate}
       </Typography>
-      {task.patient !== null && (
+      {task.user && (
+        <Chip
+          label={`User: ${task.user.name}`}
+          variant="outlined"
+          style={{ marginRight: '8px', marginBottom: '8px' }}
+        />
+      )}
+      {task.patient && (
         <Chip
           label={`Patient: ${task.patient.name}`}
           variant="outlined"
           style={{ marginRight: '8px', marginBottom: '8px' }}
+          onClick={() => navigate('/patients/' + task.patientId)}
         />
       )}
-      {task.specialist !== null && (
+      {task.specialist && (
         <Chip
           label={`Specialist: ${task.specialist.name}`}
           variant="outlined"
           style={{ marginRight: '8px', marginBottom: '8px' }}
+          onClick={() => navigate('/specialists/' + task.specialistId)}
         />
       )}
-      {task.appointmentId !== null && (
+      {task.appointmentId && (
         <Chip
           label={`Appointment: ${task.appointmentId}`}
           variant="outlined"
           style={{ marginRight: '8px', marginBottom: '8px' }}
+          onClick={() => navigate('/appointments/' + task.appointmentId)}
         />
       )}
     </Container>
