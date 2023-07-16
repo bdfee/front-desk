@@ -35,7 +35,8 @@ export const updateOneById = async (id: number, object: unknown): Promise<Task> 
   }
 
   if (validateDetail(task)) {
-    return task.save();
+    await task.save();
+    return findOne(id);
   }
 
   throw new Error("Unknown error updating task");

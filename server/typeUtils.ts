@@ -180,8 +180,9 @@ export const isTaskDetail = (object: unknown): object is TaskDetail => {
     return false;
   }
   const { taskId, dueDate, description, userId, specialist, patient, appointmentId } = object as TaskDetail;
-  const { name: specialistName } = specialist as { name: string };
-  const { name: patientName } = patient as { name: string };
+
+  // const { name: specialistName } = specialist as { name: string };
+  // const { name: patientName } = patient as { name: string };
 
   return (
     typeof taskId === "number" &&
@@ -190,9 +191,9 @@ export const isTaskDetail = (object: unknown): object is TaskDetail => {
     typeof userId === "number" &&
     (typeof patient === "object" || patient === null) &&
     (typeof specialist === "object" || specialist === null) &&
-    (typeof appointmentId === "number" || appointmentId === null) &&
-    (typeof specialistName === "string" || specialistName === "undefined") &&
-    (typeof patientName === "string" || patientName === "undefined")
+    (typeof appointmentId === "number" || appointmentId === null)
+    // (typeof specialistName === "string" || specialistName === "undefined") &&
+    // (typeof patientName === "string" || patientName === "undefined")
   );
 };
 
