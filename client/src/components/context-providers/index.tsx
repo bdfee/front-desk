@@ -5,9 +5,9 @@ import TokenProvider from './token'
 
 const Providers = ({ children }: { children: ReactNode }) => (
   <QueryProvider>
-    <AlertProvider>
-      <TokenProvider>{children}</TokenProvider>
-    </AlertProvider>
+    <TokenProvider>
+      <AlertProvider>{children}</AlertProvider>
+    </TokenProvider>
   </QueryProvider>
 )
 

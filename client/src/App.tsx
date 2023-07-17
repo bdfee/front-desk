@@ -8,14 +8,12 @@ import Login from './components/login'
 import Signup from './components/signup'
 import AppointmentInformation from './components/appointment-information'
 import Status from './components/status'
-import { useToken } from './components/context-providers/token'
-
 import { Route, Routes, Link } from 'react-router-dom'
 import { Typography, Container, Divider, Button, Grid } from '@mui/material'
+import { useTokenCtx } from './components/context-providers/token'
 
 const App = () => {
-  const token = useToken()
-
+  const tokenCtx = useTokenCtx()
   return (
     <div className="App">
       <Container>
@@ -31,7 +29,7 @@ const App = () => {
             </Grid>
           </Grid>
         </Container>
-        {token && (
+        {tokenCtx?.token && (
           <>
             <Button component={Link} to="/" style={{ margin: '0px 5px' }}>
               front
@@ -59,7 +57,7 @@ const App = () => {
         </Button>
         <Divider style={{ marginBottom: '1em' }} />
         <Routes>
-          {token && (
+          {tokenCtx?.token && (
             <>
               <Route path="/tasks" element={<Tasks />} />
               <Route path="/patients" element={<PatientTable />} />
@@ -70,9 +68,10 @@ const App = () => {
                 element={<AppointmentInformation />}
               />
               <Route path="/calendar" element={<Calendar />} />
+              <Route path="/" element={<Front />} />
             </>
           )}
-          <Route path="/" element={<Front />} />
+
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
         </Routes>

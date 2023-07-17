@@ -1,26 +1,33 @@
-import { SyntheticEvent, useState, useContext } from 'react'
+import { SyntheticEvent, useEffect, useState } from 'react'
 import { Container, Typography, TextField, Button } from '@mui/material'
 import { useLoginUser } from './actions'
-import { AlertCtx } from '../components/context-providers/alert'
+import { useAlertCtx } from './context-providers/alert'
+import { useTokenCtx } from './context-providers/token'
+import { useNavigate, useLocation } from 'react-router-dom'
 
 const LoginForm = () => {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
+  const alertCtx = useAlertCtx()
+  const tokenCtx = useTokenCtx()
+  const navigate = useNavigate()
+  const location = useLocation()
 
-  const alertCtx = useContext(AlertCtx)
+  useEffect(() => {
+    if (location.state?.username) {
+      setUsername(location.state.username)
+    }
+  }, [])
 
-  const { mutate: loginUser } = useLoginUser(alertCtx?.setAlertPayload)
+  const { mutate: loginUser } = useLoginUser(
+    alertCtx?.setAlertPayload,
+    tokenCtx?.addToken,
+    navigate,
+  )
 
   const handleSubmit = (e: SyntheticEvent) => {
     e.preventDefault()
-
-    console.log('Username:', username)
-    console.log('Password:', password)
-
     loginUser({ username, password })
-
-    setUsername('')
-    setPassword('')
   }
 
   return (

@@ -1,36 +1,33 @@
-import {
-  createContext,
-  useEffect,
-  useState,
-  useContext,
-  ReactNode,
-} from 'react'
-import { useNavigate } from 'react-router-dom'
+import { createContext, useContext, ReactNode, useState } from 'react'
 
-const TokenCtx = createContext('')
-export const useToken = () => useContext(TokenCtx)
+interface TokenCtxType {
+  token: string
+  addToken: (token: string) => void
+  removeToken: () => void
+}
 
-const checkTokenValidity = (token: string) => (token ? true : false)
+const TokenCtx = createContext<TokenCtxType | null>(null)
+
+export const useTokenCtx = () => {
+  if (TokenCtx) {
+    return useContext(TokenCtx)
+  }
+  throw new Error('token context error')
+}
 
 export const TokenProvider = ({ children }: { children: ReactNode }) => {
   const [token, setToken] = useState('')
-  const navigate = useNavigate()
-  useEffect(() => {
-    const storedToken = localStorage.getItem('frontdesk')
-    if (!storedToken) {
-      return navigate('/login')
-    }
-    const isTokenValid = checkTokenValidity(storedToken)
 
-    if (!isTokenValid) {
-      return navigate('/login')
-    }
+  const addToken = (token: string) => setToken(token)
+  const removeToken = () => setToken('')
 
-    setToken(storedToken)
-    navigate('/')
-  }, [])
+  const tokenCtxValue = {
+    token,
+    addToken,
+    removeToken,
+  }
 
-  return <TokenCtx.Provider value={token}>{children}</TokenCtx.Provider>
+  return <TokenCtx.Provider value={tokenCtxValue}>{children}</TokenCtx.Provider>
 }
 
 export default TokenProvider

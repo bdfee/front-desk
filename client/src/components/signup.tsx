@@ -1,23 +1,24 @@
 import { SyntheticEvent, useState } from 'react'
 import { TextField, Button, Grid } from '@mui/material'
 import { useCreateUser } from './actions'
-import { useAlert } from './context-providers/alert'
+import { useNavigate } from 'react-router-dom'
+import { useAlertCtx } from './context-providers/alert'
 
 const SignupForm = () => {
   const [name, setName] = useState('')
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
+  const navigate = useNavigate()
+  const alertCtx = useAlertCtx()
 
-  const alert = useAlert()
-
-  const { mutate: createUser } = useCreateUser(alert?.setAlertPayload)
+  const { mutate: createUser } = useCreateUser(
+    alertCtx?.setAlertPayload,
+    navigate,
+  )
 
   const handleSubmit = (event: SyntheticEvent) => {
     event.preventDefault()
     createUser({ name, username, password })
-    console.log('Name:', name)
-    console.log('Username:', username)
-    console.log('Password:', password)
   }
 
   return (

@@ -2,7 +2,8 @@ import { createContext, useState, ReactNode, useContext } from 'react'
 import { AlertCtxType, NullableAlertPayload } from '../../types'
 
 export const AlertCtx = createContext<AlertCtxType | null>(null)
-export const useAlert = () => {
+
+export const useAlertCtx = () => {
   if (AlertCtx !== null) {
     return useContext(AlertCtx)
   }
