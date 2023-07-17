@@ -6,6 +6,7 @@ import Front from './components/front'
 import Tasks from './components/tasks'
 import Login from './components/login'
 import Signup from './components/signup'
+import Logout from './components/logout'
 import AppointmentInformation from './components/appointment-information'
 import Status from './components/status'
 import { Route, Routes, Link } from 'react-router-dom'
@@ -29,7 +30,7 @@ const App = () => {
             </Grid>
           </Grid>
         </Container>
-        {tokenCtx?.token && (
+        {tokenCtx?.token ? (
           <>
             <Button component={Link} to="/" style={{ margin: '0px 5px' }}>
               front
@@ -46,18 +47,24 @@ const App = () => {
             <Button component={Link} to="/calendar">
               calendar
             </Button>
+            <Button component={Link} to="/logout">
+              logout
+            </Button>
+          </>
+        ) : (
+          <>
+            <Button component={Link} to="/login">
+              login
+            </Button>
+            <Button component={Link} to="/signup">
+              signup
+            </Button>
           </>
         )}
 
-        <Button component={Link} to="/login">
-          login
-        </Button>
-        <Button component={Link} to="/signup">
-          signup
-        </Button>
         <Divider style={{ marginBottom: '1em' }} />
         <Routes>
-          {tokenCtx?.token && (
+          {tokenCtx?.token ? (
             <>
               <Route path="/tasks" element={<Tasks />} />
               <Route path="/patients" element={<PatientTable />} />
@@ -69,11 +76,16 @@ const App = () => {
               />
               <Route path="/calendar" element={<Calendar />} />
               <Route path="/" element={<Front />} />
+              <Route path="/logout" element={<Logout />} />
+            </>
+          ) : (
+            <>
+              <Route path="/" element={<div>welcome</div>} />
+
+              <Route path="/login" element={<Login />} />
+              <Route path="/signup" element={<Signup />} />
             </>
           )}
-
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<Signup />} />
         </Routes>
       </Container>
     </div>
