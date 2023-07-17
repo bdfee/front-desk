@@ -19,7 +19,7 @@ import {
   useDeleteSpecialistById,
   useUpdateSpecialistById,
 } from './actions'
-import { AlertCtx } from '../../App'
+import { AlertCtx } from '../../components/context-providers/alert'
 
 const SpecialistTable = () => {
   const [editMode, setEditMode] = useState(false)

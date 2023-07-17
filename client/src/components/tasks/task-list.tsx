@@ -1,6 +1,7 @@
 import { useContext, useState } from 'react'
 import { Grid, Typography, Button, Paper } from '@mui/material'
-import { AlertCtx } from '../../App'
+import { AlertCtx } from '../../components/context-providers/alert'
+
 import { useDeleteTaskById, useFetchTasks } from './actions'
 import { useQueryClient } from '@tanstack/react-query'
 import TaskForm from './task-form'

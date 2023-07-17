@@ -15,7 +15,8 @@ import {
   RBCEventPropsForForm,
   AppointmentFormProps,
 } from '../../types'
-import { AlertCtx } from '../../App'
+import { AlertCtx } from '../../components/context-providers/alert'
+
 import { validateTextInput } from '../../validations/inputs'
 import FetchedFormComponents from './fetched-form-components'
 import { useUpdateAppointmentById, useAddAppointment } from './actions'

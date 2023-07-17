@@ -5,7 +5,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { Button, Typography } from '@mui/material'
 import { useQueryClient } from '@tanstack/react-query'
 import { useDeleteAppointmentById } from './actions'
-import { AlertCtx } from '../../App'
+import { AlertCtx } from '../../components/context-providers/alert'
 
 const AppointmentInformation = () => {
   const [modalOpen, setModalOpen] = useState<boolean>(false)

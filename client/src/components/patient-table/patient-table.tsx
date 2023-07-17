@@ -19,7 +19,7 @@ import {
   useDeletePatientById,
   usePrefetchPatientById,
 } from './actions'
-import { AlertCtx } from '../../App'
+import { AlertCtx } from '../../components/context-providers/alert'
 
 const PatientTable = () => {
   const navigate = useNavigate()

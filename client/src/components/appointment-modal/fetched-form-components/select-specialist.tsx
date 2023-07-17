@@ -9,7 +9,7 @@ import {
 import { SelectSpecialistProps } from '../../../types'
 import { useFetchSpecialists } from './actions'
 import { useContext } from 'react'
-import { AlertCtx } from '../../../App'
+import { AlertCtx } from '../../../components/context-providers/alert'
 
 const SelectSpecialist = ({
   specialistId,

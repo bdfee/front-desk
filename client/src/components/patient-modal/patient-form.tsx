@@ -19,7 +19,7 @@ import {
   formatPhone,
   validateEmail,
 } from '../../validations/inputs'
-import { AlertCtx } from '../../App'
+import { AlertCtx } from '../../components/context-providers/alert'
 import { useQueryClient } from '@tanstack/react-query'
 import SelectSpecialist from '../appointment-modal/fetched-form-components/select-specialist'
 

@@ -65,7 +65,7 @@ export interface User {
   password: string
 }
 
-export type UserLogin = Omit<User, 'name'>
+export type UserLogin = Omit<User, 'name' | 'userId'>
 
 export type SafeUser = Omit<User, 'password'>
 

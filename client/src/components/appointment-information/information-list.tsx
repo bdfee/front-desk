@@ -2,7 +2,7 @@ import { Container, Typography, Box, List, ListItemText } from '@mui/material'
 import { useContext } from 'react'
 import { AppointmentListProps } from '../../types'
 import { useGetAppointmentById } from './actions'
-import { AlertCtx } from '../../App'
+import { AlertCtx } from '../../components/context-providers/alert'
 
 const InformationList = ({ id }: AppointmentListProps) => {
   const alertCtx = useContext(AlertCtx)
