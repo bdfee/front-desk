@@ -8,7 +8,7 @@ import {
   Chip,
 } from '@mui/material'
 import { useFetchTasks } from '../tasks/actions'
-import { AlertCtx } from '../../App'
+import { AlertCtx } from '../../components/context-providers/alert'
 // import { TaskList } from '../tasks/task-list'
 import dayjs from 'dayjs'
 

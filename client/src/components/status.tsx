@@ -1,5 +1,5 @@
 import { useContext } from 'react'
-import { AlertCtx } from '../App'
+import { AlertCtx } from '../components/context-providers/alert'
 import { Alert, Box } from '@mui/material'
 
 interface StatusPropsType {

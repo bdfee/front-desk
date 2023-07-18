@@ -7,7 +7,8 @@ import {
   OutlinedInput,
 } from '@mui/material'
 import { useContext } from 'react'
-import { AlertCtx } from '../../../App'
+import { AlertCtx } from '../../../components/context-providers/alert'
+
 import { SelectPatientProps } from '../../../types'
 import { useFetchPatients } from './actions'
 

@@ -4,7 +4,7 @@ import { validateTextInput, sanitizeTextInput } from '../../validations/inputs'
 import { useQueryClient } from '@tanstack/react-query'
 import { SpecialistFormProps } from '../../types'
 import { useCreateSpecialist } from './actions'
-import { AlertCtx } from '../../App'
+import { AlertCtx } from '../../components/context-providers/alert'
 
 const SpecialistForm = ({ closeModal }: SpecialistFormProps) => {
   const [firstName, setFirstName] = useState('')

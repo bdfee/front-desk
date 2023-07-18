@@ -4,54 +4,34 @@ import PatientInformation from './components/patient-information'
 import Calendar from './components/calendar'
 import Front from './components/front'
 import Tasks from './components/tasks'
-import { BrowserRouter as Router, Route, Routes, Link } from 'react-router-dom'
-import { Typography, Container, Divider, Button, Grid } from '@mui/material'
-import { createContext, useState } from 'react'
+import Login from './components/login'
+import Signup from './components/signup'
+import Logout from './components/logout'
 import AppointmentInformation from './components/appointment-information'
 import Status from './components/status'
-import { AlertCtxType, NullableAlertPayload } from './types'
-
-export const AlertCtx = createContext<AlertCtxType | null>(null)
+import { Route, Routes, Link } from 'react-router-dom'
+import { Typography, Container, Divider, Button, Grid } from '@mui/material'
+import { useTokenCtx } from './components/context-providers/token'
 
 const App = () => {
-  const [alertPayload, setAlertPayload] = useState<NullableAlertPayload>()
-
-  const setAlertWithTimeout: AlertCtxType['setAlertPayload'] = (
-    type,
-    message,
-    location,
-  ) => {
-    setAlertPayload({ type, message, location })
-
-    const id = setTimeout(() => {
-      setAlertPayload(undefined)
-    }, 3000)
-
-    return () => clearTimeout(id)
-  }
-
-  const AlertCtxValue: AlertCtxType = {
-    setAlertPayload: setAlertWithTimeout,
-    alertPayload,
-  }
-
+  const tokenCtx = useTokenCtx()
   return (
     <div className="App">
-      <Router>
-        <AlertCtx.Provider value={AlertCtxValue}>
-          <Container>
-            <Container>
-              <Grid container spacing={2} alignItems="center">
-                <Grid item xs={9}>
-                  <Typography variant="h2" style={{ marginBottom: '.05em' }}>
-                    frontdesk
-                  </Typography>
-                </Grid>
-                <Grid item xs={3}>
-                  <Status location="page" />
-                </Grid>
-              </Grid>
-            </Container>
+      <Container>
+        <Container>
+          <Grid container spacing={2} alignItems="center">
+            <Grid item xs={9}>
+              <Typography variant="h2" style={{ marginBottom: '.05em' }}>
+                frontdesk
+              </Typography>
+            </Grid>
+            <Grid item xs={3}>
+              <Status location="page" />
+            </Grid>
+          </Grid>
+        </Container>
+        {tokenCtx?.token ? (
+          <>
             <Button component={Link} to="/" style={{ margin: '0px 5px' }}>
               front
             </Button>
@@ -67,8 +47,25 @@ const App = () => {
             <Button component={Link} to="/calendar">
               calendar
             </Button>
-            <Divider style={{ marginBottom: '1em' }} />
-            <Routes>
+            <Button component={Link} to="/logout">
+              logout
+            </Button>
+          </>
+        ) : (
+          <>
+            <Button component={Link} to="/login">
+              login
+            </Button>
+            <Button component={Link} to="/signup">
+              signup
+            </Button>
+          </>
+        )}
+
+        <Divider style={{ marginBottom: '1em' }} />
+        <Routes>
+          {tokenCtx?.token ? (
+            <>
               <Route path="/tasks" element={<Tasks />} />
               <Route path="/patients" element={<PatientTable />} />
               <Route path="/patients/:id" element={<PatientInformation />} />
@@ -79,10 +76,18 @@ const App = () => {
               />
               <Route path="/calendar" element={<Calendar />} />
               <Route path="/" element={<Front />} />
-            </Routes>
-          </Container>
-        </AlertCtx.Provider>
-      </Router>
+              <Route path="/logout" element={<Logout />} />
+            </>
+          ) : (
+            <>
+              <Route path="/" element={<div>welcome</div>} />
+
+              <Route path="/login" element={<Login />} />
+              <Route path="/signup" element={<Signup />} />
+            </>
+          )}
+        </Routes>
+      </Container>
     </div>
   )
 }

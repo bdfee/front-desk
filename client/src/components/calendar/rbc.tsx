@@ -7,7 +7,7 @@ import 'react-big-calendar/lib/css/react-big-calendar.css'
 import FetchedFormComponents from '../appointment-modal/fetched-form-components'
 import { RBCEventProps, NewEvent, RBCProps } from '../../types'
 import { useFetchAppointments } from './actions'
-import { AlertCtx } from '../../App'
+import { AlertCtx } from '../../components/context-providers/alert'
 import { formatEvents, eventPropGetter, RBCDefaultProps } from './utils'
 
 const RBC = ({ openModal }: RBCProps) => {

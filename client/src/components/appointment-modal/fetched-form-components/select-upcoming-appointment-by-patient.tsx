@@ -8,7 +8,7 @@ import {
 } from '@mui/material'
 import { Dispatch, SetStateAction } from 'react'
 import { useFetchAppointmentsByPatientId } from './actions'
-import { AlertCtx } from '../../../App'
+import { AlertCtx } from '../../../components/context-providers/alert'
 import { useContext } from 'react'
 import { sortAppointments } from '../../utils'
 
