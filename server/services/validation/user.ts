@@ -5,6 +5,8 @@ import { JWT_SECRET } from "../../utils/config";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
+const EXPIRES_IN = "12h";
+
 export const validUserLogin = (object: unknown): object is UserLogin => {
   return isUserLogin(object);
 };
@@ -40,7 +42,9 @@ export const authenticateUser = (user: UserForToken): AuthenticatedUser => {
     throw new Error("JWT_SECRET is not defined");
   }
 
-  const token = jwt.sign(user, JWT_SECRET);
+  const token = jwt.sign(user, JWT_SECRET, {
+    expiresIn: EXPIRES_IN,
+  });
 
   if (!token) {
     throw new Error("Failed to generate token");

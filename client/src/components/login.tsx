@@ -4,6 +4,7 @@ import { useLoginUser } from './actions'
 import { useAlertCtx } from './context-providers/alert'
 import { useTokenCtx } from './context-providers/token'
 import { useNavigate, useLocation } from 'react-router-dom'
+import { useSecureLocalStorage } from './actions'
 
 const LoginForm = () => {
   const [username, setUsername] = useState('')
@@ -12,6 +13,8 @@ const LoginForm = () => {
   const tokenCtx = useTokenCtx()
   const navigate = useNavigate()
   const location = useLocation()
+
+  useSecureLocalStorage(tokenCtx?.addToken, navigate)
 
   useEffect(() => {
     if (location.state?.username) {
