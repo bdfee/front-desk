@@ -13,6 +13,7 @@ import { Route, Routes, Link, useNavigate } from 'react-router-dom'
 import { Typography, Container, Divider, Button, Grid } from '@mui/material'
 import { useTokenCtx } from './components/context-providers/token'
 import { useSecureLocalStorage } from './components/user-admin/actions'
+import LoginStatus from './components/user-admin/login-status'
 
 const App = () => {
   const navigate = useNavigate()
@@ -26,12 +27,15 @@ const App = () => {
         <Container>
           <Grid container spacing={2} alignItems="center">
             <Grid item xs={9}>
-              <Typography variant="h2" style={{ marginBottom: '.05em' }}>
-                frontdesk
-              </Typography>
+              <Typography variant="h2">frontdesk</Typography>
             </Grid>
             <Grid item xs={3}>
-              <Status location="page" />
+              <Grid sx={{ height: 50 }}>
+                <Status location="page" />
+              </Grid>
+              <Grid sx={{ height: 30 }}>
+                <LoginStatus />
+              </Grid>
             </Grid>
           </Grid>
         </Container>
@@ -52,9 +56,6 @@ const App = () => {
             <Button component={Link} to="/calendar">
               calendar
             </Button>
-            <Button component={Link} to="/logout">
-              logout
-            </Button>
           </>
         ) : (
           <>
@@ -62,7 +63,7 @@ const App = () => {
               login
             </Button>
             <Button component={Link} to="/signup">
-              signup
+              create account
             </Button>
           </>
         )}
