@@ -65,3 +65,14 @@ export const useSecureLocalStorage = (
     }
   }, [addToken])
 }
+
+export const getSecureLocalStorageName = () => {
+  const storage = secureLocalStorage.getItem('frontdesk') as {
+    user: AuthenticatedUser
+  }
+
+  if (storage) {
+    return storage.user.name
+  }
+  return null
+}
