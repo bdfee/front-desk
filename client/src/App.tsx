@@ -9,12 +9,17 @@ import Signup from './components/signup'
 import Logout from './components/logout'
 import AppointmentInformation from './components/appointment-information'
 import Status from './components/status'
-import { Route, Routes, Link } from 'react-router-dom'
+import { Route, Routes, Link, useNavigate } from 'react-router-dom'
 import { Typography, Container, Divider, Button, Grid } from '@mui/material'
 import { useTokenCtx } from './components/context-providers/token'
+import { useSecureLocalStorage } from './components/actions'
 
 const App = () => {
+  const navigate = useNavigate()
   const tokenCtx = useTokenCtx()
+
+  useSecureLocalStorage(tokenCtx?.addToken, navigate)
+
   return (
     <div className="App">
       <Container>

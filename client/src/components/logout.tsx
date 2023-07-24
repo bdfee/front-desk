@@ -3,6 +3,7 @@ import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useAlertCtx } from './context-providers/alert'
 import { useTokenCtx } from './context-providers/token'
+import secureLocalStorage from 'react-secure-storage'
 
 const Logout = () => {
   const tokenCtx = useTokenCtx()
@@ -13,8 +14,8 @@ const Logout = () => {
     if (alertCtx && tokenCtx && navigate) {
       alertCtx?.setAlertPayload('success', 'logged out', 'page')
       tokenCtx?.removeToken()
+      secureLocalStorage.removeItem('frontdesk')
       navigate('/')
-      console.log('here')
     }
   }, [alertCtx, tokenCtx, navigate])
 
