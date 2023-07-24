@@ -1,15 +1,8 @@
 import { useContext } from 'react'
-import {
-  List,
-  ListItemText,
-  Typography,
-  Divider,
-  Paper,
-  Chip,
-} from '@mui/material'
+import { Typography, Divider } from '@mui/material'
 import { useFetchTasks } from '../tasks/actions'
 import { AlertCtx } from '../../components/context-providers/alert'
-// import { TaskList } from '../tasks/task-list'
+import Task from '../tasks/task'
 import dayjs from 'dayjs'
 
 const Tasks = () => {
@@ -28,38 +21,9 @@ const Tasks = () => {
     <>
       <Typography>todays tasks</Typography>
       <Divider />
-
-      <List>
-        {todaysTaskList.map((task) => (
-          <Paper key={task.taskId}>
-            <ListItemText
-              primary={task.description}
-              secondary={'task description'}
-            />
-            {task.patient && (
-              <Chip
-                label={`Patient: ${task.patient.name}`}
-                variant="outlined"
-                style={{ marginRight: '8px', marginBottom: '8px' }}
-              />
-            )}
-            {task.specialist && (
-              <Chip
-                label={`Specialist: ${task.specialist.name}`}
-                variant="outlined"
-                style={{ marginRight: '8px', marginBottom: '8px' }}
-              />
-            )}
-            {task.appointmentId && (
-              <Chip
-                label={`Appointment: ${task.appointmentId}`}
-                variant="outlined"
-                style={{ marginRight: '8px', marginBottom: '8px' }}
-              />
-            )}
-          </Paper>
-        ))}
-      </List>
+      {todaysTaskList.map((task) => (
+        <Task key={task.taskId} task={task} />
+      ))}
     </>
   )
 }
