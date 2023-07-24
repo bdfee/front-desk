@@ -4,11 +4,11 @@ import * as patientService from "../services/patient";
 import * as appointmentService from "../services/appointment";
 import * as taskService from "../services/task";
 import { Error } from "sequelize";
-import { authenticate } from "../middleware/auth";
+// import { authenticate } from "../middleware/auth";
 
 const router = Router();
 
-router.get("/", authenticate, async (_req, res, next) => {
+router.get("/", async (_req, res, next) => {
   try {
     const specialists = await specialistService.getAll();
     res.json(specialists);
