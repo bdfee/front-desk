@@ -1,8 +1,8 @@
 import { Typography } from '@mui/material'
 import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useAlertCtx } from './context-providers/alert'
-import { useTokenCtx } from './context-providers/token'
+import { useAlertCtx } from '../context-providers/alert'
+import { useTokenCtx } from '../context-providers/token'
 import secureLocalStorage from 'react-secure-storage'
 
 const Logout = () => {

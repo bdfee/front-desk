@@ -1,8 +1,8 @@
 import { SyntheticEvent, useEffect, useState } from 'react'
 import { Container, Typography, TextField, Button } from '@mui/material'
 import { useLoginUser } from './actions'
-import { useAlertCtx } from './context-providers/alert'
-import { useTokenCtx } from './context-providers/token'
+import { useAlertCtx } from '../context-providers/alert'
+import { useTokenCtx } from '../context-providers/token'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { useSecureLocalStorage } from './actions'
 

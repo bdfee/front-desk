@@ -2,7 +2,7 @@ import { SyntheticEvent, useState } from 'react'
 import { TextField, Button, Grid } from '@mui/material'
 import { useCreateUser } from './actions'
 import { useNavigate } from 'react-router-dom'
-import { useAlertCtx } from './context-providers/alert'
+import { useAlertCtx } from '../context-providers/alert'
 
 const SignupForm = () => {
   const [name, setName] = useState('')
