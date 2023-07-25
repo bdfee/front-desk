@@ -1,8 +1,14 @@
 import { useQuery } from '@tanstack/react-query'
-import { Specialist, PatientDetail, AppointmentDetail } from '../../../types'
-import specialistService from '../../../services/specialist'
-import patientService from '../../../services/patients'
-import { SetAlertPayload } from '../../../types'
+import {
+  Specialist,
+  PatientDetail,
+  AppointmentDetail,
+  SafeUser,
+} from '../../types'
+import specialistService from '../../services/specialist'
+import patientService from '../../services/patients'
+import userService from '../../services/user'
+import { SetAlertPayload } from '../../types'
 
 export const useFetchSpecialists = (setAlertPayload?: SetAlertPayload) =>
   useQuery<Specialist[]>({
@@ -32,4 +38,13 @@ export const useFetchAppointmentsByPatientId = (
     onError: () =>
       setAlertPayload &&
       setAlertPayload('error', 'error fetching appointments', 'page'),
+  })
+
+export const useFetchUsers = (setAlertPayload?: SetAlertPayload) =>
+  useQuery<SafeUser[]>({
+    queryKey: ['USERS'],
+    queryFn: userService.getAll,
+    onError: () =>
+      setAlertPayload &&
+      setAlertPayload('error', 'error fetching users', 'modal'),
   })

@@ -6,16 +6,15 @@ import {
   FormControl,
   OutlinedInput,
 } from '@mui/material'
-import { SelectSpecialistProps } from '../../../types'
+import { SelectSpecialistProps } from '../../types'
 import { useFetchSpecialists } from './actions'
-import { useContext } from 'react'
-import { AlertCtx } from '../../../components/context-providers/alert'
+import { useAlertCtx } from '../../components/context-providers/alert'
 
 const SelectSpecialist = ({
   specialistId,
   setSpecialistId,
 }: SelectSpecialistProps) => {
-  const alertCtx = useContext(AlertCtx)
+  const alertCtx = useAlertCtx()
 
   const { data: specialistData, status } = useFetchSpecialists(
     alertCtx?.setAlertPayload,
@@ -49,7 +48,7 @@ const SelectSpecialist = ({
       {specialistId && (
         <Button
           style={{
-            color: 'blue',
+            color: 'primary',
           }}
           size="small"
           onClick={() => setSpecialistId('')}

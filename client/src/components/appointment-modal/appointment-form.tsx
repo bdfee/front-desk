@@ -18,7 +18,11 @@ import {
 import { AlertCtx } from '../../components/context-providers/alert'
 
 import { validateTextInput } from '../../validations/inputs'
-import FetchedFormComponents from './fetched-form-components'
+import {
+  SelectPatient,
+  SelectSpecialist,
+  SelectType,
+} from '../fetched-form-components/index'
 import { useUpdateAppointmentById, useAddAppointment } from './actions'
 const AppointmentForm = ({
   serviceType,
@@ -187,14 +191,12 @@ const AppointmentForm = ({
         onChange={({ target }) => setDescription(target.value)}
       />
       <Divider />
-      <FetchedFormComponents
-        patientId={patientId}
-        setPatientId={setPatientId}
+      <SelectPatient patientId={patientId} setPatientId={setPatientId} />
+      <SelectSpecialist
         specialistId={specialistId}
         setSpecialistId={setSpecialistId}
-        type={type}
-        setType={setType}
       />
+      <SelectType type={type} setType={setType} />
       <Grid>
         <Grid item>
           <Button

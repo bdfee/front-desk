@@ -21,8 +21,7 @@ import {
 } from '../../validations/inputs'
 import { AlertCtx } from '../../components/context-providers/alert'
 import { useQueryClient } from '@tanstack/react-query'
-import SelectSpecialist from '../appointment-modal/fetched-form-components/select-specialist'
-
+import { SelectSpecialist } from '../fetched-form-components'
 import { useAddPatient, useUpdatePatientById } from './actions'
 
 const PatientForm = ({ type, closeModal }: PatientFormProps) => {

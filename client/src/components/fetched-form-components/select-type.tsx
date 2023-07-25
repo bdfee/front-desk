@@ -6,8 +6,8 @@ import {
   InputLabel,
   OutlinedInput,
 } from '@mui/material'
-import { SelectTypeProps } from '../../../types'
-import Swatch from '../swatch'
+import { SelectTypeProps } from '../../types'
+import Swatch from '../appointment-modal/swatch'
 
 const SelectType = ({ type, setType }: SelectTypeProps) => {
   return (
@@ -39,7 +39,7 @@ const SelectType = ({ type, setType }: SelectTypeProps) => {
       {type && (
         <Button
           style={{
-            color: 'blue',
+            color: 'primary',
           }}
           size="small"
           onClick={() => setType('')}

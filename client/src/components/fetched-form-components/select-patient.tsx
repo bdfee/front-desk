@@ -6,14 +6,12 @@ import {
   FormControl,
   OutlinedInput,
 } from '@mui/material'
-import { useContext } from 'react'
-import { AlertCtx } from '../../../components/context-providers/alert'
-
-import { SelectPatientProps } from '../../../types'
+import { useAlertCtx } from '../../components/context-providers/alert'
+import { SelectPatientProps } from '../../types'
 import { useFetchPatients } from './actions'
 
 const SelectPatient = ({ patientId, setPatientId }: SelectPatientProps) => {
-  const alertCtx = useContext(AlertCtx)
+  const alertCtx = useAlertCtx()
 
   const { data: patientsData, status: patientsStatus } = useFetchPatients(
     alertCtx?.setAlertPayload,
@@ -52,7 +50,7 @@ const SelectPatient = ({ patientId, setPatientId }: SelectPatientProps) => {
       {patientId && (
         <Button
           style={{
-            color: 'blue',
+            color: 'primary',
           }}
           size="small"
           onClick={() => setPatientId('')}
