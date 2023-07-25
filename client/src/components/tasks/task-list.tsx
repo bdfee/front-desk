@@ -1,4 +1,4 @@
-import { useContext, useState } from 'react'
+import { useContext, useState, Dispatch, SetStateAction } from 'react'
 import { Grid, Typography, Button, Paper } from '@mui/material'
 import { AlertCtx } from '../../components/context-providers/alert'
 
@@ -7,7 +7,13 @@ import { useQueryClient } from '@tanstack/react-query'
 import TaskForm from './task-form'
 import Task from './task'
 
-export const TaskList = () => {
+export const TaskList = ({
+  setCollapsed,
+  collapsed,
+}: {
+  setCollapsed: Dispatch<SetStateAction<boolean>>
+  collapsed: boolean
+}) => {
   const [editIdxs, setEditIdxs] = useState<number[]>([])
   const queryClient = useQueryClient()
   const alertCtx = useContext(AlertCtx)
@@ -26,7 +32,7 @@ export const TaskList = () => {
   }
 
   const handleEditIdxs = (index: number, action: string) => {
-    if (action === 'add') {
+    if (action === 'edit') {
       return setEditIdxs(editIdxs.concat(index))
     }
 
@@ -37,9 +43,19 @@ export const TaskList = () => {
 
   return (
     <Grid item xs={12} sm={6}>
-      <Typography variant="h6" gutterBottom>
-        Task List
-      </Typography>
+      <Grid container>
+        <Grid item xs={9}>
+          <Typography variant="h5" gutterBottom>
+            Task List
+          </Typography>
+        </Grid>
+        <Grid item xs={3}>
+          <Button variant="contained" onClick={() => setCollapsed(!collapsed)}>
+            {!collapsed ? 'show' : 'hide'} task form
+          </Button>
+        </Grid>
+      </Grid>
+
       {taskList.map((task, index) => (
         <Paper key={task.taskId}>
           {editIdxs.includes(index) ? (
@@ -54,13 +70,18 @@ export const TaskList = () => {
           <Button
             variant="outlined"
             color="secondary"
+            sx={{
+              '&:hover': {
+                color: 'red',
+              },
+            }}
             onClick={() => deleteTaskById(+task.taskId)}
           >
             Delete
           </Button>
           {editIdxs.includes(index) ? (
             <Button
-              variant="outlined"
+              variant="contained"
               color="secondary"
               onClick={() => handleEditIdxs(index, 'remove')}
             >
@@ -69,8 +90,8 @@ export const TaskList = () => {
           ) : (
             <Button
               variant="outlined"
-              color="secondary"
-              onClick={() => handleEditIdxs(index, 'add')}
+              color="primary"
+              onClick={() => handleEditIdxs(index, 'edit')}
             >
               Edit
             </Button>

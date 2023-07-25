@@ -4,7 +4,11 @@ import { Calendar as ReactBigCalendar } from 'react-big-calendar'
 import { dayjs } from './dayjs'
 import 'react-big-calendar/lib/css/react-big-calendar.css'
 
-import FetchedFormComponents from '../appointment-modal/fetched-form-components'
+import {
+  SelectPatient,
+  SelectSpecialist,
+  SelectType,
+} from '../fetched-form-components/index'
 import { RBCEventProps, NewEvent, RBCProps } from '../../types'
 import { useFetchAppointments } from './actions'
 import { AlertCtx } from '../../components/context-providers/alert'
@@ -68,14 +72,15 @@ const RBC = ({ openModal }: RBCProps) => {
 
   return (
     <>
-      <FetchedFormComponents
-        specialistId={specialistIdFilter}
-        setSpecialistId={setSpecialistIdFilter}
+      <SelectPatient
         patientId={patientIdFilter}
         setPatientId={setPatientIdFilter}
-        type={typeFilter}
-        setType={setTypeFilter}
       />
+      <SelectSpecialist
+        specialistId={specialistIdFilter}
+        setSpecialistId={setSpecialistIdFilter}
+      />
+      <SelectType type={typeFilter} setType={setTypeFilter} />
       <div style={{ height: '600px' }}>
         <ReactBigCalendar
           defaultDate={defaultDate}

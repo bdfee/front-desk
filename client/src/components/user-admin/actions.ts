@@ -76,3 +76,14 @@ export const getSecureLocalStorageName = () => {
   }
   return null
 }
+
+export const getSecureLocalStorageId = () => {
+  const storage = secureLocalStorage.getItem('frontdesk') as {
+    user: AuthenticatedUser
+  }
+
+  if (storage) {
+    return storage.user.userId
+  }
+  return null
+}

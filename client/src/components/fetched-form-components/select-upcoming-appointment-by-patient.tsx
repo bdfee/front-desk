@@ -8,9 +8,8 @@ import {
 } from '@mui/material'
 import { Dispatch, SetStateAction } from 'react'
 import { useFetchAppointmentsByPatientId } from './actions'
-import { AlertCtx } from '../../../components/context-providers/alert'
-import { useContext } from 'react'
-import { sortAppointments } from '../../utils'
+import { useAlertCtx } from '../../components/context-providers/alert'
+import { sortAppointments } from '../utils'
 
 interface SelectUpcomingAppointmentByPatientProps {
   patientId: string
@@ -23,9 +22,8 @@ const SelectUpcomingAppointmentsByPatient = ({
   appointmentId,
   setAppointmentId,
 }: SelectUpcomingAppointmentByPatientProps) => {
-  const alertCtx = useContext(AlertCtx)
+  const alertCtx = useAlertCtx()
 
-  // this should be a diff route props
   const { data: appointmentsData, status } = useFetchAppointmentsByPatientId(
     +patientId,
     alertCtx?.setAlertPayload,
@@ -63,7 +61,7 @@ const SelectUpcomingAppointmentsByPatient = ({
       {appointmentId && (
         <Button
           style={{
-            color: 'blue',
+            color: 'primary',
           }}
           size="small"
           onClick={() => setAppointmentId('')}
