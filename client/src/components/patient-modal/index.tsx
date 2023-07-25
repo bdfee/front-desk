@@ -29,7 +29,9 @@ const PatientModal = (props: PatientModalProps) => {
 
   return (
     <>
-      <Button onClick={() => openModal()}>{props.type} patient</Button>
+      <Button variant="contained" size="small" onClick={() => openModal()}>
+        {props.type} patient
+      </Button>
       <Dialog fullWidth={true} open={modalOpen} onClose={closeModal}>
         <Container>
           <Grid container spacing={2} alignItems="center">
