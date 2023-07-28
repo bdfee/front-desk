@@ -59,11 +59,19 @@ export const findAllByUserId = async (userId: number) => {
     include: [
       {
         model: Specialist,
-        attributes: ["name"],
+        attributes: ["name", "specialistId"],
       },
       {
         model: Patient,
-        attributes: ["name"],
+        attributes: ["name", "patientId"],
+      },
+      {
+        model: User,
+        attributes: ["name", "userId"],
+      },
+      {
+        model: Appointment,
+        attributes: ["date", "appointmentId"],
       },
     ],
   });

@@ -7,13 +7,20 @@ import {
   Typography,
   Divider,
   Box,
+  Collapse,
+  Link,
 } from '@mui/material'
+import { useState } from 'react'
 import { dayjs } from '../calendar/dayjs'
 import { useFetchAppointments } from '../calendar/actions'
 import { RBCDefaultProps } from '../calendar/utils'
+import { useNavigate } from 'react-router-dom'
+import Expand from './expand'
 
 const Patients = () => {
   // appointments today patients detail
+  const [collapse, setCollapse] = useState(false)
+  const navigate = useNavigate()
   const { data: appointmentsData, status: appointmentsStatus } =
     useFetchAppointments()
 
@@ -28,28 +35,46 @@ const Patients = () => {
 
   return (
     <Box>
-      <Typography>todays patients</Typography>
+      <Typography
+        sx={{ cursor: 'pointer', paddingTop: '31px' }}
+        variant="button"
+        onClick={() => setCollapse(!collapse)}
+      >
+        Patients arriving today
+        <Expand collapse={collapse} />
+      </Typography>
       <Divider />
-      <Table>
-        <TableHead>
-          <TableRow>
-            <TableCell>Name</TableCell>
-            <TableCell>Type</TableCell>
-            <TableCell>Specialist</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {appointments?.map((appointment) => {
-            return (
-              <TableRow key={appointment.appointmentId}>
-                <TableCell>{appointment.patient.name}</TableCell>
-                <TableCell>{appointment.type}</TableCell>
-                <TableCell>{appointment.specialist.name}</TableCell>
-              </TableRow>
-            )
-          })}
-        </TableBody>
-      </Table>
+      <Collapse in={collapse}>
+        <Table>
+          <TableHead sx={{ position: 'sticky' }}>
+            <TableRow>
+              <TableCell>Name</TableCell>
+              <TableCell>Type</TableCell>
+              <TableCell>Specialist</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody sx={{ height: 100 }}>
+            {appointments?.map(
+              ({ appointmentId, patient, type, specialist, patientId }) => {
+                return (
+                  <TableRow key={appointmentId}>
+                    <TableCell>
+                      <Link
+                        onClick={() => navigate(`/patients/${patientId}`)}
+                        variant="button"
+                      >
+                        {patient.name}
+                      </Link>
+                    </TableCell>
+                    <TableCell>{type}</TableCell>
+                    <TableCell>{specialist.name}</TableCell>
+                  </TableRow>
+                )
+              },
+            )}
+          </TableBody>
+        </Table>
+      </Collapse>
     </Box>
   )
 }

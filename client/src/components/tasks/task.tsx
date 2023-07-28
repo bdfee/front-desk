@@ -10,28 +10,24 @@ const Task = ({ task }: TaskProps) => {
   const navigate = useNavigate()
   return (
     <Grid container key={task.taskId}>
-      <Grid xs={6}>
+      <Grid item xs={9}>
         <Box>
-          <Typography variant="subtitle1" gutterBottom>
-            Description: {task.description}
+          <Typography variant="subtitle1">
+            <strong>Description:</strong> {task.description}
           </Typography>
-          <Typography variant="subtitle1" gutterBottom>
-            Due Date: {task.dueDate}
+          <Typography>
+            <strong>Assigned to:</strong> {task.user?.name}
+          </Typography>
+          <Typography variant="subtitle1">
+            <strong>Due Date:</strong> {task.dueDate}
           </Typography>
         </Box>
       </Grid>
-      <Grid xs={6}>
-        {task.user && (
-          <Chip
-            label={`User: ${task.user?.name}`}
-            variant="outlined"
-            style={{ marginRight: '8px', marginBottom: '8px' }}
-            onClick={() => navigate('/users/' + task.user?.userId)}
-          />
-        )}
+
+      <Grid item xs={3} sx={{ marginTop: '5px' }}>
         {task.patient && (
           <Chip
-            label={`Patient: ${task.patient.name}`}
+            label={task.patient.name}
             variant="outlined"
             style={{ marginRight: '8px', marginBottom: '8px' }}
             onClick={() => navigate('/patients/' + task.patient?.patientId)}
@@ -39,7 +35,7 @@ const Task = ({ task }: TaskProps) => {
         )}
         {task.specialist && (
           <Chip
-            label={`Specialist: ${task.specialist.name}`}
+            label={task.specialist.name}
             variant="outlined"
             style={{ marginRight: '8px', marginBottom: '8px' }}
             onClick={() =>
@@ -49,7 +45,7 @@ const Task = ({ task }: TaskProps) => {
         )}
         {task.appointment && (
           <Chip
-            label={`Appointment: ${task.appointment?.date}`}
+            label={task.appointment?.date}
             variant="outlined"
             style={{ marginRight: '8px', marginBottom: '8px' }}
             onClick={() =>

@@ -10,6 +10,7 @@ import { NewEvent, RBCEventProps, RBCEventPropsForForm } from '../../types'
 import AppointmentModal from '../appointment-modal'
 import { useState } from 'react'
 import { dayjs } from '../calendar/dayjs'
+import '../index.css'
 
 const RBCDayView = () => {
   const [formValues, setFormValues] = useState<

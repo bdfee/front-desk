@@ -1,5 +1,6 @@
 import { useQuery, useMutation, QueryClient } from '@tanstack/react-query'
 import taskService from '../../services/task'
+import userService from '../../services/user'
 import { SetAlertPayload, TaskDetail, TaskInput } from '../../types'
 
 export const useFetchTasks = (setAlertPayload?: SetAlertPayload) =>
@@ -9,6 +10,18 @@ export const useFetchTasks = (setAlertPayload?: SetAlertPayload) =>
     onError: () =>
       setAlertPayload &&
       setAlertPayload('error', 'error fetching tasks', 'page'),
+  })
+
+export const useFetchUserTasksById = (
+  userId: number,
+  setAlertPayload?: SetAlertPayload,
+) =>
+  useQuery<TaskDetail[]>({
+    queryKey: ['TASKS', userId],
+    queryFn: () => userService.getTasksByUser(userId),
+    onError: () =>
+      setAlertPayload &&
+      setAlertPayload('error', 'error fetching user tasks', 'page'),
   })
 
 export const useDeleteTaskById = (

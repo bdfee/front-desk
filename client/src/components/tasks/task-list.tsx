@@ -1,5 +1,5 @@
 import { useContext, useState, Dispatch, SetStateAction } from 'react'
-import { Grid, Typography, Button, Paper } from '@mui/material'
+import { Grid, Typography, Button, Paper, Container } from '@mui/material'
 import { AlertCtx } from '../../components/context-providers/alert'
 
 import { useDeleteTaskById, useFetchTasks } from './actions'
@@ -57,7 +57,11 @@ export const TaskList = ({
       </Grid>
 
       {taskList.map((task, index) => (
-        <Paper key={task.taskId}>
+        <Container
+          component={Paper}
+          key={task.taskId}
+          sx={{ marginBottom: '10px' }}
+        >
           {editIdxs.includes(index) ? (
             <TaskForm
               task={task}
@@ -96,7 +100,7 @@ export const TaskList = ({
               Edit
             </Button>
           )}
-        </Paper>
+        </Container>
       ))}
     </Grid>
   )
